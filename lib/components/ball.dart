@@ -14,6 +14,7 @@ class Ball extends PositionComponent
   double speed;
   bool firstTouch;
   bool isSpriteLoaded = false;
+
   Ball({
     required this.posi,
     required this.type,
@@ -24,23 +25,23 @@ class Ball extends PositionComponent
   }) {
     String strImage = getImagePNG(type);
     _loadSprite(strImage).then((_) {
-      allballs.add(this); // ballが追加されたときにリストに追加
+      allballs.add(this);
       _createBody();
-      add(spriteComponent); // スプライトコンポーネントを追加
-      add(bodyComponent); // ボディコンポーネントを追加
+      add(spriteComponent);
+      add(bodyComponent);
     });
   }
   bool hasCombined = false;
-  double timeElapsed = 0.0; // 時間追跡用の変数
+  double timeElapsed = 0.0;
   Future<void> _loadSprite(String imagePath) async {
     spriteComponent =
         SpriteComponent()
           ..sprite = await Sprite.load(imagePath)
           ..anchor =
               Anchor
-                  .center // ここでアンカーを中心に設定
+                  .center
           ..size = Vector2.all(typeSize);
-    isSpriteLoaded = true; // スプライトの読み込み完了
+    isSpriteLoaded = true;
   }
 
   void _createBody() {

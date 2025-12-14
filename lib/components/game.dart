@@ -116,6 +116,11 @@ class SuikaGame extends Forge2DGame
     ]);
   }
 
+  Future<void> calcObjHeight() async {
+    // オブジェクトが積み上がった高さを計算するロジックをここに実装
+    
+  }
+
   @override
   void onTapDown(TapDownEvent event) {
     super.onTapDown(event);
