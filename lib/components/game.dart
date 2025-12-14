@@ -1,30 +1,83 @@
 import 'dart:async';
 import 'dart:math';
-
-import 'package:flame/components.dart';
-import 'package:flame_forge2d/flame_forge2d.dart';
-import 'package:flame_kenney_xml/flame_kenney_xml.dart';
 import 'package:flutter/material.dart';
+import 'package:flame_forge2d/flame_forge2d.dart';
+import 'package:flame/components.dart';
+import 'package:flame/events.dart';
+import 'package:flame/extensions.dart';
+import 'package:flame_kenney_xml/flame_kenney_xml.dart';
+import 'package:forge2d_game/components/ball.dart';
+import 'package:forge2d_game/components/background.dart';
+import 'package:forge2d_game/components/ground.dart';
 
-import 'background.dart';
-import 'brick.dart';
-import 'enemy.dart'; 
-import 'ground.dart';
-import 'player.dart';
+///------------------------------------------------------
+///グローバル変数
+///------------------------------------------------------
+double scale = 10;
+double dbGravity = 20.0;
+double width = 0;
+double height = 0;
+double widthBase = 392.0;
+double heightBase = 826.0;
+double widthPer = 1;
+double heightPer = 1;
+double allPer = 1;
+double firstSpeed = 40;
+double lineY = -135 / scale;
+double xStart = -171 / scale;
+double xEnd = 144 / scale;
+double yStart = -150 / scale;
+double yEnd = 250 / scale;
+double yDrop = lineY - (50 / scale);
+int starRandomNum = 1;
+int randomNum = 2;
+double certainTime = 0.5;
 
-class MyPhysicsGame extends Forge2DGame {
-  MyPhysicsGame()
-    : super(
-        gravity: Vector2(0, 10),
-        camera: CameraComponent.withFixedResolution(width: 800, height: 600),
-      );
+final List<Ball> ballToRemove = [];
+final List<Ball> ballToAdd = [];
+List<Ball> allballs = [];
 
+class SuikaGame extends Forge2DGame
+    with TapCallbacks, HasCollisionDetection, WidgetsBindingObserver {
+  SuikaGame() : super(zoom: scale, gravity: Vector2(0, dbGravity));
+  final Random rng = Random();
+  int firstType = 1;
+  int secondType = 1;
+  late Offset position;
+  double touchX = 0.0;
+  double touchY = 0.0;
+  Vector2 topLeft = Vector2.zero();
+  Vector2 topRight = Vector2.zero();
+  Vector2 bottomRight = Vector2.zero();
+  Vector2 bottomLeft = Vector2.zero();
   late final XmlSpriteSheet aliens;
   late final XmlSpriteSheet elements;
   late final XmlSpriteSheet tiles;
+  @override
+  void onGameResize(Vector2 size) {
+    super.onGameResize(size);
+    final screenWidth = size.x;
+    final screenHeight = size.y;
+
+    ///座標の倍率計算
+    widthPer = screenWidth / widthBase;
+    heightPer = screenHeight / heightBase;
+    allPer = (widthPer + heightPer) / 2;
+  }
 
   @override
-  FutureOr<void> onLoad() async {
+  Future<void> onLoad() async {
+    await super.onLoad();
+    WidgetsBinding.instance.addObserver(this);
+    await images.loadAll(['01.png', '02.png', '03.png']);
+    firstType = rng.nextInt(randomNum) + starRandomNum; // 1～4のランダムな整数
+    secondType = rng.nextInt(randomNum) + starRandomNum; // 1～4のランダムな整数
+    final visibleRect = camera.visibleWorldRect;
+    topLeft = visibleRect.topLeft.toVector2();
+    topRight = visibleRect.topRight.toVector2();
+    bottomRight = visibleRect.bottomRight.toVector2();
+    bottomLeft = visibleRect.bottomLeft.toVector2();
+
     final backgroundImage = await images.load('colored_grass.png');
     final spriteSheets = await Future.wait([
       XmlSpriteSheet.load(
@@ -47,10 +100,6 @@ class MyPhysicsGame extends Forge2DGame {
 
     await world.add(Background(sprite: Sprite(backgroundImage)));
     await addGround();
-    unawaited(addBricks().then((_) => addEnemies()));
-    await addPlayer();
-
-    return super.onLoad();
   }
 
   Future<void> addGround() {
@@ -67,86 +116,63 @@ class MyPhysicsGame extends Forge2DGame {
     ]);
   }
 
-  final _random = Random();
-
-  Future<void> addBricks() async {
-    for (var i = 0; i < 5; i++) {
-      final type = BrickType.randomType;
-      final size = BrickSize.randomSize;
-      await world.add(
-        Brick(
-          type: type,
-          size: size,
-          damage: BrickDamage.some,
-          position: Vector2(
-            camera.visibleWorldRect.right / 3 +
-                (_random.nextDouble() * 5 - 2.5),
-            0,
+  @override
+  void onTapDown(TapDownEvent event) {
+    super.onTapDown(event);
+    double hitSize = 0.0;
+    double typeSize = 0.0;
+    double xPosi = 0.0;
+    if (!event.handled) {
+      final touchPoint = event.canvasPosition;
+      touchX = touchPoint.x / scale - bottomRight.x;
+      touchY = touchPoint.y / scale - bottomRight.y;
+      typeSize = calcTypeSize(firstType, allPer);
+      hitSize = typeSize;
+      if (touchX > xStart && touchX < xEnd) {
+        if (touchX >
+                ((xStart * widthPer + hitSize / 2 + 10 / scale * widthPer)) &&
+            touchX < (xEnd * widthPer - hitSize / 2)) {
+          xPosi = touchX;
+        } else if (touchX <=
+            (xStart * widthPer + hitSize / 2 + 10 / scale * widthPer)) {
+          xPosi = (xStart * widthPer + hitSize / 2 + 10 / scale * widthPer);
+        } else if (touchX >= (xEnd * widthPer - hitSize / 2)) {
+          xPosi = (xEnd * widthPer - hitSize / 2);
+        } else {
+          xPosi = touchX;
+        }
+        world.add(
+          Ball(
+            posi: Vector2(xPosi, yDrop * heightPer),
+            type: firstType,
+            typeSize: typeSize,
+            hitSize: hitSize,
+            speed: firstSpeed,
+            firstTouch: false,
           ),
-          sprites: brickFileNames(
-            type,
-            size,
-          ).map((key, filename) => MapEntry(key, elements.getSprite(filename))),
-        ),
-      );
-      await Future<void>.delayed(const Duration(milliseconds: 500));
+        );
+
+        ///次のballを決定する
+        firstType = secondType;
+        secondType = rng.nextInt(randomNum) + starRandomNum;
+      }
     }
   }
-
-  Future<void> addPlayer() async => world.add(
-    Player(
-      Vector2(camera.visibleWorldRect.left * 2 / 3, 0),
-      aliens.getSprite(PlayerColor.randomColor.fileName),
-    ),
-  );
 
   @override
   void update(double dt) {
     super.update(dt);
-    if (isMounted &&
-        world.children.whereType<Player>().isEmpty &&
-        world.children.whereType<Enemy>().isNotEmpty) {
-      addPlayer();
+    // 保留されたエンティティの削除
+    if (ballToRemove.isNotEmpty) {
+      for (var ball in ballToRemove) {
+        ball.removeFromParent();
+      }
+      ballToRemove.clear();
     }
-    if (isMounted &&
-        enemiesFullyAdded &&
-        world.children.whereType<Enemy>().isEmpty &&
-        world.children.whereType<TextComponent>().isEmpty) {
-      world.addAll(
-        [
-          (position: Vector2(0.5, 0.5), color: Colors.white),
-          (position: Vector2.zero(), color: Colors.orangeAccent),
-        ].map(
-          (e) => TextComponent(
-            text: 'You win!',
-            anchor: Anchor.center,
-            position: e.position,
-            textRenderer: TextPaint(
-              style: TextStyle(color: e.color, fontSize: 16),
-            ),
-          ),
-        ),
-      );
+    // 保留されたエンティティの追加
+    if (ballToAdd.isNotEmpty) {
+      ballToAdd.forEach(world.add);
+      ballToAdd.clear();
     }
-  }
-
-  var enemiesFullyAdded = false;
-
-  Future<void> addEnemies() async {
-    await Future<void>.delayed(const Duration(seconds: 2));
-    for (var i = 0; i < 3; i++) {
-      await world.add(
-        Enemy(
-          Vector2(
-            camera.visibleWorldRect.right / 3 +
-                (_random.nextDouble() * 7 - 3.5),
-            (_random.nextDouble() * 3),
-          ),
-          aliens.getSprite(EnemyColor.randomColor.fileName),
-        ),
-      );
-      await Future<void>.delayed(const Duration(seconds: 1));
-    }
-    enemiesFullyAdded = true;
   }
 }
