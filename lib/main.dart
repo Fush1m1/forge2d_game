@@ -4,5 +4,5 @@ import 'package:flutter/material.dart';
 import 'components/game.dart';
 
 void main() {
-  runApp(GameWidget.controlled(gameFactory: SuikaGame.new));
+  runApp(SafeArea(child: GameWidget.controlled(gameFactory: SuikaGame.new)));
 }
