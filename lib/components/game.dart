@@ -128,11 +128,12 @@ class SuikaGame extends Forge2DGame
     }
 
     for (final ball in allballs) {
-      final yi = 26 - ball.bodyComponent.body.position.y;
+      final yi = (camera.visibleWorldRect.bottom - groundSize) - ball.bodyComponent.body.position.y;
       if (yi > objHeight) {
         objHeight = yi;
       }
     }
+    print('objHeight: $objHeight');
     return objHeight;
   }
 
@@ -197,7 +198,7 @@ class SuikaGame extends Forge2DGame
       ballToAdd.clear();
     }
 
-    if (isMounted && objHeight > 17) {
+    if (isMounted && objHeight > (camera.visibleWorldRect.bottom - groundSize)/3) {
       world.addAll(
         [
           (position: Vector2(0.5, 0.5), color: Colors.white),
