@@ -14,7 +14,42 @@ class Ball extends PositionComponent
   double typeSize;
   double hitSize;
   double speed;
+
+  /// この ball が「初めて何かに接触したか」を示す状態フラグ。
+  ///
+  /// ## 役割
+  /// - 生成直後（落下中）の ball と、
+  ///   何かに接触して設置された ball を区別するために使用する。
+  /// - ゲーム進行・入力制御・合体判定の起点となる重要なフラグ。
+  ///
+  /// ## 状態遷移
+  /// - false :
+  ///   - 生成直後の状態
+  ///   - プレイヤーがタップして落下中の ball
+  ///   - まだ床や他の ball に接触していない
+  /// - true :
+  ///   - 下のバー（underBar）または他の ball に初めて接触した後
+  ///   - 設置済みとみなされ、合体判定が有効になる
+  ///
+  /// ## 使用箇所と目的
+  /// 1. 入力制御:
+  ///    - 落下中（firstTouch == false）は次の ball を生成させない
+  ///    - 初回接触時に tapOK を true に戻し、次のタップを許可する
+  ///
+  /// 2. 合体制御:
+  ///    - 落下中の ball が空中で即座に合体するのを防ぐ
+  ///    - 設置後のみ同種 ball との合体を許可する
+  ///
+  /// 3. 物理安定化:
+  ///    - 空中での一時的な重なりによる誤判定を防止する
+  ///
+  /// ## 注意点
+  /// - 初回接触時のみ true に遷移し、
+  ///   一度 true になった後は false に戻さない
+  /// - 合体によって生成される ball は、
+  ///   すでに設置済みとして扱うため true で初期化する
   bool firstTouch;
+
   bool isSpriteLoaded = false;
 
   Ball({
@@ -52,7 +87,6 @@ class Ball extends PositionComponent
       typeSize: typeSize,
       hitSize: hitSize,
       speed: speed,
-      firstTouch: firstTouch,
     );
   }
 
@@ -128,7 +162,6 @@ class BallBody extends BodyComponent with ContactCallbacks {
   double typeSize;
   double hitSize;
   double speed;
-  bool firstTouch;
   BallBody({
     required this.parentball,
     required this.posi,
@@ -136,7 +169,6 @@ class BallBody extends BodyComponent with ContactCallbacks {
     required this.typeSize,
     required this.hitSize,
     required this.speed,
-    required this.firstTouch,
   }) {
     opacity = 0.0;
   }

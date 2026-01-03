@@ -10,6 +10,7 @@ import 'package:forge2d_game/components/ball.dart';
 import 'package:forge2d_game/components/background.dart';
 import 'package:forge2d_game/components/brick.dart';
 import 'package:forge2d_game/components/ground.dart';
+import 'package:forge2d_game/components/debug_info.dart';
 import 'package:forge2d_game/config.dart';
 
 final List<Ball> ballToRemove = [];
@@ -54,6 +55,7 @@ class SuikaGame extends Forge2DGame
   Future<void> onLoad() async {
     await super.onLoad();
     WidgetsBinding.instance.addObserver(this);
+    camera.viewport.add(DebugInfoComponent());
     await images.loadAll(['01.png', '02.png', '03.png']);
     firstType = rng.nextInt(randomNum) + starRandomNum; // 1～4のランダムな整数
     secondType = rng.nextInt(randomNum) + starRandomNum; // 1～4のランダムな整数
@@ -87,6 +89,7 @@ class SuikaGame extends Forge2DGame
     await addGround();
     await addBrick(camera.visibleWorldRect.left);
     await addBrick(camera.visibleWorldRect.right);
+    debugMode = true;
   }
 
   Future<void> addGround() {
@@ -104,7 +107,7 @@ class SuikaGame extends Forge2DGame
   }
 
   Future<void> addBrick(double x) async {
-    final y = camera.visibleWorldRect.bottom - groundSize*1.8;
+    final y = camera.visibleWorldRect.bottom - groundSize * 1.8;
     final type = BrickType.metal;
     final size = BrickSize.size140x220;
 
@@ -128,7 +131,9 @@ class SuikaGame extends Forge2DGame
     }
 
     for (final ball in allballs) {
-      final yi = (camera.visibleWorldRect.bottom - groundSize) - ball.bodyComponent.body.position.y;
+      final yi =
+          (camera.visibleWorldRect.bottom - groundSize) -
+          ball.bodyComponent.body.position.y;
       if (yi > objHeight) {
         objHeight = yi;
       }
@@ -198,7 +203,16 @@ class SuikaGame extends Forge2DGame
       ballToAdd.clear();
     }
 
-    if (isMounted && objHeight > (camera.visibleWorldRect.bottom - groundSize)/3) {
+    if (isMounted) {
+      DebugInfo.add('Obj Height: $objHeight');
+      DebugInfo.add(
+        'Threshold: ${(camera.visibleWorldRect.bottom - groundSize) / 3}',
+      );
+      DebugInfo.add('Ball count: ${allballs.length}');
+    }
+
+    if (isMounted &&
+        objHeight > (camera.visibleWorldRect.bottom - groundSize) / 3) {
       world.addAll(
         [
           (position: Vector2(0.5, 0.5), color: Colors.white),
