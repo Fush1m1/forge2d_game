@@ -1,10 +1,12 @@
 import 'dart:async';
+import 'package:flame/collisions.dart';
 import 'package:flame_forge2d/flame_forge2d.dart';
 import 'package:flame/components.dart';
 import 'package:forge2d_game/components/game.dart';
+import 'package:forge2d_game/config.dart';
 
 class Ball extends PositionComponent
-    with HasGameReference<SuikaGame>, ContactCallbacks {
+    with HasGameReference<SuikaGame>, ContactCallbacks, CollisionCallbacks {
   late final SpriteComponent spriteComponent;
   late final BodyComponent bodyComponent;
   final Vector2 posi;
@@ -37,9 +39,7 @@ class Ball extends PositionComponent
     spriteComponent =
         SpriteComponent()
           ..sprite = await Sprite.load(imagePath)
-          ..anchor =
-              Anchor
-                  .center
+          ..anchor = Anchor.center
           ..size = Vector2.all(typeSize);
     isSpriteLoaded = true;
   }
@@ -88,18 +88,19 @@ class Ball extends PositionComponent
     int newType = 1;
     double newSize = 10.0;
     double newHitSize = 10.0;
+    if (!firstTouch) {
+      firstTouch = true;
+      game.onballCollision();
+    }
     if (other is Ball) {
-      if (!firstTouch) {
-        firstTouch = true;
-      }
       if (other.type == type && !other.hasCombined && !hasCombined) {
         Vector2 newPosition =
             (other.bodyComponent.body.position + bodyComponent.body.position) /
             2;
         hasCombined = true;
         other.hasCombined = true;
-        ballToRemove.add(other);
-        ballToRemove.add(this);
+        // ballToRemove.add(other);
+        // ballToRemove.add(this);
         if (type < 3) {
           newType = type + 1;
           newSize = calcTypeSize(newType, allPer);

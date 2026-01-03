@@ -8,30 +8,9 @@ import 'package:flame/extensions.dart';
 import 'package:flame_kenney_xml/flame_kenney_xml.dart';
 import 'package:forge2d_game/components/ball.dart';
 import 'package:forge2d_game/components/background.dart';
+import 'package:forge2d_game/components/brick.dart';
 import 'package:forge2d_game/components/ground.dart';
-
-///------------------------------------------------------
-///グローバル変数
-///------------------------------------------------------
-double scale = 10;
-double dbGravity = 20.0;
-double width = 0;
-double height = 0;
-double widthBase = 392.0;
-double heightBase = 826.0;
-double widthPer = 1;
-double heightPer = 1;
-double allPer = 1;
-double firstSpeed = 40;
-double lineY = -135 / scale;
-double xStart = -171 / scale;
-double xEnd = 144 / scale;
-double yStart = -150 / scale;
-double yEnd = 250 / scale;
-double yDrop = lineY - (50 / scale);
-int starRandomNum = 1;
-int randomNum = 2;
-double certainTime = 0.5;
+import 'package:forge2d_game/config.dart';
 
 final List<Ball> ballToRemove = [];
 final List<Ball> ballToAdd = [];
@@ -43,7 +22,6 @@ class SuikaGame extends Forge2DGame
   final Random rng = Random();
   int firstType = 1;
   int secondType = 1;
-  late Offset position;
   double touchX = 0.0;
   double touchY = 0.0;
   Vector2 topLeft = Vector2.zero();
@@ -53,6 +31,13 @@ class SuikaGame extends Forge2DGame
   late final XmlSpriteSheet aliens;
   late final XmlSpriteSheet elements;
   late final XmlSpriteSheet tiles;
+  bool tapOK = true;
+
+  /// 現在積み上がっているオブジェクトの高さ
+  ///
+  /// 正の値は地面の表面より下、負の値は地面の表面より上を示します
+  double objHeight = 0;
+
   @override
   void onGameResize(Vector2 size) {
     super.onGameResize(size);
@@ -100,6 +85,10 @@ class SuikaGame extends Forge2DGame
 
     await world.add(Background(sprite: Sprite(backgroundImage)));
     await addGround();
+    await addBrick(camera.visibleWorldRect.left);
+    await addBrick(camera.visibleWorldRect.right);
+
+    debugMode = true;
   }
 
   Future<void> addGround() {
@@ -116,9 +105,40 @@ class SuikaGame extends Forge2DGame
     ]);
   }
 
-  Future<void> calcObjHeight() async {
-    // オブジェクトが積み上がった高さを計算するロジックをここに実装
-    
+  Future<void> addBrick(double x) async {
+    final brickHeight = 220.0 / scale;
+
+    final y = (camera.visibleWorldRect.bottom - brickHeight / 2 - brickHeight);
+    final type = BrickType.metal;
+    final size = BrickSize.size140x220;
+
+    await world.add(
+      Brick(
+        type: type,
+        size: size,
+        damage: BrickDamage.none,
+        position: Vector2(x, 21),
+        sprites: brickFileNames(
+          type,
+          size,
+        ).map((key, filename) => MapEntry(key, elements.getSprite(filename))),
+      ),
+    );
+  }
+
+  double calcObjHeight() {
+    if (allballs.isEmpty) {
+      return 0.0;
+    }
+
+    for (final ball in allballs) {
+      final yi = 26 - ball.bodyComponent.body.position.y;
+      if (yi > objHeight) {
+        objHeight = yi;
+      }
+    }
+    print('Current objHeight: $objHeight');
+    return objHeight;
   }
 
   @override
@@ -127,7 +147,7 @@ class SuikaGame extends Forge2DGame
     double hitSize = 0.0;
     double typeSize = 0.0;
     double xPosi = 0.0;
-    if (!event.handled) {
+    if (!event.handled && tapOK) {
       final touchPoint = event.canvasPosition;
       touchX = touchPoint.x / scale - bottomRight.x;
       touchY = touchPoint.y / scale - bottomRight.y;
@@ -146,16 +166,17 @@ class SuikaGame extends Forge2DGame
         } else {
           xPosi = touchX;
         }
-        world.add(
-          Ball(
-            posi: Vector2(xPosi, yDrop * heightPer),
-            type: firstType,
-            typeSize: typeSize,
-            hitSize: hitSize,
-            speed: firstSpeed,
-            firstTouch: false,
-          ),
+        final ball = Ball(
+          posi: Vector2(xPosi, yDrop * heightPer),
+          type: firstType,
+          typeSize: typeSize,
+          hitSize: hitSize,
+          speed: firstSpeed,
+          firstTouch: false,
         );
+        world.add(ball);
+        tapOK = false;
+        allballs.add(ball);
 
         ///次のballを決定する
         firstType = secondType;
@@ -170,6 +191,7 @@ class SuikaGame extends Forge2DGame
     // 保留されたエンティティの削除
     if (ballToRemove.isNotEmpty) {
       for (var ball in ballToRemove) {
+        allballs.remove(ball);
         ball.removeFromParent();
       }
       ballToRemove.clear();
@@ -178,6 +200,36 @@ class SuikaGame extends Forge2DGame
     if (ballToAdd.isNotEmpty) {
       ballToAdd.forEach(world.add);
       ballToAdd.clear();
+    }
+
+    if (isMounted && objHeight > 17) {
+      world.addAll(
+        [
+          (position: Vector2(0.5, 0.5), color: Colors.white),
+          (position: Vector2.zero(), color: Colors.orangeAccent),
+        ].map(
+          (e) => TextComponent(
+            text: 'Game Over',
+            anchor: Anchor.center,
+            position: e.position,
+            textRenderer: TextPaint(
+              style: TextStyle(color: e.color, fontSize: 5),
+            ),
+          ),
+        ),
+      );
+    }
+  }
+
+  // 衝突検知時に呼ばれるメソッド
+  void onballCollision() {
+    // tapOKの状態を変更する
+    tapOK = true;
+    final balls = children.whereType<Ball>();
+    final allStopped = balls.every((ball) => !ball.bodyComponent.body.isAwake);
+    print('All balls stopped: $allStopped');
+    if (allStopped) {
+      calcObjHeight();
     }
   }
 }

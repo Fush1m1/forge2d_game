@@ -259,7 +259,7 @@ class Brick extends BodyComponent {
          bodyDef:
              BodyDef()
                ..position = position
-               ..type = BodyType.dynamic,
+               ..type = BodyType.static,
          fixtureDefs: [
            FixtureDef(
                PolygonShape()..setAsBoxXY(
