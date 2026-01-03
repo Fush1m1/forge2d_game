@@ -33,10 +33,6 @@ class SuikaGame extends Forge2DGame
   late final XmlSpriteSheet elements;
   late final XmlSpriteSheet tiles;
   bool tapOK = true;
-
-  /// 現在積み上がっているオブジェクトの高さ
-  ///
-  /// 正の値は地面の表面より下、負の値は地面の表面より上を示します
   double objHeight = 0;
 
   @override
