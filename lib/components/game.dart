@@ -87,8 +87,6 @@ class SuikaGame extends Forge2DGame
     await addGround();
     await addBrick(camera.visibleWorldRect.left);
     await addBrick(camera.visibleWorldRect.right);
-
-    debugMode = true;
   }
 
   Future<void> addGround() {
@@ -106,9 +104,7 @@ class SuikaGame extends Forge2DGame
   }
 
   Future<void> addBrick(double x) async {
-    final brickHeight = 220.0 / scale;
-
-    final y = (camera.visibleWorldRect.bottom - brickHeight / 2 - brickHeight);
+    final y = camera.visibleWorldRect.bottom - groundSize*1.8;
     final type = BrickType.metal;
     final size = BrickSize.size140x220;
 
@@ -117,7 +113,7 @@ class SuikaGame extends Forge2DGame
         type: type,
         size: size,
         damage: BrickDamage.none,
-        position: Vector2(x, 21),
+        position: Vector2(x, y),
         sprites: brickFileNames(
           type,
           size,
@@ -137,7 +133,6 @@ class SuikaGame extends Forge2DGame
         objHeight = yi;
       }
     }
-    print('Current objHeight: $objHeight');
     return objHeight;
   }
 
@@ -227,7 +222,6 @@ class SuikaGame extends Forge2DGame
     tapOK = true;
     final balls = children.whereType<Ball>();
     final allStopped = balls.every((ball) => !ball.bodyComponent.body.isAwake);
-    print('All balls stopped: $allStopped');
     if (allStopped) {
       calcObjHeight();
     }
