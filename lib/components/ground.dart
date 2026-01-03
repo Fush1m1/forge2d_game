@@ -6,7 +6,6 @@ import 'body_component_with_user_data.dart'; // Add this import
 const groundSize = 7.0;
 
 class Ground extends BodyComponentWithUserData {
-  // Edit this line
   Ground(Vector2 position, Sprite sprite)
     : super(
         renderBody: false,

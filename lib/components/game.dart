@@ -227,7 +227,7 @@ class SuikaGame extends Forge2DGame
     }
   }
 
-  // 衝突検知時に呼ばれるメソッド
+  /// 衝突検知時に呼ばれるメソッド
   void onballCollision() {
     // tapOKの状態を変更する
     tapOK = true;
