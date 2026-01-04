@@ -18,8 +18,8 @@ class SuikaGame extends Forge2DGame
   SuikaGame() : super(zoom: scale, gravity: Vector2(0, dbGravity));
 
   final Random rng = Random();
-  int firstType = 1;
-  int secondType = 1;
+  int numberOfFirstBall = 1;
+  int numberOfSecondBall = 1;
   double touchX = 0.0;
   double touchY = 0.0;
   Vector2 topLeft = Vector2.zero();
@@ -50,8 +50,8 @@ class SuikaGame extends Forge2DGame
     WidgetsBinding.instance.addObserver(this);
     camera.viewport.add(DebugInfoComponent());
     await images.loadAll(['01.png', '02.png', '03.png']);
-    firstType = rng.nextInt(randomNum) + starRandomNum; // 1～4のランダムな整数
-    secondType = rng.nextInt(randomNum) + starRandomNum; // 1～4のランダムな整数
+    numberOfFirstBall = rng.nextInt(randomNum) + starRandomNum;
+    numberOfSecondBall = rng.nextInt(randomNum) + starRandomNum;
     final visibleRect = camera.visibleWorldRect;
     topLeft = visibleRect.topLeft.toVector2();
     topRight = visibleRect.topRight.toVector2();
@@ -137,42 +137,38 @@ class SuikaGame extends Forge2DGame
   @override
   void onTapDown(TapDownEvent event) {
     super.onTapDown(event);
-    double hitSize = 0.0;
-    double typeSize = 0.0;
-    double xPosi = 0.0;
+    double xPosi;
     if (!event.handled && tapOK) {
       final touchPoint = event.canvasPosition;
       touchX = touchPoint.x / scale - bottomRight.x;
       touchY = touchPoint.y / scale - bottomRight.y;
-      typeSize = calcTypeSize(firstType, allPer);
-      hitSize = typeSize;
+      double ballSize = calcTypeSize(numberOfFirstBall, allPer);
       if (touchX > xStart && touchX < xEnd) {
         if (touchX >
-                ((xStart * widthPer + hitSize / 2 + 10 / scale * widthPer)) &&
-            touchX < (xEnd * widthPer - hitSize / 2)) {
+                ((xStart * widthPer + ballSize / 2 + 10 / scale * widthPer)) &&
+            touchX < (xEnd * widthPer - ballSize / 2)) {
           xPosi = touchX;
         } else if (touchX <=
-            (xStart * widthPer + hitSize / 2 + 10 / scale * widthPer)) {
-          xPosi = (xStart * widthPer + hitSize / 2 + 10 / scale * widthPer);
-        } else if (touchX >= (xEnd * widthPer - hitSize / 2)) {
-          xPosi = (xEnd * widthPer - hitSize / 2);
+            (xStart * widthPer + ballSize / 2 + 10 / scale * widthPer)) {
+          xPosi = (xStart * widthPer + ballSize / 2 + 10 / scale * widthPer);
+        } else if (touchX >= (xEnd * widthPer - ballSize / 2)) {
+          xPosi = (xEnd * widthPer - ballSize / 2);
         } else {
           xPosi = touchX;
         }
         final ball = NumberBall(
           posi: Vector2(xPosi, yDrop * heightPer),
-          type: firstType,
-          typeSize: typeSize,
-          hitSize: hitSize,
+          number: numberOfFirstBall,
+          ballSize: ballSize,
           speed: firstSpeed,
-          firstTouch: false,
+          hasFirstCollisionExecuted: false,
         );
         world.add(ball);
         tapOK = false;
 
         ///次のballを決定する
-        firstType = secondType;
-        secondType = rng.nextInt(randomNum) + starRandomNum;
+        numberOfFirstBall = numberOfSecondBall;
+        numberOfSecondBall = rng.nextInt(randomNum) + starRandomNum;
       }
     }
   }
