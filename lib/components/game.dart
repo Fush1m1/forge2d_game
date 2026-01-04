@@ -6,7 +6,7 @@ import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flame/extensions.dart';
 import 'package:flame_kenney_xml/flame_kenney_xml.dart';
-import 'package:forge2d_game/components/ball.dart';
+import 'package:forge2d_game/components/number_ball.dart';
 import 'package:forge2d_game/components/background.dart';
 import 'package:forge2d_game/components/brick.dart';
 import 'package:forge2d_game/components/ground.dart';
@@ -80,9 +80,8 @@ class SuikaGame extends Forge2DGame
 
     await world.add(Background(sprite: Sprite(backgroundImage)));
     await addGround();
-    await addBrick(camera.visibleWorldRect.left);
-    await addBrick(camera.visibleWorldRect.right);
-    debugMode = true;
+    await addBrick(camera.visibleWorldRect.left / 2);
+    await addBrick(camera.visibleWorldRect.right / 2);
   }
 
   Future<void> addGround() {
@@ -119,7 +118,7 @@ class SuikaGame extends Forge2DGame
   }
 
   double calcObjHeight() {
-    final balls = world.children.whereType<Ball>();
+    final balls = world.children.whereType<NumberBall>();
     if (balls.isEmpty) {
       return 0.0;
     }
@@ -160,7 +159,7 @@ class SuikaGame extends Forge2DGame
         } else {
           xPosi = touchX;
         }
-        final ball = Ball(
+        final ball = NumberBall(
           posi: Vector2(xPosi, yDrop * heightPer),
           type: firstType,
           typeSize: typeSize,
@@ -199,7 +198,9 @@ class SuikaGame extends Forge2DGame
       DebugInfo.add(
         'Threshold: ${(camera.visibleWorldRect.bottom - groundSize) / 3}',
       );
-      DebugInfo.add('Ball count: ${world.children.whereType<Ball>().length}');
+      DebugInfo.add(
+        'Ball count: ${world.children.whereType<NumberBall>().length}',
+      );
     }
 
     if (isMounted &&
@@ -224,12 +225,11 @@ class SuikaGame extends Forge2DGame
 
   /// 衝突検知時に呼ばれるメソッド
   void onballCollision() {
-    // tapOKの状態を変更する
-    tapOK = true;
-    final balls = children.whereType<Ball>();
+    final balls = children.whereType<NumberBall>();
     final allStopped = balls.every((ball) => !ball.bodyComponent.body.isAwake);
     if (allStopped) {
       calcObjHeight();
     }
+    tapOK = true;
   }
 }

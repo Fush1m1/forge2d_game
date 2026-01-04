@@ -5,10 +5,10 @@ import 'package:flame/components.dart';
 import 'package:forge2d_game/components/game.dart';
 import 'package:forge2d_game/config.dart';
 
-final List<Ball> ballToRemove = [];
-final List<Ball> ballToAdd = [];
+final List<NumberBall> ballToRemove = [];
+final List<NumberBall> ballToAdd = [];
 
-class Ball extends PositionComponent
+class NumberBall extends PositionComponent
     with HasGameReference<SuikaGame>, ContactCallbacks, CollisionCallbacks {
   late final SpriteComponent spriteComponent;
   late final BodyComponent bodyComponent;
@@ -55,7 +55,7 @@ class Ball extends PositionComponent
 
   bool isSpriteLoaded = false;
 
-  Ball({
+  NumberBall({
     required this.posi,
     required this.type,
     required this.typeSize,
@@ -120,7 +120,7 @@ class Ball extends PositionComponent
       firstTouch = true;
       game.onballCollision();
     }
-    if (other is Ball) {
+    if (other is NumberBall) {
       if (other.type == type && !other.hasCombined && !hasCombined) {
         Vector2 newPosition =
             (other.bodyComponent.body.position + bodyComponent.body.position) /
@@ -134,7 +134,7 @@ class Ball extends PositionComponent
           newSize = calcTypeSize(newType, allPer);
           newHitSize = newSize;
           ballToAdd.add(
-            Ball(
+            NumberBall(
               posi: newPosition,
               type: newType,
               typeSize: newSize,
@@ -150,7 +150,7 @@ class Ball extends PositionComponent
 }
 
 class BallBody extends BodyComponent with ContactCallbacks {
-  final Ball parentball;
+  final NumberBall parentball;
   final Vector2 posi;
   int type;
   double typeSize;
