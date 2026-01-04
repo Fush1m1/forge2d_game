@@ -13,10 +13,6 @@ import 'package:forge2d_game/components/ground.dart';
 import 'package:forge2d_game/components/debug_info.dart';
 import 'package:forge2d_game/config.dart';
 
-final List<Ball> ballToRemove = [];
-final List<Ball> ballToAdd = [];
-List<Ball> allballs = [];
-
 class SuikaGame extends Forge2DGame
     with TapCallbacks, HasCollisionDetection, WidgetsBindingObserver {
   SuikaGame() : super(zoom: scale, gravity: Vector2(0, dbGravity));
@@ -134,7 +130,6 @@ class SuikaGame extends Forge2DGame
         objHeight = yi;
       }
     }
-    print('objHeight: $objHeight');
     return objHeight;
   }
 

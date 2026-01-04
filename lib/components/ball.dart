@@ -5,6 +5,10 @@ import 'package:flame/components.dart';
 import 'package:forge2d_game/components/game.dart';
 import 'package:forge2d_game/config.dart';
 
+final List<Ball> ballToRemove = [];
+final List<Ball> ballToAdd = [];
+List<Ball> allballs = [];
+
 class Ball extends PositionComponent
     with HasGameReference<SuikaGame>, ContactCallbacks, CollisionCallbacks {
   late final SpriteComponent spriteComponent;
@@ -133,9 +137,9 @@ class Ball extends PositionComponent
             2;
         hasCombined = true;
         other.hasCombined = true;
-        // ballToRemove.add(other);
-        // ballToRemove.add(this);
         if (type < 3) {
+          ballToRemove.add(other);
+          ballToRemove.add(this);
           newType = type + 1;
           newSize = calcTypeSize(newType, allPer);
           newHitSize = newSize;
