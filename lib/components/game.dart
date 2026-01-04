@@ -16,6 +16,7 @@ import 'package:forge2d_game/config.dart';
 class SuikaGame extends Forge2DGame
     with TapCallbacks, HasCollisionDetection, WidgetsBindingObserver {
   SuikaGame() : super(zoom: scale, gravity: Vector2(0, dbGravity));
+
   final Random rng = Random();
   int firstType = 1;
   int secondType = 1;
@@ -118,11 +119,12 @@ class SuikaGame extends Forge2DGame
   }
 
   double calcObjHeight() {
-    if (allballs.isEmpty) {
+    final balls = world.children.whereType<Ball>();
+    if (balls.isEmpty) {
       return 0.0;
     }
 
-    for (final ball in allballs) {
+    for (final ball in balls) {
       final yi =
           (camera.visibleWorldRect.bottom - groundSize) -
           ball.bodyComponent.body.position.y;
@@ -168,7 +170,6 @@ class SuikaGame extends Forge2DGame
         );
         world.add(ball);
         tapOK = false;
-        allballs.add(ball);
 
         ///次のballを決定する
         firstType = secondType;
@@ -183,7 +184,6 @@ class SuikaGame extends Forge2DGame
     // 保留されたエンティティの削除
     if (ballToRemove.isNotEmpty) {
       for (var ball in ballToRemove) {
-        allballs.remove(ball);
         ball.removeFromParent();
       }
       ballToRemove.clear();
@@ -199,7 +199,7 @@ class SuikaGame extends Forge2DGame
       DebugInfo.add(
         'Threshold: ${(camera.visibleWorldRect.bottom - groundSize) / 3}',
       );
-      DebugInfo.add('Ball count: ${allballs.length}');
+      DebugInfo.add('Ball count: ${world.children.whereType<Ball>().length}');
     }
 
     if (isMounted &&

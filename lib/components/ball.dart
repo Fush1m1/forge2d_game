@@ -7,7 +7,6 @@ import 'package:forge2d_game/config.dart';
 
 final List<Ball> ballToRemove = [];
 final List<Ball> ballToAdd = [];
-List<Ball> allballs = [];
 
 class Ball extends PositionComponent
     with HasGameReference<SuikaGame>, ContactCallbacks, CollisionCallbacks {
@@ -66,7 +65,6 @@ class Ball extends PositionComponent
   }) {
     String strImage = getImagePNG(type);
     _loadSprite(strImage).then((_) {
-      allballs.add(this);
       _createBody();
       add(spriteComponent);
       add(bodyComponent);
@@ -111,12 +109,6 @@ class Ball extends PositionComponent
         timeElapsed = 0;
       }
     }
-  }
-
-  @override
-  void onRemove() {
-    super.onRemove();
-    allballs.remove(this);
   }
 
   @override
