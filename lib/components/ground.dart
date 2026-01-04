@@ -1,7 +1,7 @@
 import 'package:flame/components.dart';
 import 'package:flame_forge2d/flame_forge2d.dart';
 
-import 'body_component_with_user_data.dart'; // Add this import
+import '../utils/body_component_with_user_data.dart'; // Add this import
 
 const groundSize = 7.0;
 

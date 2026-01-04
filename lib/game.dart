@@ -10,8 +10,8 @@ import 'package:forge2d_game/components/number_ball.dart';
 import 'package:forge2d_game/components/background.dart';
 import 'package:forge2d_game/components/brick.dart';
 import 'package:forge2d_game/components/ground.dart';
-import 'package:forge2d_game/components/debug_info.dart';
-import 'package:forge2d_game/config.dart';
+import 'package:forge2d_game/utils/debug_info.dart';
+import 'package:forge2d_game/utils/config.dart';
 
 class SuikaGame extends Forge2DGame
     with TapCallbacks, HasCollisionDetection, WidgetsBindingObserver {

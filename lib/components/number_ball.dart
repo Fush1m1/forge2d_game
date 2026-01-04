@@ -2,8 +2,8 @@ import 'dart:async';
 import 'package:flame/collisions.dart';
 import 'package:flame_forge2d/flame_forge2d.dart';
 import 'package:flame/components.dart';
-import 'package:forge2d_game/components/game.dart';
-import 'package:forge2d_game/config.dart';
+import 'package:forge2d_game/game.dart';
+import 'package:forge2d_game/utils/config.dart';
 
 final List<NumberBall> ballToRemove = [];
 final List<NumberBall> ballToAdd = [];

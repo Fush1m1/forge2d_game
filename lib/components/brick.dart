@@ -4,7 +4,7 @@ import 'dart:ui' as ui;
 import 'package:flame/components.dart';
 import 'package:flame/extensions.dart';
 import 'package:flame_forge2d/flame_forge2d.dart';
-import 'package:forge2d_game/components/body_component_with_user_data.dart';
+import 'package:forge2d_game/utils/body_component_with_user_data.dart';
 
 const brickScale = 0.5;
 
