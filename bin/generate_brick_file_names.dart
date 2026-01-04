@@ -16,7 +16,6 @@ void main() {
       height: int.parse(node.getAttribute('height')!),
     );
   }
-  print(generateBrickFileNames(rects));
 }
 
 class Rect extends Equatable {
