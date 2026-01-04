@@ -98,10 +98,8 @@ class Ball extends PositionComponent
   void update(double dt) {
     super.update(dt);
     if (isSpriteLoaded) {
-      if (isSpriteLoaded) {
-        spriteComponent.position = bodyComponent.body.position;
-        spriteComponent.angle = bodyComponent.body.angle;
-      }
+      spriteComponent.position = bodyComponent.body.position;
+      spriteComponent.angle = bodyComponent.body.angle;
     }
     if (firstTouch) {
       if (bodyComponent.body.position.y + hitSize / 2 <= lineY * heightPer) {
