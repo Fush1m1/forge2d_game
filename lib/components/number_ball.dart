@@ -5,8 +5,6 @@ import 'package:flame/components.dart';
 import 'package:forge2d_game/game.dart';
 import 'package:forge2d_game/utils/config.dart';
 
-final List<NumberBall> ballToRemove = [];
-final List<NumberBall> ballToAdd = [];
 
 class NumberBall extends PositionComponent
     with HasGameReference<SuikaGame>, ContactCallbacks, CollisionCallbacks {
@@ -91,10 +89,10 @@ class NumberBall extends PositionComponent
         hasCombined = true;
         other.hasCombined = true;
         if (number < 3) {
-          ballToRemove.add(other);
-          ballToRemove.add(this);
+          game.ballToRemove.add(other);
+          game.ballToRemove.add(this);
           int newNumber = number + 1;
-          ballToAdd.add(
+          game.ballToAdd.add(
             NumberBall(
               posi: newPosition,
               number: newNumber,

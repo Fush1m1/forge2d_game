@@ -31,6 +31,10 @@ class SuikaGame extends Forge2DGame
   late final XmlSpriteSheet tiles;
   bool tapOK = true;
   double objHeight = 0;
+  bool isGameOver = false;
+
+  final List<NumberBall> ballToRemove = [];
+  final List<NumberBall> ballToAdd = [];
 
   @override
   void onGameResize(Vector2 size) {
@@ -133,8 +137,24 @@ class SuikaGame extends Forge2DGame
     return objHeight;
   }
 
+
+  void resetGame() {
+    world.children.whereType<NumberBall>().forEach((ball) {
+      ball.removeFromParent();
+    });
+    ballToRemove.clear();
+    ballToAdd.clear();
+    objHeight = 0;
+    isGameOver = false;
+    tapOK = true;
+    numberOfFirstBall = rng.nextInt(randomNum) + starRandomNum;
+    numberOfSecondBall = rng.nextInt(randomNum) + starRandomNum;
+    overlays.remove('GameOver');
+  }
+
   @override
   void onTapDown(TapDownEvent event) {
+    if (isGameOver) return;
     super.onTapDown(event);
     double xPosi;
     if (!event.handled && tapOK) {
@@ -199,22 +219,10 @@ class SuikaGame extends Forge2DGame
     }
 
     if (isMounted &&
-        objHeight > (camera.visibleWorldRect.bottom - groundSize) / 3) {
-      world.addAll(
-        [
-          (position: Vector2(0.5, 0.5), color: Colors.white),
-          (position: Vector2.zero(), color: Colors.orangeAccent),
-        ].map(
-          (e) => TextComponent(
-            text: 'Game Over',
-            anchor: Anchor.center,
-            position: e.position,
-            textRenderer: TextPaint(
-              style: TextStyle(color: e.color, fontSize: 5),
-            ),
-          ),
-        ),
-      );
+        objHeight > (camera.visibleWorldRect.bottom - groundSize) / 3 &&
+        !isGameOver) {
+      isGameOver = true;
+      overlays.add('GameOver');
     }
   }
 
