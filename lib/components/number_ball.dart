@@ -27,20 +27,23 @@ class NumberBall extends PositionComponent
     required this.ballSize,
     required this.speed,
     required this.hasFirstCollisionExecuted,
-  }) {
-    String strImage = getImagePNG(number);
-    _loadSprite(strImage).then((_) {
-      _createBody();
-      add(spriteComponent);
-      add(bodyComponent);
-    });
+  });
+
+  @override
+  Future<void> onLoad() async {
+    await super.onLoad();
+    _loadSprite();
+    _createBody();
+    add(spriteComponent);
+    add(bodyComponent);
   }
   bool hasCombined = false;
   double timeElapsed = 0.0;
-  Future<void> _loadSprite(String imagePath) async {
+  void _loadSprite() {
+    String spriteName = getAlienSpriteName(number);
     spriteComponent =
         SpriteComponent()
-          ..sprite = await Sprite.load(imagePath)
+          ..sprite = game.aliens.getSprite(spriteName)
           ..anchor = Anchor.center
           ..size = Vector2.all(ballSize);
     isSpriteLoaded = true;
@@ -161,19 +164,15 @@ double calcTypeSize(int number, double per) {
   }
 }
 
-String getImagePNG(int number) {
-  String strImage = '';
+String getAlienSpriteName(int number) {
   switch (number) {
     case 1:
-      strImage = '01.png';
-      break;
+      return 'alienBeige_round.png';
     case 2:
-      strImage = '02.png';
-      break;
+      return 'alienBlue_round.png';
     case 3:
-      strImage = '03.png';
-      break;
+      return 'alienGreen_round.png';
     default:
+      return 'alienBeige_round.png';
   }
-  return strImage;
 }

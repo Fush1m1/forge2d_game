@@ -49,7 +49,6 @@ class SuikaGame extends Forge2DGame
     await super.onLoad();
     WidgetsBinding.instance.addObserver(this);
     camera.viewport.add(DebugInfoComponent());
-    await images.loadAll(['01.png', '02.png', '03.png']);
     numberOfFirstBall = rng.nextInt(randomNum) + starRandomNum;
     numberOfSecondBall = rng.nextInt(randomNum) + starRandomNum;
     final visibleRect = camera.visibleWorldRect;
