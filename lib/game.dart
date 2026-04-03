@@ -83,8 +83,12 @@ class SuikaGame extends Forge2DGame
 
     await world.add(Background(sprite: Sprite(backgroundImage)));
     await addGround();
-    await addBrick(camera.visibleWorldRect.left / 2);
-    await addBrick(camera.visibleWorldRect.right / 2);
+    await addBrick(camera.visibleWorldRect.left / 2, 1.8);
+    await addBrick(camera.visibleWorldRect.right / 2, 1.8);
+    await addBrick(camera.visibleWorldRect.left / 2, 3.0);
+    await addBrick(camera.visibleWorldRect.right / 2, 3.0);
+    await addBrick(camera.visibleWorldRect.left / 2, 4.2);
+    await addBrick(camera.visibleWorldRect.right / 2, 4.2);
   }
 
   Future<void> addGround() {
@@ -101,9 +105,8 @@ class SuikaGame extends Forge2DGame
     ]);
   }
 
-  Future<void> addBrick(double x) async {
-    // TODO: この1.8とかいうマジックナンバーをなんとかする
-    final y = camera.visibleWorldRect.bottom - groundSize * 1.8;
+  Future<void> addBrick(double x, double h) async {
+    final y = camera.visibleWorldRect.bottom - groundSize * h;
     final type = BrickType.metal;
     final size = BrickSize.size70x140;
 
@@ -209,10 +212,12 @@ class SuikaGame extends Forge2DGame
       ballToAdd.clear();
     }
 
+    double threshold = camera.visibleWorldRect.bottom - groundSize;
+
     if (isMounted) {
       DebugInfo.add('Obj Height: $objHeight');
       DebugInfo.add(
-        'Threshold: ${(camera.visibleWorldRect.bottom - groundSize) / 3}',
+        'Threshold: $threshold',
       );
       DebugInfo.add(
         'Ball count: ${world.children.whereType<AlienBall>().length}',
@@ -220,8 +225,7 @@ class SuikaGame extends Forge2DGame
     }
 
     if (isMounted &&
-        objHeight > (camera.visibleWorldRect.bottom - groundSize) / 3 &&
-        !isGameOver) {
+        objHeight > threshold && !isGameOver) {
       isGameOver = true;
       overlays.add('GameOver');
     }

@@ -88,7 +88,7 @@ class AlienBall extends PositionComponent
             2;
         hasCombined = true;
         other.hasCombined = true;
-        if (number < 3) {
+        if (number < 9) {
           game.ballToRemove.add(other);
           game.ballToRemove.add(this);
           int newNumber = number + 1;
@@ -157,6 +157,19 @@ double calcTypeSize(int number, double per) {
       return 30.0 / scale * per;
     case 3:
       return 35.0 / scale * per;
+    case 4:
+      return 45.0 / scale * per;
+    case 5:
+      return 60.0 / scale * per;
+    case 6:
+      return 80.0 / scale * per;
+    case 7:
+      return 100.0 / scale * per;
+    case 8:
+      return 120.0 / scale * per;
+    case 9:
+      return 150.0 / scale * per;
+
     default:
       return 0;
   }
@@ -170,6 +183,19 @@ String getAlienSpriteName(int number) {
       return 'alienBlue_round.png';
     case 3:
       return 'alienGreen_round.png';
+    case 4:
+      return 'alienPink_round.png';
+    case 5:
+      return 'alienYellow_round.png';
+    case 6:
+      return 'alienBeige_suit.png';
+    case 7:
+      return 'alienBlue_suit.png';
+    case 8:
+      return 'alienGreen_suit.png';
+    case 9:
+      return 'alienPink_suit.png';
+    
     default:
       return 'alienBeige_round.png';
   }
