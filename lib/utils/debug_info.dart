@@ -1,4 +1,5 @@
 import 'package:flame/components.dart';
+import 'package:flame/events.dart';
 import 'package:flutter/material.dart';
 
 class DebugInfo {
@@ -15,7 +16,9 @@ class DebugInfo {
   static List<String> get messages => _messages;
 }
 
-class DebugInfoComponent extends PositionComponent {
+class DebugInfoComponent extends PositionComponent with TapCallbacks {
+  DebugInfoComponent() : super(size: Vector2(200, 100));
+
   final TextPaint _textPaint = TextPaint(
     style: const TextStyle(
       fontSize: 14.0,
@@ -24,8 +27,11 @@ class DebugInfoComponent extends PositionComponent {
     ),
   );
 
+  bool isVisible = true;
+
   @override
   void render(Canvas canvas) {
+    if (!isVisible) return;
     final messages = DebugInfo.messages;
     for (var i = 0; i < messages.length; i++) {
       _textPaint.render(canvas, messages[i], Vector2(10, 10 + i * 20));
@@ -36,5 +42,11 @@ class DebugInfoComponent extends PositionComponent {
   void update(double dt) {
     // This ensures the debug info is fresh every frame.
     DebugInfo.clear();
+  }
+
+  @override
+  void onTapDown(TapDownEvent event) {
+    isVisible = !isVisible;
+    event.handled = true;
   }
 }
