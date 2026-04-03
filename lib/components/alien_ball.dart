@@ -6,7 +6,7 @@ import 'package:forge2d_game/game.dart';
 import 'package:forge2d_game/utils/config.dart';
 
 
-class NumberBall extends PositionComponent
+class AlienBall extends PositionComponent
     with HasGameReference<SuikaGame>, ContactCallbacks, CollisionCallbacks {
   late final SpriteComponent spriteComponent;
   late final BodyComponent bodyComponent;
@@ -19,7 +19,7 @@ class NumberBall extends PositionComponent
 
   bool isSpriteLoaded = false;
 
-  NumberBall({
+  AlienBall({
     required this.posi,
     required this.number,
     required this.ballSize,
@@ -81,7 +81,7 @@ class NumberBall extends PositionComponent
       hasFirstCollisionExecuted = true;
       game.onballCollision();
     }
-    if (other is NumberBall) {
+    if (other is AlienBall) {
       if (other.number == number && !other.hasCombined && !hasCombined) {
         Vector2 newPosition =
             (other.bodyComponent.body.position + bodyComponent.body.position) /
@@ -93,7 +93,7 @@ class NumberBall extends PositionComponent
           game.ballToRemove.add(this);
           int newNumber = number + 1;
           game.ballToAdd.add(
-            NumberBall(
+            AlienBall(
               posi: newPosition,
               number: newNumber,
               ballSize: calcTypeSize(newNumber, allPer),
@@ -109,7 +109,7 @@ class NumberBall extends PositionComponent
 }
 
 class BallBody extends BodyComponent with ContactCallbacks {
-  final NumberBall parentball;
+  final AlienBall parentball;
   final Vector2 posi;
   double ballSize;
   double speed;

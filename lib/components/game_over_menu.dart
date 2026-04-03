@@ -13,7 +13,7 @@ class GameOverMenu extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(30),
         decoration: BoxDecoration(
-          color: AppTheme.overlayBackground.withOpacity(0.9),
+          color: AppTheme.overlayBackground.withValues(alpha: 0.9),
           borderRadius: BorderRadius.circular(AppTheme.borderRadiusLarge),
           border: Border.all(
             color: AppTheme.overlayBorder,
@@ -21,7 +21,7 @@ class GameOverMenu extends StatelessWidget {
           ),
           boxShadow: [
             BoxShadow(
-              color: AppTheme.shadowColor.withOpacity(0.2),
+              color: AppTheme.shadowColor.withValues(alpha: 0.2),
               blurRadius: 20,
               spreadRadius: 5,
             ),

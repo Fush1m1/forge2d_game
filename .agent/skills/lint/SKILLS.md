@@ -1,6 +1,6 @@
 # SKILLS.md
 
-## Skill: run_flutter_lint
+## Skill: version increment
 
 ### Description
 コミットのたびに、pubspec.yamlのversionを1つ上げる

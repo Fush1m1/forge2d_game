@@ -6,7 +6,7 @@ import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flame/extensions.dart';
 import 'package:flame_kenney_xml/flame_kenney_xml.dart';
-import 'package:forge2d_game/components/number_ball.dart';
+import 'package:forge2d_game/components/alien_ball.dart';
 import 'package:forge2d_game/components/background.dart';
 import 'package:forge2d_game/components/brick.dart';
 import 'package:forge2d_game/components/ground.dart';
@@ -33,8 +33,8 @@ class SuikaGame extends Forge2DGame
   double objHeight = 0;
   bool isGameOver = false;
 
-  final List<NumberBall> ballToRemove = [];
-  final List<NumberBall> ballToAdd = [];
+  final List<AlienBall> ballToRemove = [];
+  final List<AlienBall> ballToAdd = [];
 
   @override
   void onGameResize(Vector2 size) {
@@ -102,9 +102,10 @@ class SuikaGame extends Forge2DGame
   }
 
   Future<void> addBrick(double x) async {
+    // TODO: この1.8とかいうマジックナンバーをなんとかする
     final y = camera.visibleWorldRect.bottom - groundSize * 1.8;
     final type = BrickType.metal;
-    final size = BrickSize.size140x220;
+    final size = BrickSize.size70x140;
 
     await world.add(
       Brick(
@@ -121,7 +122,7 @@ class SuikaGame extends Forge2DGame
   }
 
   double calcObjHeight() {
-    final balls = world.children.whereType<NumberBall>();
+    final balls = world.children.whereType<AlienBall>();
     if (balls.isEmpty) {
       return 0.0;
     }
@@ -139,7 +140,7 @@ class SuikaGame extends Forge2DGame
 
 
   void resetGame() {
-    world.children.whereType<NumberBall>().forEach((ball) {
+    world.children.whereType<AlienBall>().forEach((ball) {
       ball.removeFromParent();
     });
     ballToRemove.clear();
@@ -175,7 +176,7 @@ class SuikaGame extends Forge2DGame
         } else {
           xPosi = touchX;
         }
-        final ball = NumberBall(
+        final ball = AlienBall(
           posi: Vector2(xPosi, yDrop * heightPer),
           number: numberOfFirstBall,
           ballSize: ballSize,
@@ -214,7 +215,7 @@ class SuikaGame extends Forge2DGame
         'Threshold: ${(camera.visibleWorldRect.bottom - groundSize) / 3}',
       );
       DebugInfo.add(
-        'Ball count: ${world.children.whereType<NumberBall>().length}',
+        'Ball count: ${world.children.whereType<AlienBall>().length}',
       );
     }
 
@@ -228,7 +229,7 @@ class SuikaGame extends Forge2DGame
 
   /// 衝突検知時に呼ばれるメソッド
   void onballCollision() {
-    final balls = children.whereType<NumberBall>();
+    final balls = children.whereType<AlienBall>();
     final allStopped = balls.every((ball) => !ball.bodyComponent.body.isAwake);
     if (allStopped) {
       calcObjHeight();
