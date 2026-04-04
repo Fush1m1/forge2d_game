@@ -53,8 +53,9 @@ class GameOverMenu extends StatelessWidget {
                 foregroundColor: AppTheme.buttonText,
                 elevation: 5,
                 shape: RoundedRectangleBorder(
-                  borderRadius:
-                      BorderRadius.circular(AppTheme.borderRadiusMedium),
+                  borderRadius: BorderRadius.circular(
+                    AppTheme.borderRadiusMedium,
+                  ),
                 ),
                 padding: const EdgeInsets.symmetric(
                   horizontal: 50,

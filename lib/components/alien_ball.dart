@@ -1,14 +1,12 @@
 import 'dart:async';
-import 'package:flame/collisions.dart';
 import 'package:flame_forge2d/flame_forge2d.dart';
 import 'package:flame/components.dart';
 import 'package:forge2d_game/game.dart';
 import 'package:forge2d_game/utils/config.dart';
 import 'package:forge2d_game/utils/state_parameter.dart';
 
-
 class AlienBall extends PositionComponent
-    with HasGameReference<SuikaGame>, ContactCallbacks, CollisionCallbacks {
+    with HasGameReference<SuikaGame>, ContactCallbacks {
   late final SpriteComponent spriteComponent;
   late final BodyComponent bodyComponent;
   final Vector2 posi;
@@ -36,6 +34,7 @@ class AlienBall extends PositionComponent
     add(spriteComponent);
     add(bodyComponent);
   }
+
   bool hasCombined = false;
   double timeElapsed = 0.0;
   void _loadSprite() {
@@ -200,7 +199,7 @@ String getAlienSpriteName(int number) {
       return 'alienPink_suit.png';
     case 10:
       return 'alienYellow_suit.png';
-    
+
     default:
       return 'alienBeige_round.png';
   }

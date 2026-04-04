@@ -25,7 +25,6 @@ class SuikaGame extends Forge2DGame
   late final XmlSpriteSheet aliens;
   late final XmlSpriteSheet elements;
   late final XmlSpriteSheet tiles;
-  bool _tapOK = true;
   double _objHeight = 0;
   bool _isGameOver = false;
 
@@ -51,7 +50,7 @@ class SuikaGame extends Forge2DGame
     camera.viewport.add(DebugInfoComponent());
     numberOfFirstBall = rng.nextInt(randomNum) + starRandomNum;
     numberOfSecondBall = rng.nextInt(randomNum) + starRandomNum;
-    
+
     final visibleRect = camera.visibleWorldRect;
     _bottomRight = visibleRect.bottomRight.toVector2();
 
@@ -156,7 +155,6 @@ class SuikaGame extends Forge2DGame
     return _objHeight;
   }
 
-
   void resetGame() {
     world.children.whereType<AlienBall>().forEach((ball) {
       ball.removeFromParent();
@@ -165,7 +163,7 @@ class SuikaGame extends Forge2DGame
     ballToAdd.clear();
     _objHeight = 0;
     _isGameOver = false;
-    _tapOK = true;
+    tapOK = true;
     numberOfFirstBall = rng.nextInt(randomNum) + starRandomNum;
     numberOfSecondBall = rng.nextInt(randomNum) + starRandomNum;
     overlays.remove('GameOver');
@@ -176,7 +174,7 @@ class SuikaGame extends Forge2DGame
     if (_isGameOver) return;
     super.onTapDown(event);
     double xPosi;
-    if (!event.handled && _tapOK) {
+    if (!event.handled && tapOK) {
       final touchPoint = event.canvasPosition;
       touchX = touchPoint.x / scale - _bottomRight.x;
       touchY = touchPoint.y / scale - _bottomRight.y;
@@ -202,7 +200,7 @@ class SuikaGame extends Forge2DGame
           hasFirstCollisionExecuted: false,
         );
         world.add(ball);
-        _tapOK = false;
+        tapOK = false;
 
         ///次のballを決定する
         numberOfFirstBall = numberOfSecondBall;
@@ -231,16 +229,13 @@ class SuikaGame extends Forge2DGame
 
     if (isMounted) {
       DebugInfo.add('Obj Height: $_objHeight');
-      DebugInfo.add(
-        'Threshold: $threshold',
-      );
+      DebugInfo.add('Threshold: $threshold');
       DebugInfo.add(
         'Ball count: ${world.children.whereType<AlienBall>().length}',
       );
     }
 
-    if (isMounted &&
-        _objHeight > threshold && !_isGameOver) {
+    if (isMounted && _objHeight > threshold && !_isGameOver) {
       _isGameOver = true;
       overlays.add('GameOver');
     }
@@ -249,12 +244,12 @@ class SuikaGame extends Forge2DGame
   /// 衝突検知時に呼ばれるメソッド
   void onballCollision(Object? other) {
     if (other is Brick) {
-      _tapOK = false;
+      tapOK = false;
       // TODO: 地面かボールに衝突するまでtapを受け付けない
-      _tapOK = true;
+      tapOK = true;
     } else {
       calcObjHeight();
-      _tapOK = true;      
+      tapOK = true;
     }
   }
 }

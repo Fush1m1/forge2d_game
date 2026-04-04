@@ -5,3 +5,4 @@ double height = 0;
 double widthPer = 1;
 double heightPer = 1;
 double allPer = 1;
+bool tapOK = true;
