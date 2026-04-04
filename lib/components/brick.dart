@@ -253,6 +253,7 @@ class Brick extends BodyComponentWithUserData {
     required BrickDamage damage,
     required Vector2 position,
     required Map<BrickDamage, Sprite> sprites,
+    double angle = 0,
   }) : _damage = damage,
        _sprites = sprites,
        super(
@@ -260,6 +261,7 @@ class Brick extends BodyComponentWithUserData {
          bodyDef:
              BodyDef()
                ..position = position
+               ..angle = angle
                ..type = BodyType.static,
          fixtureDefs: [
            FixtureDef(

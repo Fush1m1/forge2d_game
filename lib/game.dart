@@ -12,26 +12,22 @@ import 'package:forge2d_game/components/brick.dart';
 import 'package:forge2d_game/components/ground.dart';
 import 'package:forge2d_game/utils/debug_info.dart';
 import 'package:forge2d_game/utils/config.dart';
+import 'package:forge2d_game/utils/state_parameter.dart';
 
 class SuikaGame extends Forge2DGame
     with TapCallbacks, HasCollisionDetection, WidgetsBindingObserver {
   SuikaGame() : super(zoom: scale, gravity: Vector2(0, dbGravity));
 
   final Random rng = Random();
-  int numberOfFirstBall = 1;
-  int numberOfSecondBall = 1;
   double touchX = 0.0;
   double touchY = 0.0;
-  Vector2 topLeft = Vector2.zero();
-  Vector2 topRight = Vector2.zero();
-  Vector2 bottomRight = Vector2.zero();
-  Vector2 bottomLeft = Vector2.zero();
+  Vector2 _bottomRight = Vector2.zero();
   late final XmlSpriteSheet aliens;
   late final XmlSpriteSheet elements;
   late final XmlSpriteSheet tiles;
-  bool tapOK = true;
-  double objHeight = 0;
-  bool isGameOver = false;
+  bool _tapOK = true;
+  double _objHeight = 0;
+  bool _isGameOver = false;
 
   final List<AlienBall> ballToRemove = [];
   final List<AlienBall> ballToAdd = [];
@@ -55,11 +51,9 @@ class SuikaGame extends Forge2DGame
     camera.viewport.add(DebugInfoComponent());
     numberOfFirstBall = rng.nextInt(randomNum) + starRandomNum;
     numberOfSecondBall = rng.nextInt(randomNum) + starRandomNum;
+    
     final visibleRect = camera.visibleWorldRect;
-    topLeft = visibleRect.topLeft.toVector2();
-    topRight = visibleRect.topRight.toVector2();
-    bottomRight = visibleRect.bottomRight.toVector2();
-    bottomLeft = visibleRect.bottomLeft.toVector2();
+    _bottomRight = visibleRect.bottomRight.toVector2();
 
     final backgroundImage = await images.load('colored_grass.png');
     final spriteSheets = await Future.wait([
@@ -89,6 +83,8 @@ class SuikaGame extends Forge2DGame
     await addBrick(camera.visibleWorldRect.right / 2, 3.0);
     await addBrick(camera.visibleWorldRect.left / 2, 4.2);
     await addBrick(camera.visibleWorldRect.right / 2, 4.2);
+    await addTriangleBrick(camera.visibleWorldRect.left / 2, 5.4, 1);
+    await addTriangleBrick(camera.visibleWorldRect.right / 2, 5.4, -1);
   }
 
   Future<void> addGround() {
@@ -124,6 +120,25 @@ class SuikaGame extends Forge2DGame
     );
   }
 
+  Future<void> addTriangleBrick(double x, double h, double a) async {
+    final y = camera.visibleWorldRect.bottom - groundSize * h;
+    final type = BrickType.metal;
+    final size = BrickSize.size70x140;
+    final damage = BrickDamage.none;
+    final filename = 'elementMetal000.png';
+
+    await world.add(
+      Brick(
+        type: type,
+        size: size,
+        damage: damage,
+        position: Vector2(x, y),
+        sprites: {damage: elements.getSprite(filename)},
+        angle: a * pi / 180,
+      ),
+    );
+  }
+
   double calcObjHeight() {
     final balls = world.children.whereType<AlienBall>();
     if (balls.isEmpty) {
@@ -134,11 +149,11 @@ class SuikaGame extends Forge2DGame
       final yi =
           (camera.visibleWorldRect.bottom - groundSize) -
           ball.bodyComponent.body.position.y;
-      if (yi > objHeight) {
-        objHeight = yi;
+      if (yi > _objHeight) {
+        _objHeight = yi;
       }
     }
-    return objHeight;
+    return _objHeight;
   }
 
 
@@ -148,9 +163,9 @@ class SuikaGame extends Forge2DGame
     });
     ballToRemove.clear();
     ballToAdd.clear();
-    objHeight = 0;
-    isGameOver = false;
-    tapOK = true;
+    _objHeight = 0;
+    _isGameOver = false;
+    _tapOK = true;
     numberOfFirstBall = rng.nextInt(randomNum) + starRandomNum;
     numberOfSecondBall = rng.nextInt(randomNum) + starRandomNum;
     overlays.remove('GameOver');
@@ -158,13 +173,13 @@ class SuikaGame extends Forge2DGame
 
   @override
   void onTapDown(TapDownEvent event) {
-    if (isGameOver) return;
+    if (_isGameOver) return;
     super.onTapDown(event);
     double xPosi;
-    if (!event.handled && tapOK) {
+    if (!event.handled && _tapOK) {
       final touchPoint = event.canvasPosition;
-      touchX = touchPoint.x / scale - bottomRight.x;
-      touchY = touchPoint.y / scale - bottomRight.y;
+      touchX = touchPoint.x / scale - _bottomRight.x;
+      touchY = touchPoint.y / scale - _bottomRight.y;
       double ballSize = calcTypeSize(numberOfFirstBall, allPer);
       if (touchX > xStart && touchX < xEnd) {
         if (touchX >
@@ -187,7 +202,7 @@ class SuikaGame extends Forge2DGame
           hasFirstCollisionExecuted: false,
         );
         world.add(ball);
-        tapOK = false;
+        _tapOK = false;
 
         ///次のballを決定する
         numberOfFirstBall = numberOfSecondBall;
@@ -215,7 +230,7 @@ class SuikaGame extends Forge2DGame
     double threshold = camera.visibleWorldRect.bottom - groundSize;
 
     if (isMounted) {
-      DebugInfo.add('Obj Height: $objHeight');
+      DebugInfo.add('Obj Height: $_objHeight');
       DebugInfo.add(
         'Threshold: $threshold',
       );
@@ -225,19 +240,21 @@ class SuikaGame extends Forge2DGame
     }
 
     if (isMounted &&
-        objHeight > threshold && !isGameOver) {
-      isGameOver = true;
+        _objHeight > threshold && !_isGameOver) {
+      _isGameOver = true;
       overlays.add('GameOver');
     }
   }
 
   /// 衝突検知時に呼ばれるメソッド
-  void onballCollision() {
-    final balls = children.whereType<AlienBall>();
-    final allStopped = balls.every((ball) => !ball.bodyComponent.body.isAwake);
-    if (allStopped) {
+  void onballCollision(Object? other) {
+    if (other is Brick) {
+      _tapOK = false;
+      // TODO: 地面かボールに衝突するまでtapを受け付けない
+      _tapOK = true;
+    } else {
       calcObjHeight();
+      _tapOK = true;      
     }
-    tapOK = true;
   }
 }

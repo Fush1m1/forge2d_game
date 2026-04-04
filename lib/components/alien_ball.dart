@@ -4,6 +4,7 @@ import 'package:flame_forge2d/flame_forge2d.dart';
 import 'package:flame/components.dart';
 import 'package:forge2d_game/game.dart';
 import 'package:forge2d_game/utils/config.dart';
+import 'package:forge2d_game/utils/state_parameter.dart';
 
 
 class AlienBall extends PositionComponent
@@ -79,7 +80,7 @@ class AlienBall extends PositionComponent
   void beginContact(Object other, Contact contact) {
     if (!hasFirstCollisionExecuted) {
       hasFirstCollisionExecuted = true;
-      game.onballCollision();
+      game.onballCollision(other);
     }
     if (other is AlienBall) {
       if (other.number == number && !other.hasCombined && !hasCombined) {
@@ -88,7 +89,7 @@ class AlienBall extends PositionComponent
             2;
         hasCombined = true;
         other.hasCombined = true;
-        if (number < 9) {
+        if (number < 10) {
           game.ballToRemove.add(other);
           game.ballToRemove.add(this);
           int newNumber = number + 1;
@@ -169,6 +170,8 @@ double calcTypeSize(int number, double per) {
       return 120.0 / scale * per;
     case 9:
       return 150.0 / scale * per;
+    case 10:
+      return 200.0 / scale * per;
 
     default:
       return 0;
@@ -195,6 +198,8 @@ String getAlienSpriteName(int number) {
       return 'alienGreen_suit.png';
     case 9:
       return 'alienPink_suit.png';
+    case 10:
+      return 'alienYellow_suit.png';
     
     default:
       return 'alienBeige_round.png';
