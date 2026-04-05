@@ -82,8 +82,8 @@ class SuikaGame extends Forge2DGame
     await addBrick(camera.visibleWorldRect.right / 2, 3.0);
     await addBrick(camera.visibleWorldRect.left / 2, 4.2);
     await addBrick(camera.visibleWorldRect.right / 2, 4.2);
-    await addTriangleBrick(camera.visibleWorldRect.left / 2, 5.4, 1);
-    await addTriangleBrick(camera.visibleWorldRect.right / 2, 5.4, -1);
+    // await addTriangleBrick(camera.visibleWorldRect.left / 2, 5.4, 1);
+    // await addTriangleBrick(camera.visibleWorldRect.right / 2, 5.4, -1);
   }
 
   Future<void> addGround() {
@@ -119,6 +119,10 @@ class SuikaGame extends Forge2DGame
     );
   }
 
+  /// 三角形のブロックを追加するためのメソッド
+  ///
+  /// `a`は回転角度（度数法）を指定します。例えば、1なら時計回りに90度、-1なら反時計回りに90度回転します。
+  /// 三角形の頂点に物体が乗った際、それが落ちるように a = 1 を指定できます。
   Future<void> addTriangleBrick(double x, double h, double a) async {
     final y = camera.visibleWorldRect.bottom - groundSize * h;
     final type = BrickType.metal;
