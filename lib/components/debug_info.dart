@@ -27,7 +27,7 @@ class DebugInfoComponent extends PositionComponent with TapCallbacks {
     ),
   );
 
-  bool isVisible = true;
+  bool isVisible = false;
 
   @override
   void render(Canvas canvas) {
