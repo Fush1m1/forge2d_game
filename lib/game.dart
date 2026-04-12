@@ -41,6 +41,9 @@ class SuikaGame extends Forge2DGame
     widthPer = screenWidth / widthBase;
     heightPer = screenHeight / heightBase;
     allPer = (widthPer + heightPer) / 2;
+
+    /// ブラウザのリサイズに追随してワールド座標の右下を更新
+    _bottomRight = camera.visibleWorldRect.bottomRight.toVector2();
   }
 
   @override
@@ -183,19 +186,12 @@ class SuikaGame extends Forge2DGame
       touchX = touchPoint.x / scale - _bottomRight.x;
       touchY = touchPoint.y / scale - _bottomRight.y;
       double ballSize = calcTypeSize(numberOfFirstBall, allPer);
-      if (touchX > xStart && touchX < xEnd) {
-        if (touchX >
-                ((xStart * widthPer + ballSize / 2 + 10 / scale * widthPer)) &&
-            touchX < (xEnd * widthPer - ballSize / 2)) {
-          xPosi = touchX;
-        } else if (touchX <=
-            (xStart * widthPer + ballSize / 2 + 10 / scale * widthPer)) {
-          xPosi = (xStart * widthPer + ballSize / 2 + 10 / scale * widthPer);
-        } else if (touchX >= (xEnd * widthPer - ballSize / 2)) {
-          xPosi = (xEnd * widthPer - ballSize / 2);
-        } else {
-          xPosi = touchX;
-        }
+      final visibleRect = camera.visibleWorldRect;
+      final wallOffset = ballSize / 2;
+      final dropLeft = visibleRect.left + wallOffset;
+      final dropRight = visibleRect.right - wallOffset;
+      if (touchX > visibleRect.left && touchX < visibleRect.right) {
+        xPosi = touchX.clamp(dropLeft, dropRight);
         final ball = AlienBall(
           posi: Vector2(xPosi, yDrop * heightPer),
           number: numberOfFirstBall,
