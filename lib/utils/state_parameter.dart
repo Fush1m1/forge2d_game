@@ -6,3 +6,4 @@ double widthPer = 1;
 double heightPer = 1;
 double allPer = 1;
 bool tapOK = true;
+bool isEasyMode = false;

@@ -102,6 +102,10 @@ class AlienBall extends PositionComponent
               hasFirstCollisionExecuted: true,
             ),
           );
+          // Yellow Suit（最大ボール）が誕生したらコングラッチュレーション
+          if (newNumber == 10) {
+            game.showCongratulations();
+          }
         }
       }
     }
@@ -150,27 +154,28 @@ class BallBody extends BodyComponent with ContactCallbacks {
 }
 
 double calcTypeSize(int number, double per) {
+  final easyFactor = isEasyMode ? 0.5 : 1.0;
   switch (number) {
     case 1:
-      return 25.0 / scale * per;
+      return 25.0 / scale * per * easyFactor;
     case 2:
-      return 30.0 / scale * per;
+      return 30.0 / scale * per * easyFactor;
     case 3:
-      return 35.0 / scale * per;
+      return 35.0 / scale * per * easyFactor;
     case 4:
-      return 45.0 / scale * per;
+      return 45.0 / scale * per * easyFactor;
     case 5:
-      return 60.0 / scale * per;
+      return 60.0 / scale * per * easyFactor;
     case 6:
-      return 80.0 / scale * per;
+      return 80.0 / scale * per * easyFactor;
     case 7:
-      return 100.0 / scale * per;
+      return 100.0 / scale * per * easyFactor;
     case 8:
-      return 120.0 / scale * per;
+      return 120.0 / scale * per * easyFactor;
     case 9:
-      return 150.0 / scale * per;
+      return 150.0 / scale * per * easyFactor;
     case 10:
-      return 200.0 / scale * per;
+      return 200.0 / scale * per * easyFactor;
 
     default:
       return 0;

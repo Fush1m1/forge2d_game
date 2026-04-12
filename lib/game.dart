@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'dart:math';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide PointerMoveEvent, PointerDownEvent, PointerUpEvent, PointerCancelEvent;
 import 'package:flame_forge2d/flame_forge2d.dart';
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
@@ -15,7 +15,11 @@ import 'package:forge2d_game/utils/config.dart';
 import 'package:forge2d_game/utils/state_parameter.dart';
 
 class SuikaGame extends Forge2DGame
-    with TapCallbacks, HasCollisionDetection, WidgetsBindingObserver {
+    with
+        TapCallbacks,
+        PointerMoveCallbacks,
+        HasCollisionDetection,
+        WidgetsBindingObserver {
   SuikaGame() : super(zoom: scale, gravity: Vector2(0, dbGravity));
 
   final Random rng = Random();
@@ -30,6 +34,16 @@ class SuikaGame extends Forge2DGame
 
   final List<AlienBall> ballToRemove = [];
   final List<AlienBall> ballToAdd = [];
+
+  // バースト（連射）用
+  bool _isHolding = false;
+  int _burstCount = 0;
+  double _burstTimer = 0.0;
+  double _pressDuration = 0.0;
+  static const double _burstInterval = 0.15; // 0.15秒ごとに発射
+  static const double _longPressThreshold = 0.5; // 0.5秒以上で長押し判定
+
+
 
   @override
   void onGameResize(Vector2 size) {
@@ -87,6 +101,10 @@ class SuikaGame extends Forge2DGame
     await addBrick(camera.visibleWorldRect.right / 2, 4.2);
     // await addTriangleBrick(camera.visibleWorldRect.left / 2, 5.4, 1);
     // await addTriangleBrick(camera.visibleWorldRect.right / 2, 5.4, -1);
+
+    /// ゲーム開始前にモード選択を表示
+    pauseEngine();
+    overlays.add('ModeSelect');
   }
 
   Future<void> addGround() {
@@ -162,6 +180,12 @@ class SuikaGame extends Forge2DGame
     return _objHeight;
   }
 
+  void startGame() {
+    overlays.remove('ModeSelect');
+    overlays.add('TopControls');
+    resumeEngine();
+  }
+
   void resetGame() {
     world.children.whereType<AlienBall>().forEach((ball) {
       ball.removeFromParent();
@@ -174,24 +198,34 @@ class SuikaGame extends Forge2DGame
     numberOfFirstBall = rng.nextInt(randomNum) + starRandomNum;
     numberOfSecondBall = rng.nextInt(randomNum) + starRandomNum;
     overlays.remove('GameOver');
+    overlays.remove('Congratulations');
+    overlays.remove('TopControls');
+    pauseEngine();
+    overlays.add('ModeSelect');
   }
 
-  @override
-  void onTapDown(TapDownEvent event) {
+  void showCongratulations() {
+    overlays.remove('TopControls');
+    overlays.add('Congratulations');
+  }
+
+  void _updatePosition(Vector2 canvasPosition) {
+    // 画面座標をワールド座標に変換（手動計算）
+    touchX = canvasPosition.x / scale - _bottomRight.x;
+    touchY = canvasPosition.y / scale - _bottomRight.y;
+  }
+
+  void _dropBall() {
     if (_isGameOver) return;
-    super.onTapDown(event);
-    double xPosi;
-    if (!event.handled && tapOK) {
-      final touchPoint = event.canvasPosition;
-      touchX = touchPoint.x / scale - _bottomRight.x;
-      touchY = touchPoint.y / scale - _bottomRight.y;
+    if (tapOK || _isHolding) {
       double ballSize = calcTypeSize(numberOfFirstBall, allPer);
       final visibleRect = camera.visibleWorldRect;
       final wallOffset = ballSize / 2;
       final dropLeft = visibleRect.left + wallOffset;
       final dropRight = visibleRect.right - wallOffset;
+
       if (touchX > visibleRect.left && touchX < visibleRect.right) {
-        xPosi = touchX.clamp(dropLeft, dropRight);
+        double xPosi = touchX.clamp(dropLeft, dropRight);
         final ball = AlienBall(
           posi: Vector2(xPosi, yDrop * heightPer),
           number: numberOfFirstBall,
@@ -210,8 +244,59 @@ class SuikaGame extends Forge2DGame
   }
 
   @override
+  void onTapDown(TapDownEvent event) {
+    if (_isGameOver) return;
+    super.onTapDown(event);
+    if (!event.handled) {
+      _updatePosition(event.canvasPosition);
+      _isHolding = true;
+      _burstCount = 0;
+      _burstTimer = 0.0;
+      _pressDuration = 0.0; // リセット
+
+      // 最初の1発目
+      if (tapOK) {
+        _dropBall();
+        _burstCount = 1;
+      }
+    }
+  }
+
+  @override
+  void onTapUp(TapUpEvent event) {
+    super.onTapUp(event);
+    _isHolding = false;
+  }
+
+  @override
+  void onTapCancel(TapCancelEvent event) {
+    super.onTapCancel(event);
+    _isHolding = false;
+  }
+
+  @override
+  void onPointerMove(PointerMoveEvent event) {
+    _updatePosition(event.canvasPosition);
+  }
+
+
+  @override
   void update(double dt) {
     super.update(dt);
+    // 連射ロジック
+    if (_isHolding && !_isGameOver) {
+      _pressDuration += dt;
+      // 長押し判定時間（0.5秒）を超えたら連射開始
+      if (_pressDuration >= _longPressThreshold && _burstCount < 10) {
+        _burstTimer += dt;
+        if (_burstTimer >= _burstInterval) {
+          _dropBall();
+          _burstCount++;
+          _burstTimer = 0.0;
+        }
+      }
+    }
+
     // 保留されたエンティティの削除
     if (ballToRemove.isNotEmpty) {
       for (var ball in ballToRemove) {
@@ -225,7 +310,7 @@ class SuikaGame extends Forge2DGame
       ballToAdd.clear();
     }
 
-    double threshold = camera.visibleWorldRect.bottom - groundSize;
+    double threshold = (camera.visibleWorldRect.bottom - groundSize) * (isEasyMode ? 2.0 : 1.0);
 
     if (isMounted) {
       DebugInfo.add('Obj Height: $_objHeight');
@@ -237,6 +322,7 @@ class SuikaGame extends Forge2DGame
 
     if (isMounted && _objHeight > threshold && !_isGameOver) {
       _isGameOver = true;
+      overlays.remove('TopControls');
       overlays.add('GameOver');
     }
   }
