@@ -102,7 +102,6 @@ class AlienBall extends PositionComponent
               hasFirstCollisionExecuted: true,
             ),
           );
-          // Yellow Suit（最大ボール）が誕生したらコングラッチュレーション
           if (newNumber == 10) {
             game.showCongratulations();
           }
