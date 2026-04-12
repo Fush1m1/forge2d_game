@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:forge2d_game/components/next_alien.dart';
 import 'package:forge2d_game/game.dart';
 import 'package:forge2d_game/utils/app_theme.dart';
 
@@ -14,30 +15,44 @@ class TopControls extends StatelessWidget {
         padding: const EdgeInsets.all(16.0),
         child: Align(
           alignment: Alignment.topRight,
-          child: Container(
-            decoration: BoxDecoration(
-              boxShadow: [
-                BoxShadow(
-                  color: AppTheme.shadowColor.withValues(alpha: 0.3),
-                  blurRadius: 10,
-                  offset: const Offset(0, 4),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Container(
+                decoration: BoxDecoration(
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppTheme.shadowColor.withValues(alpha: 0.3),
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
                 ),
-              ],
-            ),
-            child: ElevatedButton.icon(
-              onPressed: game.resetGame,
-              icon: const Icon(Icons.refresh, size: 20),
-              label: const Text('New Game'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppTheme.buttonBackground,
-                foregroundColor: AppTheme.buttonText,
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(AppTheme.borderRadiusMedium),
+                child: ElevatedButton.icon(
+                  onPressed: game.resetGame,
+                  icon: const Icon(Icons.refresh, size: 20),
+                  label: const Text('New Game'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppTheme.buttonBackground,
+                    foregroundColor: AppTheme.buttonText,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 12,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(
+                        AppTheme.borderRadiusMedium,
+                      ),
+                    ),
+                    elevation: 0,
+                  ),
                 ),
-                elevation: 0,
               ),
-            ),
+              const SizedBox(height: 16),
+              // 次のボールを表示
+              NextAlien(game: game),
+            ],
           ),
         ),
       ),

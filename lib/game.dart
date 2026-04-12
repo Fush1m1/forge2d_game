@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:math';
-import 'package:flutter/material.dart' hide PointerMoveEvent, PointerDownEvent, PointerUpEvent, PointerCancelEvent;
+import 'package:flutter/material.dart'
+    hide PointerMoveEvent, PointerDownEvent, PointerUpEvent, PointerCancelEvent;
 import 'package:flame_forge2d/flame_forge2d.dart';
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
@@ -11,6 +12,7 @@ import 'package:forge2d_game/components/background.dart';
 import 'package:forge2d_game/components/brick.dart';
 import 'package:forge2d_game/components/ground.dart';
 import 'package:forge2d_game/components/debug_info.dart';
+import 'package:forge2d_game/components/easy_mode_message.dart';
 import 'package:forge2d_game/utils/config.dart';
 import 'package:forge2d_game/utils/state_parameter.dart';
 
@@ -43,7 +45,8 @@ class SuikaGame extends Forge2DGame
   static const double _burstInterval = 0.15; // 0.15秒ごとに発射
   static const double _longPressThreshold = 0.5; // 0.5秒以上で長押し判定
 
-
+  // 次に出るボールを通知するためのNotifier
+  final ValueNotifier<int> nextBallNotifier = ValueNotifier(1);
 
   @override
   void onGameResize(Vector2 size) {
@@ -65,11 +68,13 @@ class SuikaGame extends Forge2DGame
     await super.onLoad();
     WidgetsBinding.instance.addObserver(this);
     camera.viewport.add(DebugInfoComponent());
+    camera.viewport.add(EasyModeMessageComponent());
     numberOfFirstBall = rng.nextInt(randomNum) + starRandomNum;
     numberOfSecondBall = rng.nextInt(randomNum) + starRandomNum;
 
     final visibleRect = camera.visibleWorldRect;
     _bottomRight = visibleRect.bottomRight.toVector2();
+    nextBallNotifier.value = numberOfSecondBall;
 
     final backgroundImage = await images.load('colored_grass.png');
     final spriteSheets = await Future.wait([
@@ -172,6 +177,7 @@ class SuikaGame extends Forge2DGame
     tapOK = true;
     numberOfFirstBall = rng.nextInt(randomNum) + starRandomNum;
     numberOfSecondBall = rng.nextInt(randomNum) + starRandomNum;
+    nextBallNotifier.value = numberOfSecondBall;
     overlays.remove('GameOver');
     overlays.remove('Congratulations');
     overlays.remove('TopControls');
@@ -214,6 +220,7 @@ class SuikaGame extends Forge2DGame
         ///次のballを決定する
         numberOfFirstBall = numberOfSecondBall;
         numberOfSecondBall = rng.nextInt(randomNum) + starRandomNum;
+        nextBallNotifier.value = numberOfFirstBall;
       }
     }
   }
@@ -254,7 +261,6 @@ class SuikaGame extends Forge2DGame
     _updatePosition(event.canvasPosition);
   }
 
-
   @override
   void update(double dt) {
     super.update(dt);
@@ -285,7 +291,9 @@ class SuikaGame extends Forge2DGame
       ballToAdd.clear();
     }
 
-    double threshold = (camera.visibleWorldRect.bottom - groundSize) * (isEasyMode ? 2.0 : 1.0);
+    double threshold =
+        (camera.visibleWorldRect.bottom - groundSize) *
+        (isEasyMode ? 2.0 : 1.0);
 
     if (isMounted) {
       DebugInfo.add('Obj Height: $_objHeight');

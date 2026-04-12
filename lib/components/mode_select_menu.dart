@@ -15,10 +15,7 @@ class ModeSelectMenu extends StatelessWidget {
         decoration: BoxDecoration(
           color: const Color(0xFF1A1A2E).withValues(alpha: 0.95),
           borderRadius: BorderRadius.circular(40.0),
-          border: Border.all(
-            color: const Color(0xFF4A4A8A),
-            width: 3.0,
-          ),
+          border: Border.all(color: const Color(0xFF4A4A8A), width: 3.0),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withValues(alpha: 0.5),

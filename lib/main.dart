@@ -14,8 +14,7 @@ void main() {
         gameFactory: SuikaGame.new,
         overlayBuilderMap: {
           'GameOver': (context, game) => GameOverMenu(game: game),
-          'Congratulations': (context, game) =>
-              CongratulationsMenu(game: game),
+          'Congratulations': (context, game) => CongratulationsMenu(game: game),
           'ModeSelect': (context, game) => ModeSelectMenu(game: game),
           'TopControls': (context, game) => TopControls(game: game),
         },
