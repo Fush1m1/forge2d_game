@@ -192,7 +192,7 @@ class SuikaGame extends Forge2DGame
 
   void _dropBall() {
     if (_isGameOver) return;
-    if (tapOK || _isHolding) {
+    if (tapOK || (isEasyMode && _isHolding)) {
       double ballSize = calcTypeSize(numberOfFirstBall, allPer);
       final visibleRect = camera.visibleWorldRect;
       final wallOffset = ballSize / 2;
@@ -259,7 +259,7 @@ class SuikaGame extends Forge2DGame
   void update(double dt) {
     super.update(dt);
     // 連射ロジック
-    if (_isHolding && !_isGameOver) {
+    if (isEasyMode && _isHolding && !_isGameOver) {
       _pressDuration += dt;
       // 長押し判定時間（0.5秒）を超えたら連射開始
       if (_pressDuration >= _longPressThreshold && _burstCount < 10) {
