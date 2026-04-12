@@ -25,7 +25,9 @@ class NextAlien extends StatelessWidget {
           ),
         ],
       ),
-      child: Column(
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.end,
+        mainAxisSize: MainAxisSize.min,
         children: [
           const Text(
             'NEXT',
@@ -36,7 +38,7 @@ class NextAlien extends StatelessWidget {
               letterSpacing: 1.2,
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(width: 8),
           ValueListenableBuilder<int>(
             valueListenable: game.nextBallNotifier,
             builder: (context, nextNumber, _) {
