@@ -1,4 +1,4 @@
-package com.example.forge2d_game
+package com.fush1m1.forge2dgame
 
 import io.flutter.embedding.android.FlutterActivity
 
