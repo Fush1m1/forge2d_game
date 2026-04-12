@@ -99,8 +99,6 @@ class SuikaGame extends Forge2DGame
     await addBrick(camera.visibleWorldRect.right / 2, 3.0);
     await addBrick(camera.visibleWorldRect.left / 2, 4.2);
     await addBrick(camera.visibleWorldRect.right / 2, 4.2);
-    // await addTriangleBrick(camera.visibleWorldRect.left / 2, 5.4, 1);
-    // await addTriangleBrick(camera.visibleWorldRect.right / 2, 5.4, -1);
 
     /// ゲーム開始前にモード選択を表示
     pauseEngine();
@@ -136,29 +134,6 @@ class SuikaGame extends Forge2DGame
           type,
           size,
         ).map((key, filename) => MapEntry(key, elements.getSprite(filename))),
-      ),
-    );
-  }
-
-  /// 三角形のブロックを追加するためのメソッド
-  ///
-  /// `a`は回転角度（度数法）を指定します。例えば、1なら時計回りに90度、-1なら反時計回りに90度回転します。
-  /// 三角形の頂点に物体が乗った際、それが落ちるように a = 1 を指定できます。
-  Future<void> addTriangleBrick(double x, double h, double a) async {
-    final y = camera.visibleWorldRect.bottom - groundSize * h;
-    final type = BrickType.metal;
-    final size = BrickSize.size70x140;
-    final damage = BrickDamage.none;
-    final filename = 'elementMetal000.png';
-
-    await world.add(
-      Brick(
-        type: type,
-        size: size,
-        damage: damage,
-        position: Vector2(x, y),
-        sprites: {damage: elements.getSprite(filename)},
-        angle: a * pi / 180,
       ),
     );
   }
