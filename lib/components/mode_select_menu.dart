@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:forge2d_game/game.dart';
+import 'package:forge2d_game/utils/app_theme.dart';
 import 'package:forge2d_game/utils/state_parameter.dart';
 
 class ModeSelectMenu extends StatelessWidget {
@@ -13,12 +14,12 @@ class ModeSelectMenu extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 36, vertical: 40),
         decoration: BoxDecoration(
-          color: const Color(0xFF1A1A2E).withValues(alpha: 0.95),
-          borderRadius: BorderRadius.circular(40.0),
-          border: Border.all(color: const Color(0xFF4A4A8A), width: 3.0),
+          color: AppTheme.overlayBackground.withValues(alpha: 0.95),
+          borderRadius: BorderRadius.circular(AppTheme.borderRadiusLarge),
+          border: Border.all(color: AppTheme.overlayBorder, width: AppTheme.borderWidth / 2),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.5),
+              color: AppTheme.shadowColor.withValues(alpha: 0.2),
               blurRadius: 30,
               spreadRadius: 8,
             ),
@@ -30,7 +31,7 @@ class ModeSelectMenu extends StatelessWidget {
             const Text(
               'Select Mode',
               style: TextStyle(
-                color: Colors.white,
+                color: AppTheme.titleText,
                 fontSize: 40,
                 fontWeight: FontWeight.bold,
                 letterSpacing: 2,
@@ -42,7 +43,7 @@ class ModeSelectMenu extends StatelessWidget {
             _ModeButton(
               label: 'Normal',
               icon: Icons.sports_esports,
-              color: const Color(0xFF9162E8),
+              color: AppTheme.normalMode,
               description: 'Standard ball sizes',
               onTap: () {
                 isEasyMode = false;
@@ -55,7 +56,7 @@ class ModeSelectMenu extends StatelessWidget {
             _ModeButton(
               label: 'Easy',
               icon: Icons.sentiment_satisfied_alt,
-              color: const Color(0xFFF9A825),
+              color: AppTheme.easyMode,
               description: 'Balls are half the size',
               onTap: () {
                 isEasyMode = true;

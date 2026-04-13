@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:forge2d_game/game.dart';
+import 'package:forge2d_game/utils/app_theme.dart';
 
 class CongratulationsMenu extends StatelessWidget {
   final SuikaGame game;
@@ -12,15 +13,15 @@ class CongratulationsMenu extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(30),
         decoration: BoxDecoration(
-          color: const Color(0xFFFFFDE7).withValues(alpha: 0.9), // Soft Yellow
-          borderRadius: BorderRadius.circular(40.0),
+          color: AppTheme.overlayBackground.withValues(alpha: 0.9),
+          borderRadius: BorderRadius.circular(AppTheme.borderRadiusLarge),
           border: Border.all(
-            color: const Color(0xFFFFE082), // Amber
-            width: 6.0,
+            color: AppTheme.overlayBorder,
+            width: AppTheme.borderWidth,
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.yellow.withValues(alpha: 0.2),
+              color: AppTheme.shadowColor.withValues(alpha: 0.2),
               blurRadius: 20,
               spreadRadius: 5,
             ),
@@ -32,7 +33,7 @@ class CongratulationsMenu extends StatelessWidget {
             const Text(
               'Congratulations!',
               style: TextStyle(
-                color: Color(0xFFF9A825), // Golden Yellow
+                color: AppTheme.congratulationsText,
                 fontSize: 48,
                 fontWeight: FontWeight.bold,
                 shadows: [
@@ -48,11 +49,13 @@ class CongratulationsMenu extends StatelessWidget {
             ElevatedButton(
               onPressed: game.resetGame,
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFFFFCA28), // Amber Yellow
+                backgroundColor: AppTheme.secondaryButtonBackground,
                 foregroundColor: Colors.white,
                 elevation: 5,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(30.0),
+                  borderRadius: BorderRadius.circular(
+                    AppTheme.borderRadiusMedium,
+                  ),
                 ),
                 padding: const EdgeInsets.symmetric(
                   horizontal: 50,
