@@ -16,7 +16,10 @@ class ModeSelectMenu extends StatelessWidget {
         decoration: BoxDecoration(
           color: AppTheme.overlayBackground.withValues(alpha: 0.95),
           borderRadius: BorderRadius.circular(AppTheme.borderRadiusLarge),
-          border: Border.all(color: AppTheme.overlayBorder, width: AppTheme.borderWidth / 2),
+          border: Border.all(
+            color: AppTheme.overlayBorder,
+            width: AppTheme.borderWidth / 2,
+          ),
           boxShadow: [
             BoxShadow(
               color: AppTheme.shadowColor.withValues(alpha: 0.2),
@@ -99,33 +102,36 @@ class _ModeButton extends StatelessWidget {
             border: Border.all(color: color, width: 2.5),
           ),
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 18),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(icon, color: color, size: 32),
-                const SizedBox(width: 16),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      label,
-                      style: TextStyle(
-                        color: color,
-                        fontSize: 26,
-                        fontWeight: FontWeight.bold,
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+            child: SizedBox(
+              height: 60,
+              width: 200,
+              child: Row(
+                children: [
+                  Icon(icon, color: color, size: 32),
+                  const SizedBox(width: 16),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        label,
+                        style: TextStyle(
+                          color: color,
+                          fontSize: 26,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
-                    ),
-                    Text(
-                      description,
-                      style: TextStyle(
-                        color: color.withValues(alpha: 0.75),
-                        fontSize: 14,
+                      Text(
+                        description,
+                        style: TextStyle(
+                          color: color.withValues(alpha: 0.75),
+                          fontSize: 14,
+                        ),
                       ),
-                    ),
-                  ],
-                ),
-              ],
+                    ],
+                  ),
+                ],
+              ),
             ),
           ),
         ),
