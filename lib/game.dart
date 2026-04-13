@@ -74,7 +74,7 @@ class SuikaGame extends Forge2DGame
 
     final visibleRect = camera.visibleWorldRect;
     _bottomRight = visibleRect.bottomRight.toVector2();
-    nextBallNotifier.value = numberOfSecondBall;
+    nextBallNotifier.value = numberOfFirstBall;
 
     final backgroundImage = await images.load('colored_grass.png');
     final spriteSheets = await Future.wait([
@@ -177,7 +177,7 @@ class SuikaGame extends Forge2DGame
     tapOK = true;
     numberOfFirstBall = rng.nextInt(randomNum) + starRandomNum;
     numberOfSecondBall = rng.nextInt(randomNum) + starRandomNum;
-    nextBallNotifier.value = numberOfSecondBall;
+    nextBallNotifier.value = numberOfFirstBall;
     overlays.remove('GameOver');
     overlays.remove('Congratulations');
     overlays.remove('TopControls');

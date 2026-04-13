@@ -43,8 +43,8 @@ class NextAlien extends StatelessWidget {
             valueListenable: game.nextBallNotifier,
             builder: (context, nextNumber, _) {
               return SizedBox(
-                width: 50,
-                height: 50,
+                width: 20,
+                height: 20,
                 child: SpriteWidget(
                   sprite: game.aliens.getSprite(getAlienSpriteName(nextNumber)),
                 ),
