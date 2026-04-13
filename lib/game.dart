@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:math';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart'
     hide PointerMoveEvent, PointerDownEvent, PointerUpEvent, PointerCancelEvent;
 import 'package:flame_forge2d/flame_forge2d.dart';
