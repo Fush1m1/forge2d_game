@@ -30,19 +30,21 @@ class CongratulationsMenu extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Text(
-              'Congratulations!',
-              style: TextStyle(
-                color: AppTheme.congratulationsText,
-                fontSize: 48,
-                fontWeight: FontWeight.bold,
-                shadows: [
-                  Shadow(
-                    color: Colors.white,
-                    offset: Offset(2, 2),
-                    blurRadius: 2,
-                  ),
-                ],
+            FittedBox(
+              child: const Text(
+                'Congratulations!',
+                style: TextStyle(
+                  color: AppTheme.congratulationsText,
+                  fontSize: 48,
+                  fontWeight: FontWeight.bold,
+                  shadows: [
+                    Shadow(
+                      color: Colors.white,
+                      offset: Offset(2, 2),
+                      blurRadius: 2,
+                    ),
+                  ],
+                ),
               ),
             ),
             const SizedBox(height: 30),
