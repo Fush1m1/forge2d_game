@@ -1,9 +1,7 @@
 import 'package:flame/components.dart';
 import 'package:flame_forge2d/flame_forge2d.dart';
-
-import '../utils/body_component_with_user_data.dart'; // Add this import
-
-const groundSize = 7.0;
+import 'package:forge2d_game/utils/config.dart';
+import '../utils/body_component_with_user_data.dart';
 
 class Ground extends BodyComponentWithUserData {
   Ground(Vector2 position, Sprite sprite)

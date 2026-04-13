@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:math';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart'
     hide PointerMoveEvent, PointerDownEvent, PointerUpEvent, PointerCancelEvent;
 import 'package:flame_forge2d/flame_forge2d.dart';
@@ -24,15 +25,17 @@ class SuikaGame extends Forge2DGame
         WidgetsBindingObserver {
   SuikaGame() : super(zoom: scale, gravity: Vector2(0, dbGravity));
 
-  final Random rng = Random();
   double touchX = 0.0;
   double touchY = 0.0;
   Vector2 _bottomRight = Vector2.zero();
+  double _objHeight = 0;
+  bool _isGameOver = false;
+
   late final XmlSpriteSheet aliens;
   late final XmlSpriteSheet elements;
   late final XmlSpriteSheet tiles;
-  double _objHeight = 0;
-  bool _isGameOver = false;
+
+  final Random rng = Random();
 
   final List<AlienBall> ballToRemove = [];
   final List<AlienBall> ballToAdd = [];
@@ -51,15 +54,8 @@ class SuikaGame extends Forge2DGame
   @override
   void onGameResize(Vector2 size) {
     super.onGameResize(size);
-    final screenWidth = size.x;
-    final screenHeight = size.y;
 
-    ///座標の倍率計算
-    widthPer = screenWidth / widthBase;
-    heightPer = screenHeight / heightBase;
-    allPer = (widthPer + heightPer) / 2;
-
-    /// ブラウザのリサイズに追随してワールド座標の右下を更新
+    // ブラウザのリサイズに追随してワールド座標の右下を更新
     _bottomRight = camera.visibleWorldRect.bottomRight.toVector2();
   }
 
@@ -98,14 +94,16 @@ class SuikaGame extends Forge2DGame
 
     await world.add(Background(sprite: Sprite(backgroundImage)));
     await addGround();
-    await addBrick(camera.visibleWorldRect.left / 2, 1.8);
-    await addBrick(camera.visibleWorldRect.right / 2, 1.8);
-    await addBrick(camera.visibleWorldRect.left / 2, 3.0);
-    await addBrick(camera.visibleWorldRect.right / 2, 3.0);
-    await addBrick(camera.visibleWorldRect.left / 2, 4.2);
-    await addBrick(camera.visibleWorldRect.right / 2, 4.2);
+    // TODO: この辺ランダム制と複数ステージ制で拡張する
+    // TODO: これなんで3.5なの？どこからきた数字だろう
+    await addBrick(camera.visibleWorldRect.left / 3 * 2, 3.5);
+    await addBrick(camera.visibleWorldRect.right / 3 * 2, 3.5);
+    await addBrick(camera.visibleWorldRect.left / 3 * 2, 10.5);
+    await addBrick(camera.visibleWorldRect.right / 3 * 2, 10.5);
+    await addBrick(camera.visibleWorldRect.left / 3 * 2, 17.5);
+    await addBrick(camera.visibleWorldRect.right / 3 * 2, 17.5);
 
-    /// ゲーム開始前にモード選択を表示
+    // ゲーム開始前にモード選択を表示
     pauseEngine();
     overlays.add('ModeSelect');
   }
@@ -125,7 +123,8 @@ class SuikaGame extends Forge2DGame
   }
 
   Future<void> addBrick(double x, double h) async {
-    final y = camera.visibleWorldRect.bottom - groundSize * h;
+    // TODO: この辺ランダム制と複数ステージ制で拡張する
+    final y = camera.visibleWorldRect.bottom - (h + groundSize);
     final type = BrickType.metal;
     final size = BrickSize.size70x140;
 
@@ -191,6 +190,7 @@ class SuikaGame extends Forge2DGame
   }
 
   void _updatePosition(Vector2 canvasPosition) {
+    // TODO: refinement
     // 画面座標をワールド座標に変換（手動計算）
     touchX = canvasPosition.x / scale - _bottomRight.x;
     touchY = canvasPosition.y / scale - _bottomRight.y;
@@ -199,7 +199,7 @@ class SuikaGame extends Forge2DGame
   void _dropBall() {
     if (_isGameOver) return;
     if (tapOK || (isEasyMode && _isHolding)) {
-      double ballSize = calcTypeSize(numberOfFirstBall, allPer);
+      double ballSize = calcTypeSize(numberOfFirstBall);
       final visibleRect = camera.visibleWorldRect;
       final wallOffset = ballSize / 2;
       final dropLeft = visibleRect.left + wallOffset;
@@ -217,7 +217,7 @@ class SuikaGame extends Forge2DGame
         world.add(ball);
         tapOK = false;
 
-        ///次のballを決定する
+        // 次のballを決定する
         numberOfFirstBall = numberOfSecondBall;
         numberOfSecondBall = rng.nextInt(randomNum) + starRandomNum;
         nextBallNotifier.value = numberOfFirstBall;
@@ -248,17 +248,6 @@ class SuikaGame extends Forge2DGame
   void onTapUp(TapUpEvent event) {
     super.onTapUp(event);
     _isHolding = false;
-  }
-
-  @override
-  void onTapCancel(TapCancelEvent event) {
-    super.onTapCancel(event);
-    _isHolding = false;
-  }
-
-  @override
-  void onPointerMove(PointerMoveEvent event) {
-    _updatePosition(event.canvasPosition);
   }
 
   @override

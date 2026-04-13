@@ -12,3 +12,4 @@ const double yDrop = lineY - (50 / scale);
 const int starRandomNum = 1;
 const int randomNum = 2;
 const double certainTime = 0.5;
+const double groundSize = 7.0;
