@@ -1,5 +1,6 @@
 import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import 'game.dart';
 import 'package:forge2d_game/components/game_over_menu.dart';
@@ -7,7 +8,13 @@ import 'package:forge2d_game/components/congratulations_menu.dart';
 import 'package:forge2d_game/components/mode_select_menu.dart';
 import 'package:forge2d_game/components/top_controls.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
+  ]);
+
   runApp(
     SafeArea(
       child: GameWidget<SuikaGame>.controlled(
