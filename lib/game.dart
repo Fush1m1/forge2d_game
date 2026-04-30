@@ -279,6 +279,7 @@ class SuikaGame extends Forge2DGame
       ballToAdd.clear();
     }
 
+    // TODO: ハードモード実装してthreshold下げてもいいかも
     double threshold =
         (camera.visibleWorldRect.bottom - groundSize) *
         (isEasyMode ? 2.0 : 1.0);
