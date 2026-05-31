@@ -1,4 +1,4 @@
-# forge2d_game
+# forge2d_suika
 
 ## Privacy Policy
 
