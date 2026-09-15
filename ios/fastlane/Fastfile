@@ -13,10 +13,30 @@ platform :ios do
 
     setup_ci if ENV["CI"]
 
+    app_identifier = ENV["APP_IDENTIFIER"] || "com.fush1m1.forge2dgame"
+
     match(
       type: "appstore",
       api_key: api_key,
       readonly: ENV["CI"] ? true : false
+    )
+
+    profile_name = lane_context[SharedValues::MATCH_PROVISIONING_PROFILE_MAPPING][app_identifier]
+    update_code_signing_settings(
+      use_automatic_signing: false,
+      path: "Runner.xcodeproj",
+      targets: ["Runner"],
+      code_sign_identity: "Apple Distribution",
+      profile_name: profile_name
+    )
+
+    build_number = latest_testflight_build_number(
+      api_key: api_key,
+      app_identifier: app_identifier
+    ) + 1
+    increment_build_number(
+      build_number: build_number,
+      xcodeproj: "Runner.xcodeproj"
     )
 
     build_app(

@@ -46,3 +46,6 @@ app.*.map.json
 
 # Dist related
 /assets/images/screenshots/
+
+# secrets
+docs/release.md
