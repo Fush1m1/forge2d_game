@@ -1,13 +1,12 @@
 import 'dart:io';
 import 'package:equatable/equatable.dart';
 import 'package:xml/xml.dart';
-import 'package:xml/xpath.dart';
 
 void main() {
   final file = File('assets/spritesheet_elements.xml');
   final rects = <String, Rect>{};
   final document = XmlDocument.parse(file.readAsStringSync());
-  for (final node in document.xpath('//TextureAtlas/SubTexture')) {
+  for (final node in document.findAllElements('SubTexture')) {
     final name = node.getAttribute('name')!;
     rects[name] = Rect(
       x: int.parse(node.getAttribute('x')!),
