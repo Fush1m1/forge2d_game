@@ -77,7 +77,11 @@ class SuikaGame extends Forge2DGame
     aliens = spriteSheets[0];
     elements = spriteSheets[1];
     tiles = spriteSheets[2];
-    await FlameAudio.audioCache.loadAll([mergeSoundFile]);
+    await FlameAudio.audioCache.loadAll([
+      mergeSoundFile,
+      gameOverSoundFile,
+      congratulationsSoundFile,
+    ]);
 
     await world.add(Background(sprite: Sprite(backgroundImage)));
     await _buildInitialLevel();
@@ -189,6 +193,7 @@ class SuikaGame extends Forge2DGame
   }
 
   void _showCongratulations() {
+    FlameAudio.play(congratulationsSoundFile);
     session.congratulate();
     overlays.remove(GameOverlay.topControls);
     overlays.add(GameOverlay.congratulations);
@@ -306,6 +311,7 @@ class SuikaGame extends Forge2DGame
         (isEasyMode ? gameOverHeightMultiplierEasy : 1);
     if (_objectHeight <= threshold) return;
 
+    FlameAudio.play(gameOverSoundFile);
     session.gameOver();
     overlays.remove(GameOverlay.topControls);
     overlays.add(GameOverlay.gameOver);
