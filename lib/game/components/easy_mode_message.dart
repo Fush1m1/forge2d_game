@@ -1,10 +1,9 @@
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flutter/material.dart';
-import 'package:forge2d_game/utils/state_parameter.dart';
 
 class EasyModeMessageComponent extends PositionComponent with TapCallbacks {
-  EasyModeMessageComponent()
+  EasyModeMessageComponent({required this.isEasyMode})
     : super(anchor: Anchor.centerLeft, size: Vector2(250, 60));
 
   final TextPaint _textPaint = TextPaint(
@@ -19,6 +18,7 @@ class EasyModeMessageComponent extends PositionComponent with TapCallbacks {
   );
 
   bool isVisible = true;
+  final bool Function() isEasyMode;
 
   @override
   void onGameResize(Vector2 size) {
@@ -29,7 +29,7 @@ class EasyModeMessageComponent extends PositionComponent with TapCallbacks {
 
   @override
   void render(Canvas canvas) {
-    if (isVisible && isEasyMode) {
+    if (isVisible && isEasyMode()) {
       _textPaint.render(
         canvas,
         'this is easy mode.\nyou can long press to burst.',

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:forge2d_game/game.dart';
-import 'package:forge2d_game/utils/app_theme.dart';
-import 'package:forge2d_game/utils/state_parameter.dart';
+import 'package:forge2d_game/app/theme/app_theme.dart';
+import 'package:forge2d_game/game/model/game_mode.dart';
+import 'package:forge2d_game/game/suika_game.dart';
 
 class ModeSelectMenu extends StatelessWidget {
   final SuikaGame game;
@@ -48,10 +48,7 @@ class ModeSelectMenu extends StatelessWidget {
               icon: Icons.sports_esports,
               color: AppTheme.normalMode,
               description: 'Standard ball sizes',
-              onTap: () {
-                isEasyMode = false;
-                game.startGame();
-              },
+              onTap: () => game.startGame(GameMode.normal),
             ),
             const SizedBox(height: 20),
 
@@ -61,10 +58,7 @@ class ModeSelectMenu extends StatelessWidget {
               icon: Icons.sentiment_satisfied_alt,
               color: AppTheme.easyMode,
               description: 'Balls are half the size',
-              onTap: () {
-                isEasyMode = true;
-                game.startGame();
-              },
+              onTap: () => game.startGame(GameMode.easy),
             ),
           ],
         ),

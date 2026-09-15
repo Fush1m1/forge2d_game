@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:forge2d_game/game.dart';
-import 'package:forge2d_game/utils/app_theme.dart';
+import 'package:forge2d_game/app/theme/app_theme.dart';
+import 'package:forge2d_game/game/suika_game.dart';
 
 class NewGameButton extends StatelessWidget {
   final SuikaGame game;

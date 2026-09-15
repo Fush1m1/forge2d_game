@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:forge2d_game/components/new_game_button.dart';
-import 'package:forge2d_game/components/next_alien.dart';
-import 'package:forge2d_game/game.dart';
+import 'package:forge2d_game/app/overlays/new_game_button.dart';
+import 'package:forge2d_game/app/overlays/next_alien.dart';
+import 'package:forge2d_game/game/suika_game.dart';
 
 class TopControls extends StatelessWidget {
   final SuikaGame game;

@@ -1,8 +1,7 @@
 import 'package:flame/widgets.dart';
 import 'package:flutter/material.dart';
-import 'package:forge2d_game/components/alien_ball.dart';
-import 'package:forge2d_game/game.dart';
-import 'package:forge2d_game/utils/app_theme.dart';
+import 'package:forge2d_game/app/theme/app_theme.dart';
+import 'package:forge2d_game/game/suika_game.dart';
 
 class NextAlien extends StatelessWidget {
   final SuikaGame game;
@@ -39,14 +38,16 @@ class NextAlien extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 8),
-          ValueListenableBuilder<int>(
-            valueListenable: game.nextBallNotifier,
-            builder: (context, nextNumber, _) {
+          ValueListenableBuilder(
+            valueListenable: game.gameState,
+            builder: (context, state, _) {
               return SizedBox(
                 width: 20,
                 height: 20,
                 child: SpriteWidget(
-                  sprite: game.aliens.getSprite(getAlienSpriteName(nextNumber)),
+                  sprite: game.aliens.getSprite(
+                    game.ballDefinitionFor(state.nextBallLevel).spriteName,
+                  ),
                 ),
               );
             },
