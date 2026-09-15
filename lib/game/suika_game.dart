@@ -243,8 +243,7 @@ class SuikaGame extends Forge2DGame
     super.onTapDown(event);
     _lastTapLog =
         'Tap: (${event.canvasPosition.x.toStringAsFixed(1)}, '
-        '${event.canvasPosition.y.toStringAsFixed(1)}) '
-        '${event.handled ? '[handled]' : '[game]'}';
+        '${event.canvasPosition.y.toStringAsFixed(1)})';
     DebugInfo.add(_lastTapLog);
     if (event.handled || !session.isPlaying) return;
     _dropPosition = _canvasToWorld(event.canvasPosition);
