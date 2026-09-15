@@ -3,6 +3,7 @@ import 'dart:math';
 
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
+import 'package:flame_audio/flame_audio.dart';
 import 'package:flame_forge2d/flame_forge2d.dart';
 import 'package:flame_kenney_xml/flame_kenney_xml.dart';
 import 'package:flutter/material.dart'
@@ -76,6 +77,7 @@ class SuikaGame extends Forge2DGame
     aliens = spriteSheets[0];
     elements = spriteSheets[1];
     tiles = spriteSheets[2];
+    await FlameAudio.audioCache.loadAll([mergeSoundFile]);
 
     await world.add(Background(sprite: Sprite(backgroundImage)));
     await _buildInitialLevel();
@@ -160,6 +162,7 @@ class SuikaGame extends Forge2DGame
     second.hasCombined = true;
     if (first.number >= 10) return;
 
+    FlameAudio.play(mergeSoundFile);
     final newLevel = first.number + 1;
     final newPosition =
         (first.bodyComponent.body.position +

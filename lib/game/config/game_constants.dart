@@ -13,3 +13,4 @@ const double brickHeightInterval = initialBrickWorldHeight;
 const int initialBrickRowCount = 3;
 const double gameOverHeightMultiplierEasy = 2;
 const double collisionSettleDuration = 0.5;
+const String mergeSoundFile = 'merge.wav';
