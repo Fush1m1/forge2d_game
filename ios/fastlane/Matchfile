@@ -1,0 +1,5 @@
+git_url("https://github.com/Fush1m1/forge2d_game.git")
+git_branch("certificates")
+storage_mode("git")
+type("appstore")
+app_identifier(ENV["APP_IDENTIFIER"] || "com.fush1m1.forge2dgame")
