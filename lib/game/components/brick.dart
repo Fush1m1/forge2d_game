@@ -4,9 +4,8 @@ import 'dart:ui' as ui;
 import 'package:flame/components.dart';
 import 'package:flame/extensions.dart';
 import 'package:flame_forge2d/flame_forge2d.dart';
+import 'package:forge2d_game/game/config/game_constants.dart';
 import 'package:forge2d_game/shared/forge2d/body_component_with_user_data.dart';
-
-const brickScale = 0.5;
 
 enum BrickType {
   explosive(density: 1, friction: 0.5),

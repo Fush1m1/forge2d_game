@@ -4,5 +4,12 @@ const double initialDropSpeed = 40;
 const double dropLineY = -100 / worldScale;
 const double dropY = dropLineY - (50 / worldScale);
 const double groundTileSize = 7;
+const double brickScale = 0.5;
+const double initialBrickSourceHeight = 140;
+const double initialBrickWorldHeight =
+    initialBrickSourceHeight / worldScale * brickScale;
+const double firstBrickHeight = initialBrickWorldHeight / 2;
+const double brickHeightInterval = initialBrickWorldHeight;
+const int initialBrickRowCount = 3;
 const double gameOverHeightMultiplierEasy = 2;
 const double collisionSettleDuration = 0.5;

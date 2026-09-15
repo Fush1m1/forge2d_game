@@ -43,6 +43,7 @@ class SuikaGame extends Forge2DGame
 
   Vector2 _dropPosition = Vector2.zero();
   double _objectHeight = 0;
+  String _lastTapLog = 'Tap: -';
 
   ValueNotifier<GameState> get gameState => session.state;
   GameMode? get mode => session.mode;
@@ -102,7 +103,8 @@ class SuikaGame extends Forge2DGame
           tiles.getSprite('grass.png'),
         ),
     ]);
-    for (final height in [3.5, 10.5, 17.5]) {
+    for (var row = 0; row < initialBrickRowCount; row++) {
+      final height = firstBrickHeight + brickHeightInterval * row;
       await _addBrick(visibleRect.left / 3 * 2, height);
       await _addBrick(visibleRect.right / 3 * 2, height);
     }
@@ -231,6 +233,11 @@ class SuikaGame extends Forge2DGame
   @override
   void onTapDown(TapDownEvent event) {
     super.onTapDown(event);
+    _lastTapLog =
+        'Tap: (${event.canvasPosition.x.toStringAsFixed(1)}, '
+        '${event.canvasPosition.y.toStringAsFixed(1)}) '
+        '${event.handled ? '[handled]' : '[game]'}';
+    DebugInfo.add(_lastTapLog);
     if (event.handled || !session.isPlaying) return;
     _dropPosition = _canvasToWorld(event.canvasPosition);
     _dropController.beginPress();
@@ -286,6 +293,7 @@ class SuikaGame extends Forge2DGame
     DebugInfo.add(
       'Ball count: ${world.children.whereType<AlienBall>().length}',
     );
+    DebugInfo.add(_lastTapLog);
   }
 
   void _updateGameOver() {
