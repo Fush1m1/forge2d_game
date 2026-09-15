@@ -5,7 +5,7 @@ on:
 
 jobs:
   testflight:
-    runs-on: macos-14
+    runs-on: macos-15
     timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
@@ -13,6 +13,12 @@ jobs:
       - name: Configure git auth for fastlane match
         run: |
           git config --global http.https://github.com/.extraheader "AUTHORIZATION: basic $(printf 'x-access-token:%s' "${{ secrets.GITHUB_TOKEN }}" | base64)"
+
+      # macos-15 ランナーのデフォルトXcode(16.4)はiOS 18系SDKまでで、
+      # App Store Connectが新規アップロードに要求するiOS 26 SDKを満たさないため明示的に切り替える。
+      - uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: latest-stable
 
       - uses: subosito/flutter-action@v2
         with:
