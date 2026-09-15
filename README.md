@@ -51,3 +51,27 @@ lib/
     └── forge2d/
         └── body_component_with_user_data.dart
 ```
+
+## TestFlight配信
+
+iOSビルドとTestFlightへのアップロードにはmacOS/Xcodeと Apple Developer の認証情報が
+必要なため、クラウドセッション上では実行できない。GitHub Actions
+（`.github/workflows/testflight.yml`、`macos-14` ランナー）と fastlane
+（`ios/fastlane/`）でCI配信できるように構成してあるので、以下のRepository
+Secretsを登録した上で Actions タブから `Deploy to TestFlight` ワークフローを
+手動実行（workflow_dispatch）する。
+
+| Secret | 内容 |
+| --- | --- |
+| `ASC_KEY_ID` | App Store Connect API キーのKey ID |
+| `ASC_ISSUER_ID` | App Store Connect API キーのIssuer ID |
+| `ASC_KEY_CONTENT` | `.p8` キーファイルの中身をbase64エンコードした文字列（`base64 -i AuthKey_XXXX.p8 \| pbcopy`） |
+| `TEAM_ID` | Apple Developer の Team ID（任意、複数チーム所属時のみ必要） |
+| `APP_IDENTIFIER` | Bundle ID（任意、既定値は `com.fush1m1.forge2dgame`） |
+
+App Store Connect API キーは developer.apple.com の
+「ユーザとアクセス」→「統合」→「App Store Connect API」から発行し、
+対象アプリに対して少なくとも「App Manager」ロールを付与しておくこと。
+証明書・プロビジョニングプロファイルはXcodeの自動署名
+（`update_code_signing_settings` + `-allowProvisioningUpdates`）で
+CI実行時に取得・更新される。
