@@ -1,4 +1,5 @@
 import 'game_mode.dart';
+import '../config/game_constants.dart';
 
 class BallDefinition {
   const BallDefinition({
@@ -11,8 +12,11 @@ class BallDefinition {
   final double diameter;
   final String spriteName;
 
-  double diameterFor(GameMode mode) =>
-      mode == GameMode.easy ? diameter / 2 : diameter;
+  /// Returns the diameter in Forge2D world units, not source-image pixels.
+  double diameterFor(GameMode mode) {
+    final modeMultiplier = mode == GameMode.easy ? 0.5 : 1.0;
+    return diameter / worldScale * modeMultiplier;
+  }
 
   static BallDefinition forLevel(int level) {
     final definition = _definitions[level];

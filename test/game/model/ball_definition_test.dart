@@ -7,8 +7,8 @@ void main() {
     final ball = BallDefinition.forLevel(6);
 
     expect(ball.spriteName, 'alienBeige_suit.png');
-    expect(ball.diameterFor(GameMode.normal), 80);
-    expect(ball.diameterFor(GameMode.easy), 40);
+    expect(ball.diameterFor(GameMode.normal), 8);
+    expect(ball.diameterFor(GameMode.easy), 4);
   });
 
   test('unsupported ball level is rejected', () {

@@ -252,6 +252,7 @@ class SuikaGame extends Forge2DGame
       _dropBall(allowWhileBusy: true);
     }
     _applyPendingBallChanges();
+    _updateDebugInfo();
     _updateGameOver();
   }
 
@@ -272,6 +273,19 @@ class SuikaGame extends Forge2DGame
       world.add(ball);
     }
     _ballsToAdd.clear();
+  }
+
+  void _updateDebugInfo() {
+    if (!isMounted) return;
+
+    final threshold =
+        (camera.visibleWorldRect.bottom - groundTileSize) *
+        (isEasyMode ? gameOverHeightMultiplierEasy : 1);
+    DebugInfo.add('Obj Height: $_objectHeight');
+    DebugInfo.add('Threshold: $threshold');
+    DebugInfo.add(
+      'Ball count: ${world.children.whereType<AlienBall>().length}',
+    );
   }
 
   void _updateGameOver() {
