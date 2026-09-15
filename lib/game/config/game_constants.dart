@@ -14,3 +14,5 @@ const int initialBrickRowCount = 3;
 const double gameOverHeightMultiplierEasy = 2;
 const double collisionSettleDuration = 0.5;
 const String mergeSoundFile = 'merge.wav';
+const String gameOverSoundFile = 'game_over.wav';
+const String congratulationsSoundFile = 'congratulations.wav';
