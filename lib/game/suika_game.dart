@@ -8,6 +8,7 @@ import 'package:flame_forge2d/flame_forge2d.dart';
 import 'package:flame_kenney_xml/flame_kenney_xml.dart';
 import 'package:flutter/material.dart'
     hide PointerCancelEvent, PointerDownEvent, PointerMoveEvent, PointerUpEvent;
+import 'package:shake/shake.dart';
 
 import 'components/alien_ball.dart';
 import 'components/background.dart';
@@ -37,10 +38,12 @@ class SuikaGame extends Forge2DGame
   final DropController _dropController = DropController();
   final List<AlienBall> _ballsToRemove = [];
   final List<AlienBall> _ballsToAdd = [];
+  final Random _random = Random();
 
   late final XmlSpriteSheet aliens;
   late final XmlSpriteSheet elements;
   late final XmlSpriteSheet tiles;
+  late final ShakeDetector _shakeDetector;
 
   Vector2 _dropPosition = Vector2.zero();
   double _objectHeight = 0;
@@ -82,6 +85,9 @@ class SuikaGame extends Forge2DGame
       gameOverSoundFile,
       congratulationsSoundFile,
     ]);
+    _shakeDetector = ShakeDetector.autoStart(
+      onPhoneShake: (event) => _shakeStackedBalls(),
+    );
 
     await world.add(Background(sprite: Sprite(backgroundImage)));
     await _buildInitialLevel();
@@ -93,6 +99,7 @@ class SuikaGame extends Forge2DGame
   void onRemove() {
     WidgetsBinding.instance.removeObserver(this);
     session.dispose();
+    _shakeDetector.stopListening();
     super.onRemove();
   }
 
@@ -190,6 +197,19 @@ class SuikaGame extends Forge2DGame
   void onBallCollision(Object other) {
     session.markDropReady();
     if (other is! Brick) _objectHeight = _calculateObjectHeight();
+  }
+
+  void _shakeStackedBalls() {
+    if (!session.isPlaying) return;
+    for (final ball in world.children.whereType<AlienBall>()) {
+      final body = ball.bodyComponent.body;
+      final horizontal =
+          (_random.nextDouble() * 2 - 1) * shakeMaxHorizontalVelocity;
+      final upward = -_random.nextDouble() * shakeMaxUpwardVelocity;
+      body.linearVelocity = body.linearVelocity + Vector2(horizontal, upward);
+      body.angularVelocity +=
+          (_random.nextDouble() * 2 - 1) * shakeMaxAngularVelocity;
+    }
   }
 
   void _showCongratulations() {
