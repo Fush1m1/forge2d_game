@@ -41,6 +41,7 @@ class SuikaGame extends Forge2DGame
   late final XmlSpriteSheet aliens;
   late final XmlSpriteSheet elements;
   late final XmlSpriteSheet tiles;
+  late final AudioPool _mergeSoundPool;
 
   Vector2 _dropPosition = Vector2.zero();
   double _objectHeight = 0;
@@ -78,10 +79,14 @@ class SuikaGame extends Forge2DGame
     elements = spriteSheets[1];
     tiles = spriteSheets[2];
     await FlameAudio.audioCache.loadAll([
-      mergeSoundFile,
       gameOverSoundFile,
       congratulationsSoundFile,
     ]);
+    _mergeSoundPool = await FlameAudio.createPool(
+      mergeSoundFile,
+      minPlayers: 2,
+      maxPlayers: 4,
+    );
 
     await world.add(Background(sprite: Sprite(backgroundImage)));
     await _buildInitialLevel();
@@ -93,6 +98,7 @@ class SuikaGame extends Forge2DGame
   void onRemove() {
     WidgetsBinding.instance.removeObserver(this);
     session.dispose();
+    _mergeSoundPool.dispose();
     super.onRemove();
   }
 
@@ -166,7 +172,7 @@ class SuikaGame extends Forge2DGame
     second.hasCombined = true;
     if (first.number >= 10) return;
 
-    FlameAudio.play(mergeSoundFile);
+    _mergeSoundPool.start();
     final newLevel = first.number + 1;
     final newPosition =
         (first.bodyComponent.body.position +
