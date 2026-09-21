@@ -194,12 +194,8 @@ class _EvolutionArrowsPainter extends CustomPainter {
           ..color = color
           ..style = PaintingStyle.stroke
           ..strokeWidth = 2.5
-          ..strokeCap = StrokeCap.round
-          ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 3);
-    final fillPaint =
-        Paint()
-          ..color = color
-          ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 3);
+          ..strokeCap = StrokeCap.round;
+    final fillPaint = Paint()..color = color;
 
     for (
       var level = EvolutionGuideMenu._minLevel;
