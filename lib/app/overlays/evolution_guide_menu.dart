@@ -7,8 +7,8 @@ import 'package:forge2d_game/game/model/ball_definition.dart';
 import 'package:forge2d_game/game/suika_game.dart';
 
 /// Shows every ball level arranged in a ring ("進化の輪"), from level 1 at
-/// the top going clockwise to level 10, so players can see the whole
-/// evolution chain at a glance.
+/// the top going clockwise to level 10, connected by arrows so players can
+/// see the whole evolution chain and its direction at a glance.
 class EvolutionGuideMenu extends StatelessWidget {
   final SuikaGame game;
 
@@ -16,10 +16,23 @@ class EvolutionGuideMenu extends StatelessWidget {
 
   static const int _minLevel = 1;
   static const int _maxLevel = 10;
-  static const double _minIconSize = 28;
-  static const double _maxIconSize = 52;
+  static const double _minIconSize = 26;
+  static const double _maxIconSize = 46;
   static const double _minDiameter = 25;
   static const double _maxDiameter = 200;
+  static const double _ringMargin = 12;
+
+  static double _angleFor(int level) =>
+      2 * math.pi * (level - _minLevel) / (_maxLevel - _minLevel + 1) -
+      math.pi / 2;
+
+  static double _iconSizeFor(int level) {
+    final definition = BallDefinition.forLevel(level);
+    final sizeT = ((definition.diameter - _minDiameter) /
+            (_maxDiameter - _minDiameter))
+        .clamp(0, 1);
+    return _minIconSize + sizeT * (_maxIconSize - _minIconSize);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -27,8 +40,8 @@ class EvolutionGuideMenu extends StatelessWidget {
       color: Colors.black.withValues(alpha: 0.55),
       child: Center(
         child: Container(
-          width: 340,
-          height: 400,
+          width: 360,
+          height: 420,
           padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
             color: AppTheme.overlayBackground.withValues(alpha: 0.97),
@@ -73,6 +86,8 @@ class EvolutionGuideMenu extends StatelessWidget {
                       constraints.maxWidth,
                       constraints.maxHeight,
                     );
+                    final ringRadius =
+                        diameter / 2 - _maxIconSize / 2 - _ringMargin;
                     return SizedBox(
                       width: diameter,
                       height: diameter,
@@ -88,6 +103,13 @@ class EvolutionGuideMenu extends StatelessWidget {
                               ),
                             ),
                           ),
+                          CustomPaint(
+                            size: Size.square(diameter),
+                            painter: _EvolutionArrowsPainter(
+                              ringRadius: ringRadius,
+                              color: AppTheme.buttonBackground,
+                            ),
+                          ),
                           for (
                             var level = _minLevel;
                             level <= _maxLevel;
@@ -97,6 +119,7 @@ class EvolutionGuideMenu extends StatelessWidget {
                               game: game,
                               level: level,
                               ringDiameter: diameter,
+                              ringRadius: ringRadius,
                             ),
                         ],
                       ),
@@ -115,20 +138,14 @@ class EvolutionGuideMenu extends StatelessWidget {
     required SuikaGame game,
     required int level,
     required double ringDiameter,
+    required double ringRadius,
   }) {
     final definition = BallDefinition.forLevel(level);
-    final sizeT = ((definition.diameter - _minDiameter) /
-            (_maxDiameter - _minDiameter))
-        .clamp(0, 1);
-    final iconSize = _minIconSize + sizeT * (_maxIconSize - _minIconSize);
-
-    final angle =
-        2 * math.pi * (level - _minLevel) / (_maxLevel - _minLevel + 1) -
-        math.pi / 2;
+    final iconSize = _iconSizeFor(level);
+    final angle = _angleFor(level);
     final center = ringDiameter / 2;
-    final radius = center - iconSize / 2 - 16;
-    final left = center + radius * math.cos(angle) - iconSize / 2;
-    final top = center + radius * math.sin(angle) - iconSize / 2;
+    final left = center + ringRadius * math.cos(angle) - iconSize / 2;
+    final top = center + ringRadius * math.sin(angle) - iconSize / 2;
 
     return Positioned(
       left: left,
@@ -142,4 +159,74 @@ class EvolutionGuideMenu extends StatelessWidget {
       ),
     );
   }
+}
+
+/// Draws a short clockwise arc with an arrowhead between every pair of
+/// adjacent levels, so the direction of evolution (level N -> level N+1) is
+/// visually obvious around the ring.
+class _EvolutionArrowsPainter extends CustomPainter {
+  _EvolutionArrowsPainter({required this.ringRadius, required this.color});
+
+  final double ringRadius;
+  final Color color;
+
+  static const double _arrowLength = 8;
+  static const double _arrowWidth = 7;
+  static const double _iconGap = 6;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final center = Offset(size.width / 2, size.height / 2);
+    final strokePaint =
+        Paint()
+          ..color = color
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 2.5
+          ..strokeCap = StrokeCap.round;
+    final fillPaint = Paint()..color = color;
+
+    for (
+      var level = EvolutionGuideMenu._minLevel;
+      level < EvolutionGuideMenu._maxLevel;
+      level++
+    ) {
+      final startGap =
+          (EvolutionGuideMenu._iconSizeFor(level) / 2 + _iconGap) / ringRadius;
+      final endGap =
+          (EvolutionGuideMenu._iconSizeFor(level + 1) / 2 + _iconGap) /
+          ringRadius;
+      final startAngle = EvolutionGuideMenu._angleFor(level) + startGap;
+      final endAngle = EvolutionGuideMenu._angleFor(level + 1) - endGap;
+      final sweep = endAngle - startAngle;
+      if (sweep <= 0.02) continue;
+
+      final path =
+          Path()..addArc(
+            Rect.fromCircle(center: center, radius: ringRadius),
+            startAngle,
+            sweep,
+          );
+      canvas.drawPath(path, strokePaint);
+
+      final tip =
+          center + Offset(math.cos(endAngle), math.sin(endAngle)) * ringRadius;
+      final forward = Offset(-math.sin(endAngle), math.cos(endAngle));
+      final perpendicular = Offset(-forward.dy, forward.dx);
+      final base = tip - forward * _arrowLength;
+      final left = base + perpendicular * (_arrowWidth / 2);
+      final right = base - perpendicular * (_arrowWidth / 2);
+
+      final arrowHead =
+          Path()
+            ..moveTo(tip.dx, tip.dy)
+            ..lineTo(left.dx, left.dy)
+            ..lineTo(right.dx, right.dy)
+            ..close();
+      canvas.drawPath(arrowHead, fillPaint);
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _EvolutionArrowsPainter oldDelegate) =>
+      oldDelegate.ringRadius != ringRadius || oldDelegate.color != color;
 }
