@@ -97,7 +97,12 @@ class BallBody extends BodyComponent with ContactCallbacks {
     required this.posi,
     required this.ballSize,
     required this.speed,
-  });
+  }) {
+    // renderBody = false ではなく opacity で消す。debugMode 中も
+    // renderDebugMode() が paint を使って描画するため、透明にしておかないと
+    // 当たり判定の円が見えてしまう。
+    opacity = 0.0;
+  }
   @override
   Body createBody() {
     final shape = CircleShape()..radius = (ballSize) / 2;
