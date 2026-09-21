@@ -24,9 +24,7 @@ class GameOverMenu extends StatelessWidget {
             children: [
               Text(
                 'GAME OVER',
-                style: textTheme.headlineLarge?.copyWith(
-                  color: colorScheme.error,
-                ),
+                style: textTheme.headlineLarge?.copyWith(color: Colors.white),
               ),
               const SizedBox(height: 30),
               FilledButton.icon(

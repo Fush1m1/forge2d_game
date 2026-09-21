@@ -25,9 +25,7 @@ class CongratulationsMenu extends StatelessWidget {
               FittedBox(
                 child: Text(
                   'CONGRATULATIONS!',
-                  style: textTheme.headlineLarge?.copyWith(
-                    color: colorScheme.tertiary,
-                  ),
+                  style: textTheme.headlineLarge?.copyWith(color: Colors.white),
                 ),
               ),
               const SizedBox(height: 30),
