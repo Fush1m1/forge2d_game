@@ -412,7 +412,7 @@ class SuikaGame extends Forge2DGame
         'stack lowest.';
 
     final chosenLane = await jevAssistant.chooseLane(
-      apiKey: appSettings.state.value.jevApiKey,
+      apiKey: jevDefaultApiKey,
       boardState: boardState,
       laneCriteria: laneCriteria,
     );

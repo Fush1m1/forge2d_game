@@ -58,19 +58,4 @@ void main() {
       AppSettingsState.defaults().soundVolume,
     );
   });
-
-  test('persists the Jev API key across a new AppSettings instance', () async {
-    final settings = AppSettings();
-    addTearDown(settings.dispose);
-    await settings.ready;
-
-    expect(settings.state.value.jevApiKey, '');
-    await settings.setJevApiKey('test-key-123');
-
-    final reloaded = AppSettings();
-    addTearDown(reloaded.dispose);
-    await reloaded.ready;
-
-    expect(reloaded.state.value.jevApiKey, 'test-key-123');
-  });
 }

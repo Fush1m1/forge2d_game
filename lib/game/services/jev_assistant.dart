@@ -6,6 +6,11 @@ import 'package:http/http.dart' as http;
 
 enum JevRequestStatus { idle, loading, success, error }
 
+/// Baked in only when built with `--dart-define=JEV_DEFAULT_API_KEY=...`,
+/// so a real key never has to be typed in-app or committed to source/git
+/// history. Empty when the flag isn't passed.
+const String jevDefaultApiKey = String.fromEnvironment('JEV_DEFAULT_API_KEY');
+
 /// Snapshot of the most recent request made to the Jev ("TypeSafe AI")
 /// `choice` primitive.
 class JevAssistantState {
@@ -43,10 +48,13 @@ class JevAssistant {
     required String boardState,
     required Map<String, String> laneCriteria,
   }) async {
-    if (apiKey.trim().isEmpty) {
+    final trimmedApiKey = apiKey.trim();
+    if (trimmedApiKey.isEmpty) {
       state.value = const JevAssistantState(
         status: JevRequestStatus.error,
-        errorMessage: 'Jev APIキーが未設定です。設定画面で入力してください。',
+        errorMessage:
+            'Jev APIキーが未設定です。--dart-define=JEV_DEFAULT_API_KEY=... '
+            'を付けてビルドしてください。',
       );
       return null;
     }
@@ -57,7 +65,7 @@ class JevAssistant {
           .post(
             Uri.parse(_endpoint),
             headers: {
-              'Authorization': 'Bearer $apiKey',
+              'Authorization': 'Bearer $trimmedApiKey',
               'Content-Type': 'application/json',
             },
             body: jsonEncode({
@@ -80,7 +88,7 @@ class JevAssistant {
       if (response.statusCode != 200) {
         state.value = JevAssistantState(
           status: JevRequestStatus.error,
-          errorMessage: _messageForStatus(response.statusCode),
+          errorMessage: _messageForStatus(response.statusCode, response.body),
         );
         return null;
       }
@@ -114,19 +122,43 @@ class JevAssistant {
     }
   }
 
-  String _messageForStatus(int statusCode) {
+  String _messageForStatus(int statusCode, String responseBody) {
+    final detail = _extractDetail(responseBody);
+    final suffix = detail == null ? '' : '\n$detail';
     switch (statusCode) {
       case 401:
-        return 'Jev APIキーが無効です。設定画面で確認してください。';
+        return 'Jev APIキーが無効です。$suffix';
       case 422:
-        return 'Jevへのリクエストが不正でした。';
+        return 'Jevへのリクエストが不正でした。$suffix';
       case 429:
-        return 'Jevのレート制限に達しました。少し待って再試行してください。';
+        return 'Jevのレート制限に達しました。少し待って再試行してください。$suffix';
       case 529:
-        return 'Jevが混雑しています。少し待って再試行してください。';
+        return 'Jevが混雑しています。少し待って再試行してください。$suffix';
       default:
-        return 'Jevへのリクエストに失敗しました ($statusCode)。';
+        return 'Jevへのリクエストに失敗しました ($statusCode)。$suffix';
     }
+  }
+
+  /// Pulls a human-readable detail out of an error response body so the
+  /// canned message above isn't the only thing shown when debugging why a
+  /// key was rejected. Falls back to the raw (truncated) body when it
+  /// isn't the `{"error"/"message": "..."}` shape we'd expect.
+  String? _extractDetail(String responseBody) {
+    if (responseBody.trim().isEmpty) return null;
+    try {
+      final decoded = jsonDecode(responseBody);
+      if (decoded is Map<String, dynamic>) {
+        final message = decoded['error'] ?? decoded['message'];
+        if (message is String && message.isNotEmpty) return message;
+      }
+    } catch (_) {
+      // Not JSON — fall through to the raw body.
+    }
+    final truncated =
+        responseBody.length > 200
+            ? '${responseBody.substring(0, 200)}...'
+            : responseBody;
+    return truncated;
   }
 
   void dispose() {
