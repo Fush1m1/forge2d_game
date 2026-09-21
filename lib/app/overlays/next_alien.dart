@@ -14,6 +14,7 @@ class NextAlien extends StatelessWidget {
     return Card(
       margin: EdgeInsets.zero,
       color: colorScheme.primary,
+      elevation: 0,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         child: Row(
