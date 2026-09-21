@@ -3,7 +3,6 @@ import 'dart:math';
 
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
-import 'package:flame_audio/flame_audio.dart';
 import 'package:flame_forge2d/flame_forge2d.dart';
 import 'package:flame_kenney_xml/flame_kenney_xml.dart';
 import 'package:flutter/material.dart'
@@ -19,8 +18,9 @@ import 'components/debug_info.dart';
 import 'components/easy_mode_message.dart';
 import 'components/ground.dart';
 import 'components/screen_flash.dart';
-import 'components/merge_burst.dart';
 import 'config/game_constants.dart';
+import 'game_audio.dart';
+import 'gameplay_controller.dart';
 import 'input/drop_controller.dart';
 import 'input/tilt_controller.dart';
 import 'level_builder.dart';
@@ -49,22 +49,19 @@ class SuikaGame extends Forge2DGame
   final JevAssistant jevAssistant = JevAssistant();
   final DropController _dropController = DropController();
   final TiltController _tiltController = TiltController();
-  final List<AlienBall> _ballsToRemove = [];
-  final List<AlienBall> _ballsToAdd = [];
   final Random _random = Random();
-  int _ballCount = 0;
   double _appliedTiltGravityX = 0;
 
   late final XmlSpriteSheet aliens;
   late final XmlSpriteSheet elements;
   late final XmlSpriteSheet tiles;
   late final LevelBuilder _levelBuilder;
-  late final AudioPool _soundPool;
+  late final GameAudio _audio;
+  late final GameplayController _gameplay;
   late final ShakeDetector _shakeDetector;
   StreamSubscription<AccelerometerEvent>? _accelerometerSubscription;
 
   Vector2 _dropPosition = Vector2.zero();
-  double _objectHeight = 0;
   String _lastTapLog = 'Tap: -';
   String _lastJevResponseLog = 'Jev res: -';
 
@@ -106,14 +103,14 @@ class SuikaGame extends Forge2DGame
       elements: elements,
       random: _random,
     );
-    await FlameAudio.audioCache.loadAll([
-      gameOverSoundFile,
-      congratulationsSoundFile,
-    ]);
-    _soundPool = await FlameAudio.createPool(
-      mergeSoundFile,
-      minPlayers: 2,
-      maxPlayers: 4,
+    _audio = GameAudio(appSettings);
+    await _audio.load();
+    _gameplay = GameplayController(
+      world: world,
+      camera: camera,
+      session: session,
+      appSettings: appSettings,
+      audio: _audio,
     );
     _shakeDetector = ShakeDetector.autoStart(
       onPhoneShake: (event) => _shakeStackedBalls(),
@@ -136,7 +133,7 @@ class SuikaGame extends Forge2DGame
   void onRemove() {
     WidgetsBinding.instance.removeObserver(this);
     session.dispose();
-    _soundPool.dispose();
+    _audio.dispose();
     _shakeDetector.stopListening();
     _accelerometerSubscription?.cancel();
     jevAssistant.dispose();
@@ -144,31 +141,16 @@ class SuikaGame extends Forge2DGame
   }
 
   void _clearBoard() {
-    for (final ball in world.children.whereType<AlienBall>().toList()) {
-      _removeBall(ball);
-    }
+    _gameplay.reset();
     for (final ground in world.children.whereType<Ground>().toList()) {
       removeBodyComponent(world, ground);
     }
     for (final brick in world.children.whereType<Brick>().toList()) {
       removeBodyComponent(world, brick);
     }
-    _ballsToRemove.clear();
-    _ballsToAdd.clear();
-    _ballCount = 0;
-    _objectHeight = 0;
     _tiltController.reset();
     _appliedTiltGravityX = 0;
     world.gravity = Vector2(0, appSettings.state.value.worldGravity);
-  }
-
-  /// Removes [ball], first destroying its [BallBody]'s Forge2D body if it
-  /// never mounted — see [destroyBodyIfUnmounted]. [AlienBall] isn't itself
-  /// a [BodyComponent] (its body lives on the child [AlienBall.bodyComponent]),
-  /// so it needs this thin wrapper rather than [removeBodyComponent].
-  void _removeBall(AlienBall ball) {
-    destroyBodyIfUnmounted(world, ball.bodyComponent);
-    ball.removeFromParent();
   }
 
   void startGame(GameMode selectedMode, Stage selectedStage) {
@@ -229,51 +211,12 @@ class SuikaGame extends Forge2DGame
   }
 
   void requestMerge(AlienBall first, AlienBall second) {
-    if (first.number != second.number ||
-        first.hasCombined ||
-        second.hasCombined) {
-      return;
-    }
-    first.hasCombined = true;
-    second.hasCombined = true;
-    if (first.number >= 10) return;
-
-    _soundPool.start(volume: appSettings.state.value.soundVolume);
-    final newLevel = first.number + 1;
-    final newPosition =
-        (first.bodyComponent.body.position +
-            second.bodyComponent.body.position) /
-        2;
-    final newBallSize = ballDefinitionFor(newLevel).diameterFor(mode!);
-    _ballsToRemove.addAll([first, second]);
-    _ballsToAdd.add(
-      AlienBall(
-        posi: newPosition,
-        number: newLevel,
-        ballSize: newBallSize,
-        speed: 0,
-        hasFirstCollisionExecuted: true,
-      ),
-    );
-    world.add(
-      MergeBurstComponent(
-        position: newPosition,
-        ballSize: newBallSize,
-        level: newLevel,
-        scaleBoost: appSettings.state.value.mergeEffectScale,
-      ),
-    );
-    // 2つ消えて1つ増えるので、combine 1回につき差し引き1個減る。
-    _ballCount--;
-    if (newLevel == 10) {
+    if (_gameplay.requestMerge(first, second)) {
       _showCongratulations();
     }
   }
 
-  void onBallCollision(Object other) {
-    session.markDropReady();
-    if (other is! Brick) _objectHeight = _calculateObjectHeight();
-  }
+  void onBallCollision(Object other) => _gameplay.onBallCollision(other);
 
   void _shakeStackedBalls() {
     if (!session.isPlaying) return;
@@ -307,51 +250,14 @@ class SuikaGame extends Forge2DGame
   }
 
   void _showCongratulations() {
-    FlameAudio.play(
-      congratulationsSoundFile,
-      volume: appSettings.state.value.soundVolume,
-    );
+    _audio.playCongratulations();
     session.congratulate();
     overlays.remove(GameOverlay.topControls);
     overlays.add(GameOverlay.congratulations);
   }
 
-  double _calculateObjectHeight() {
-    var height = 0.0;
-    for (final ball in world.children.whereType<AlienBall>()) {
-      height = max(height, _heightOf(ball));
-    }
-    return height;
-  }
-
-  bool _dropBall({bool allowWhileBusy = false}) {
-    if (!session.isPlaying || (!session.isDropReady && !allowWhileBusy)) {
-      return false;
-    }
-    final visibleRect = camera.visibleWorldRect;
-    if (_dropPosition.x <= visibleRect.left ||
-        _dropPosition.x >= visibleRect.right) {
-      return false;
-    }
-
-    final level = session.takeNextBall(allowWhileBusy: allowWhileBusy);
-    final ballSize = ballDefinitionFor(level).diameterFor(mode!);
-    final xPosition = _dropPosition.x.clamp(
-      visibleRect.left + ballSize / 2,
-      visibleRect.right - ballSize / 2,
-    );
-    world.add(
-      AlienBall(
-        posi: Vector2(xPosition, dropY),
-        number: level,
-        ballSize: ballSize,
-        speed: initialDropSpeed,
-        hasFirstCollisionExecuted: false,
-      ),
-    );
-    _ballCount++;
-    return true;
-  }
+  bool _dropBall({bool allowWhileBusy = false}) =>
+      _gameplay.dropBall(_dropPosition.x, allowWhileBusy: allowWhileBusy);
 
   /// Asks Jev to pick which lane to drop the next ball into (issue #48),
   /// then drops it there. This is an on-demand, single HTTP call kicked off
@@ -394,7 +300,7 @@ class SuikaGame extends Forge2DGame
               ? 'Empty lane, no balls stacked yet.'
               : 'Topmost ball here is level ${topBall.number} out of 10, '
                   'stack height '
-                  '${_heightOf(topBall).toStringAsFixed(1)} world units.';
+                  '${_gameplay.heightOf(topBall).toStringAsFixed(1)} world units.';
     }
 
     final boardState =
@@ -431,10 +337,6 @@ class SuikaGame extends Forge2DGame
     return body.length > 160 ? '${body.substring(0, 160)}...' : body;
   }
 
-  double _heightOf(AlienBall ball) =>
-      (camera.visibleWorldRect.bottom - groundTileSize) -
-      ball.bodyComponent.body.position.y;
-
   @override
   void onTapDown(TapDownEvent event) {
     super.onTapDown(event);
@@ -462,34 +364,11 @@ class SuikaGame extends Forge2DGame
     if (_dropController.update(dt, mode)) {
       _dropBall(allowWhileBusy: true);
     }
-    _applyPendingBallChanges();
-    _removeOffscreenBalls();
+    _gameplay.applyPendingChanges();
+    _gameplay.removeOffscreenBalls();
     _updateTiltGravity();
     _updateDebugInfo();
     _updateGameOver();
-  }
-
-  /// Removes any ball that has drifted outside the playfield — e.g. tilt
-  /// gravity pushing it past the left/right edge, since there are no side
-  /// walls, or one somehow falling through the floor — so it doesn't sit
-  /// forever as an uncountable, unmergeable ball inflating [_ballCount].
-  /// Deliberately does NOT check the top edge: every dropped ball starts
-  /// above [camera.visibleWorldRect] at [dropY] and falls in from there, so
-  /// that would remove balls the instant they're dropped.
-  void _removeOffscreenBalls() {
-    final visibleRect = camera.visibleWorldRect;
-    for (final ball in world.children.whereType<AlienBall>().toList()) {
-      final position = ball.bodyComponent.body.position;
-      final margin = ball.ballSize / 2;
-      final isOffscreen =
-          position.x < visibleRect.left - margin ||
-          position.x > visibleRect.right + margin ||
-          position.y > visibleRect.bottom + margin;
-      if (isOffscreen) {
-        _removeBall(ball);
-        _ballCount--;
-      }
-    }
   }
 
   void _updateTiltGravity() {
@@ -516,26 +395,15 @@ class SuikaGame extends Forge2DGame
     );
   }
 
-  void _applyPendingBallChanges() {
-    for (final ball in _ballsToRemove) {
-      _removeBall(ball);
-    }
-    _ballsToRemove.clear();
-    for (final ball in _ballsToAdd) {
-      world.add(ball);
-    }
-    _ballsToAdd.clear();
-  }
-
   void _updateDebugInfo() {
     if (!isMounted) return;
 
     final threshold =
         (camera.visibleWorldRect.bottom - groundTileSize) *
         (isEasyMode ? gameOverHeightMultiplierEasy : 1);
-    DebugInfo.add('Obj Height: ${_objectHeight.toStringAsFixed(1)}');
+    DebugInfo.add('Obj Height: ${_gameplay.objectHeight.toStringAsFixed(1)}');
     DebugInfo.add('Threshold: ${threshold.toStringAsFixed(1)}');
-    DebugInfo.add('Ball count: $_ballCount');
+    DebugInfo.add('Ball count: ${_gameplay.ballCount}');
     DebugInfo.add(_lastTapLog);
     // Split on commas so a long JSON response wraps onto multiple lines
     // instead of running off the edge of the screen.
@@ -549,12 +417,9 @@ class SuikaGame extends Forge2DGame
     final threshold =
         (camera.visibleWorldRect.bottom - groundTileSize) *
         (isEasyMode ? gameOverHeightMultiplierEasy : 1);
-    if (_objectHeight <= threshold) return;
+    if (_gameplay.objectHeight <= threshold) return;
 
-    FlameAudio.play(
-      gameOverSoundFile,
-      volume: appSettings.state.value.soundVolume,
-    );
+    _audio.playGameOver();
     session.gameOver();
     overlays.remove(GameOverlay.topControls);
     overlays.add(GameOverlay.gameOver);
