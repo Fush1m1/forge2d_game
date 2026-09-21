@@ -2,15 +2,26 @@ import 'package:flutter/material.dart';
 import 'package:forge2d_game/game/services/jev_assistant.dart';
 import 'package:forge2d_game/game/suika_game.dart';
 
+const _jevPassword = '2026';
+
 /// Button that asks Jev (https://typesafe.ai) to pick a lane for the next
-/// ball and drops it there (issue #48). Shows a spinner while the request
-/// is in flight and a SnackBar if it fails (e.g. missing/invalid API key).
+/// ball and drops it there (issue #48). Gated behind a password prompt
+/// first (to avoid burning through Jev credits by accident), then shows a
+/// spinner while the request is in flight and a SnackBar if it fails (e.g.
+/// missing/invalid API key).
 class JevDropButton extends StatelessWidget {
   final SuikaGame game;
 
   const JevDropButton({super.key, required this.game});
 
   Future<void> _onPressed(BuildContext context) async {
+    final authenticated = await showDialog<bool>(
+      context: context,
+      builder: (_) => const _JevPasswordDialog(),
+    );
+    if (authenticated != true) return;
+    if (!context.mounted) return;
+
     await game.requestJevDrop();
     if (!context.mounted) return;
     final result = game.jevAssistant.state.value;
@@ -44,6 +55,54 @@ class JevDropButton extends StatelessWidget {
           style: IconButton.styleFrom(elevation: 4, shadowColor: Colors.black),
         );
       },
+    );
+  }
+}
+
+class _JevPasswordDialog extends StatefulWidget {
+  const _JevPasswordDialog();
+
+  @override
+  State<_JevPasswordDialog> createState() => _JevPasswordDialogState();
+}
+
+class _JevPasswordDialogState extends State<_JevPasswordDialog> {
+  final _controller = TextEditingController();
+  String? _errorText;
+
+  void _submit() {
+    if (_controller.text == _jevPassword) {
+      Navigator.of(context).pop(true);
+    } else {
+      setState(() => _errorText = 'パスワードが違います');
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: const Text('Jevを使用'),
+      content: TextField(
+        controller: _controller,
+        obscureText: true,
+        autofocus: true,
+        keyboardType: TextInputType.number,
+        decoration: InputDecoration(labelText: 'パスワード', errorText: _errorText),
+        onSubmitted: (_) => _submit(),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(false),
+          child: const Text('キャンセル'),
+        ),
+        FilledButton(onPressed: _submit, child: const Text('OK')),
+      ],
     );
   }
 }
