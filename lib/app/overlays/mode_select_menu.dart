@@ -25,7 +25,7 @@ class ModeSelectMenu extends StatelessWidget {
       onTap: () {},
       child: Card(
         margin: EdgeInsets.zero,
-        color: _cardGreen,
+        color: Colors.white,
         elevation: 8,
         shadowColor: Colors.black,
         shape: RoundedRectangleBorder(
