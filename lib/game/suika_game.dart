@@ -236,7 +236,7 @@ class SuikaGame extends Forge2DGame
   /// "Ask Jev" password prompt can be re-tested without clearing all app
   /// data.
   void debugResetJevAuthentication() {
-    appSettings.setJevAuthenticated(false);
+    appSettings.resetJevAuthentication();
   }
 
   void requestMerge(AlienBall first, AlienBall second) {

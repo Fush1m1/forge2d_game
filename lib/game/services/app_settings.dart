@@ -3,6 +3,12 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../config/game_constants.dart' as defaults;
 
+/// yyyy-MM-dd key for [time], used to expire Jev authentication daily.
+String _dateKey(DateTime time) =>
+    '${time.year.toString().padLeft(4, '0')}-'
+    '${time.month.toString().padLeft(2, '0')}-'
+    '${time.day.toString().padLeft(2, '0')}';
+
 /// Snapshot of user-adjustable app/game settings.
 class AppSettingsState {
   const AppSettingsState({
@@ -12,7 +18,7 @@ class AppSettingsState {
     required this.shakeStrength,
     required this.strongShakeProbability,
     required this.mergeEffectScale,
-    required this.jevAuthenticated,
+    required this.jevAuthenticatedDate,
   });
 
   factory AppSettingsState.defaults() => const AppSettingsState(
@@ -22,7 +28,7 @@ class AppSettingsState {
     shakeStrength: defaults.shakeMaxHorizontalVelocity,
     strongShakeProbability: defaults.strongShakeProbability,
     mergeEffectScale: defaults.mergeBurstScaleBoost,
-    jevAuthenticated: false,
+    jevAuthenticatedDate: '',
   );
 
   final double soundVolume;
@@ -31,7 +37,17 @@ class AppSettingsState {
   final double shakeStrength;
   final double strongShakeProbability;
   final double mergeEffectScale;
-  final bool jevAuthenticated;
+
+  /// yyyy-MM-dd of the last successful Jev password entry, or '' if never
+  /// (or since reset). See [isJevAuthenticatedToday].
+  final String jevAuthenticatedDate;
+
+  /// Whether the Jev password was entered correctly today. The password is
+  /// meant to be rotated daily, so this expires at local midnight rather
+  /// than being remembered forever.
+  bool get isJevAuthenticatedToday =>
+      jevAuthenticatedDate.isNotEmpty &&
+      jevAuthenticatedDate == _dateKey(DateTime.now());
 
   AppSettingsState copyWith({
     double? soundVolume,
@@ -40,7 +56,7 @@ class AppSettingsState {
     double? shakeStrength,
     double? strongShakeProbability,
     double? mergeEffectScale,
-    bool? jevAuthenticated,
+    String? jevAuthenticatedDate,
   }) {
     return AppSettingsState(
       soundVolume: soundVolume ?? this.soundVolume,
@@ -50,7 +66,7 @@ class AppSettingsState {
       strongShakeProbability:
           strongShakeProbability ?? this.strongShakeProbability,
       mergeEffectScale: mergeEffectScale ?? this.mergeEffectScale,
-      jevAuthenticated: jevAuthenticated ?? this.jevAuthenticated,
+      jevAuthenticatedDate: jevAuthenticatedDate ?? this.jevAuthenticatedDate,
     );
   }
 }
@@ -70,7 +86,7 @@ class AppSettings {
   static const _keyShakeStrength = 'settings.shakeStrength';
   static const _keyStrongShakeProbability = 'settings.strongShakeProbability';
   static const _keyMergeEffectScale = 'settings.mergeEffectScale';
-  static const _keyJevAuthenticated = 'settings.jevAuthenticated';
+  static const _keyJevAuthenticatedDate = 'settings.jevAuthenticatedDate';
 
   final ValueNotifier<AppSettingsState> state;
 
@@ -94,7 +110,7 @@ class AppSettings {
       shakeStrength: prefs.getDouble(_keyShakeStrength),
       strongShakeProbability: prefs.getDouble(_keyStrongShakeProbability),
       mergeEffectScale: prefs.getDouble(_keyMergeEffectScale),
-      jevAuthenticated: prefs.getBool(_keyJevAuthenticated),
+      jevAuthenticatedDate: prefs.getString(_keyJevAuthenticatedDate),
     );
   }
 
@@ -137,12 +153,21 @@ class AppSettings {
     );
   }
 
-  Future<void> setJevAuthenticated(bool value) async {
-    state.value = state.value.copyWith(jevAuthenticated: value);
-    (await SharedPreferences.getInstance()).setBool(
-      _keyJevAuthenticated,
-      value,
+  /// Marks the Jev password as entered correctly for today.
+  Future<void> markJevAuthenticatedToday() async {
+    final today = _dateKey(DateTime.now());
+    state.value = state.value.copyWith(jevAuthenticatedDate: today);
+    (await SharedPreferences.getInstance()).setString(
+      _keyJevAuthenticatedDate,
+      today,
     );
+  }
+
+  /// Clears the remembered Jev authentication so the password is asked for
+  /// again immediately, regardless of the day.
+  Future<void> resetJevAuthentication() async {
+    state.value = state.value.copyWith(jevAuthenticatedDate: '');
+    (await SharedPreferences.getInstance()).remove(_keyJevAuthenticatedDate);
   }
 
   Future<void> resetToDefaults() async {
@@ -155,7 +180,7 @@ class AppSettings {
       prefs.remove(_keyShakeStrength),
       prefs.remove(_keyStrongShakeProbability),
       prefs.remove(_keyMergeEffectScale),
-      prefs.remove(_keyJevAuthenticated),
+      prefs.remove(_keyJevAuthenticatedDate),
     ]);
   }
 
