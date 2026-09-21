@@ -27,6 +27,7 @@ import 'model/brick_file_names.dart';
 import 'model/game_mode.dart';
 import 'model/game_overlay.dart';
 import 'model/game_state.dart';
+import 'services/app_settings.dart';
 import 'services/game_session.dart';
 
 class SuikaGame extends Forge2DGame
@@ -35,11 +36,13 @@ class SuikaGame extends Forge2DGame
         PointerMoveCallbacks,
         HasCollisionDetection,
         WidgetsBindingObserver {
-  SuikaGame({GameSession? session})
+  SuikaGame({GameSession? session, AppSettings? appSettings})
     : session = session ?? GameSession(),
+      appSettings = appSettings ?? AppSettings(),
       super(zoom: worldScale, gravity: Vector2(0, worldGravity));
 
   final GameSession session;
+  final AppSettings appSettings;
   final DropController _dropController = DropController();
   final TiltController _tiltController = TiltController();
   final List<AlienBall> _ballsToRemove = [];
@@ -174,7 +177,7 @@ class SuikaGame extends Forge2DGame
     _objectHeight = 0;
     _tiltController.reset();
     _appliedTiltGravityX = 0;
-    world.gravity = Vector2(0, worldGravity);
+    world.gravity = Vector2(0, appSettings.state.value.worldGravity);
   }
 
   void startGame(GameMode selectedMode) {
@@ -192,6 +195,7 @@ class SuikaGame extends Forge2DGame
     overlays.remove(GameOverlay.congratulations);
     overlays.remove(GameOverlay.topControls);
     overlays.remove(GameOverlay.evolutionGuide);
+    overlays.remove(GameOverlay.settings);
     pauseEngine();
     overlays.add(GameOverlay.modeSelect);
   }
@@ -208,6 +212,23 @@ class SuikaGame extends Forge2DGame
 
   void closeModeSelect() => overlays.remove(GameOverlay.modeSelect);
 
+  void openSettings() => overlays.add(GameOverlay.settings);
+
+  void closeSettings() => overlays.remove(GameOverlay.settings);
+
+  /// Debug-only: shows the Game Over overlay without actually losing, so the
+  /// screen can be checked without playing a full round out.
+  void debugShowGameOver() {
+    overlays.remove(GameOverlay.topControls);
+    overlays.add(GameOverlay.gameOver);
+  }
+
+  /// Debug-only: shows the Congratulations overlay without actually winning.
+  void debugShowCongratulations() {
+    overlays.remove(GameOverlay.topControls);
+    overlays.add(GameOverlay.congratulations);
+  }
+
   void requestMerge(AlienBall first, AlienBall second) {
     if (first.number != second.number ||
         first.hasCombined ||
@@ -218,7 +239,7 @@ class SuikaGame extends Forge2DGame
     second.hasCombined = true;
     if (first.number >= 10) return;
 
-    _soundPool.start();
+    _soundPool.start(volume: appSettings.state.value.soundVolume);
     final newLevel = first.number + 1;
     final newPosition =
         (first.bodyComponent.body.position +
@@ -240,6 +261,7 @@ class SuikaGame extends Forge2DGame
         position: newPosition,
         ballSize: newBallSize,
         level: newLevel,
+        scaleBoost: appSettings.state.value.mergeEffectScale,
       ),
     );
     // 2つ消えて1つ増えるので、combine 1回につき差し引き1個減る。
@@ -257,19 +279,28 @@ class SuikaGame extends Forge2DGame
   void _shakeStackedBalls() {
     if (!session.isPlaying) return;
     // ポップコーンみたいに、たまに通常より強いシェイクが来る。
-    final isStrongShake = _random.nextDouble() < strongShakeProbability;
+    final settings = appSettings.state.value;
+    final isStrongShake =
+        _random.nextDouble() < settings.strongShakeProbability;
     final multiplier = isStrongShake ? strongShakeMultiplier : 1.0;
+    // shakeStrength(水平成分)を基準に、上下・回転成分もデフォルト比を
+    // 保ったまま一緒にスケールさせる。
+    final shakeScale = settings.shakeStrength / shakeMaxHorizontalVelocity;
     for (final ball in world.children.whereType<AlienBall>()) {
       final body = ball.bodyComponent.body;
       final horizontal =
-          (_random.nextDouble() * 2 - 1) *
-          shakeMaxHorizontalVelocity *
-          multiplier;
+          (_random.nextDouble() * 2 - 1) * settings.shakeStrength * multiplier;
       final upward =
-          -_random.nextDouble() * shakeMaxUpwardVelocity * multiplier;
+          -_random.nextDouble() *
+          shakeMaxUpwardVelocity *
+          shakeScale *
+          multiplier;
       body.linearVelocity = body.linearVelocity + Vector2(horizontal, upward);
       body.angularVelocity +=
-          (_random.nextDouble() * 2 - 1) * shakeMaxAngularVelocity * multiplier;
+          (_random.nextDouble() * 2 - 1) *
+          shakeMaxAngularVelocity *
+          shakeScale *
+          multiplier;
     }
     if (isStrongShake) {
       camera.viewport.add(ScreenFlashComponent());
@@ -277,7 +308,10 @@ class SuikaGame extends Forge2DGame
   }
 
   void _showCongratulations() {
-    FlameAudio.play(congratulationsSoundFile);
+    FlameAudio.play(
+      congratulationsSoundFile,
+      volume: appSettings.state.value.soundVolume,
+    );
     session.congratulate();
     overlays.remove(GameOverlay.topControls);
     overlays.add(GameOverlay.congratulations);
@@ -366,7 +400,10 @@ class SuikaGame extends Forge2DGame
       return;
     }
     _appliedTiltGravityX = targetGravityX;
-    world.gravity = Vector2(targetGravityX, worldGravity);
+    world.gravity = Vector2(
+      targetGravityX,
+      appSettings.state.value.worldGravity,
+    );
   }
 
   Vector2 _canvasToWorld(Vector2 canvasPosition) {
@@ -407,7 +444,10 @@ class SuikaGame extends Forge2DGame
         (isEasyMode ? gameOverHeightMultiplierEasy : 1);
     if (_objectHeight <= threshold) return;
 
-    FlameAudio.play(gameOverSoundFile);
+    FlameAudio.play(
+      gameOverSoundFile,
+      volume: appSettings.state.value.soundVolume,
+    );
     session.gameOver();
     overlays.remove(GameOverlay.topControls);
     overlays.add(GameOverlay.gameOver);
