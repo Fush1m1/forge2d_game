@@ -9,6 +9,7 @@ import 'package:forge2d_game/game/suika_game.dart';
 /// rule itself is documented right here in source. This is just friction
 /// against an accidental tap burning through Jev credits, not a real
 /// access control.
+// MEMO(fushimi): パスワード生成ロジックが露出していますが、これは単なるおもしろ機能のため、よしとしています。
 String _todaysJevPassword() {
   final now = DateTime.now();
   final day = (now.day - 1).toString().padLeft(2, '0');
