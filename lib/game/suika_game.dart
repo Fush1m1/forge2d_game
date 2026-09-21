@@ -186,9 +186,14 @@ class SuikaGame extends Forge2DGame
     overlays.remove(GameOverlay.gameOver);
     overlays.remove(GameOverlay.congratulations);
     overlays.remove(GameOverlay.topControls);
+    overlays.remove(GameOverlay.evolutionGuide);
     pauseEngine();
     overlays.add(GameOverlay.modeSelect);
   }
+
+  void openEvolutionGuide() => overlays.add(GameOverlay.evolutionGuide);
+
+  void closeEvolutionGuide() => overlays.remove(GameOverlay.evolutionGuide);
 
   void requestMerge(AlienBall first, AlienBall second) {
     if (first.number != second.number ||

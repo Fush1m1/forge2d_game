@@ -3,4 +3,5 @@ abstract final class GameOverlay {
   static const topControls = 'TopControls';
   static const gameOver = 'GameOver';
   static const congratulations = 'Congratulations';
+  static const evolutionGuide = 'EvolutionGuide';
 }
