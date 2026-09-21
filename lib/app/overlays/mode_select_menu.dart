@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:forge2d_game/game/model/game_mode.dart';
 import 'package:forge2d_game/game/suika_game.dart';
 
+const _cardViolet = Color(0xFF5E17EB);
+
 class ModeSelectMenu extends StatelessWidget {
   final SuikaGame game;
 
@@ -23,12 +25,12 @@ class ModeSelectMenu extends StatelessWidget {
       onTap: () {},
       child: Card(
         margin: EdgeInsets.zero,
-        color: colorScheme.primaryContainer,
-        elevation: 12,
-        shadowColor: colorScheme.primary,
+        color: _cardViolet,
+        elevation: 8,
+        shadowColor: Colors.black,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-          side: BorderSide(color: colorScheme.primary, width: 4),
+          borderRadius: BorderRadius.circular(16),
+          side: const BorderSide(color: Colors.black, width: 4),
         ),
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 36, vertical: 40),
@@ -41,9 +43,8 @@ class ModeSelectMenu extends StatelessWidget {
                   color: colorScheme.primary,
                   fontWeight: FontWeight.w900,
                   letterSpacing: 4,
-                  shadows: [
-                    Shadow(color: colorScheme.primary, blurRadius: 24),
-                    const Shadow(color: Colors.black, blurRadius: 2),
+                  shadows: const [
+                    Shadow(color: Colors.black, offset: Offset(3, 3)),
                   ],
                 ),
               ),
@@ -83,7 +84,7 @@ class ModeSelectMenu extends StatelessWidget {
           child: GestureDetector(
             behavior: HitTestBehavior.opaque,
             onTap: game.closeModeSelect,
-            child: ColoredBox(color: Colors.black.withValues(alpha: 0.7)),
+            child: ColoredBox(color: Colors.black.withValues(alpha: 0.6)),
           ),
         ),
         Center(child: card),
@@ -111,16 +112,16 @@ class _ModeButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       margin: EdgeInsets.zero,
-      color: Colors.black,
-      elevation: 6,
-      shadowColor: color,
+      color: Color.alphaBlend(color.withValues(alpha: 0.3), _cardViolet),
+      elevation: 4,
+      shadowColor: Colors.black,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(8),
-        side: BorderSide(color: color, width: 3),
+        borderRadius: BorderRadius.circular(12),
+        side: const BorderSide(color: Colors.black, width: 3),
       ),
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(12),
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
           child: SizedBox(
@@ -140,7 +141,9 @@ class _ModeButton extends StatelessWidget {
                         fontSize: 24,
                         fontWeight: FontWeight.w900,
                         letterSpacing: 1.5,
-                        shadows: [Shadow(color: color, blurRadius: 10)],
+                        shadows: const [
+                          Shadow(color: Colors.black45, offset: Offset(1, 1)),
+                        ],
                       ),
                     ),
                     Text(
