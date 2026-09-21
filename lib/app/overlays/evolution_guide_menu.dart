@@ -128,30 +128,17 @@ class EvolutionGuideMenu extends StatelessWidget {
     final center = ringDiameter / 2;
     final radius = center - iconSize / 2 - 16;
     final left = center + radius * math.cos(angle) - iconSize / 2;
-    final top = center + radius * math.sin(angle) - iconSize / 2 - 8;
+    final top = center + radius * math.sin(angle) - iconSize / 2;
 
     return Positioned(
       left: left,
       top: top,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          SizedBox(
-            width: iconSize,
-            height: iconSize,
-            child: SpriteWidget(
-              sprite: game.aliens.getSprite(definition.spriteName),
-            ),
-          ),
-          Text(
-            '$level',
-            style: const TextStyle(
-              color: AppTheme.shadowColor,
-              fontSize: 10,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ],
+      child: SizedBox(
+        width: iconSize,
+        height: iconSize,
+        child: SpriteWidget(
+          sprite: game.aliens.getSprite(definition.spriteName),
+        ),
       ),
     );
   }
