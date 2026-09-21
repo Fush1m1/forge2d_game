@@ -2,16 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:forge2d_game/game/services/jev_assistant.dart';
 import 'package:forge2d_game/game/suika_game.dart';
 
-/// Today's Jev password, e.g. 2026-09-22 -> '20260922'. Derived from the
-/// device clock rather than stored anywhere, so there's nothing secret to
-/// leak — the generation rule itself is documented in README.md. This is
-/// just friction against an accidental tap burning through Jev credits,
-/// not a real access control.
+/// Today's Jev password. Given today as YYYYmmDD, this is
+/// `${DD-1}${YYYY+2026}${mm+10}` — e.g. 2026-09-22 -> day 21, year 4052,
+/// month 19 -> '21405219'. Derived from the device clock rather than
+/// stored anywhere, so there's nothing secret to leak — the generation
+/// rule itself is documented right here in source. This is just friction
+/// against an accidental tap burning through Jev credits, not a real
+/// access control.
 String _todaysJevPassword() {
   final now = DateTime.now();
-  return '${now.year.toString().padLeft(4, '0')}'
-      '${now.month.toString().padLeft(2, '0')}'
-      '${now.day.toString().padLeft(2, '0')}';
+  final day = (now.day - 1).toString().padLeft(2, '0');
+  final year = (now.year + 2026).toString().padLeft(4, '0');
+  final month = (now.month + 10).toString().padLeft(2, '0');
+  return '$day$year$month';
 }
 
 /// Button that asks Jev (https://typesafe.ai) to pick a lane for the next
