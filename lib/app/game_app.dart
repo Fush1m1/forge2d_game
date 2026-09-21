@@ -19,7 +19,7 @@ class GameApp extends StatelessWidget {
       theme: ThemeData(
         useMaterial3: true,
         colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFFFF2E9A),
+          seedColor: const Color(0xFF6A0DAD),
           brightness: Brightness.dark,
           dynamicSchemeVariant: DynamicSchemeVariant.vibrant,
         ),
