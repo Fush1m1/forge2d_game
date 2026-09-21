@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:flutter/material.dart';
 import 'package:forge2d_game/game/services/app_settings.dart';
 import 'package:forge2d_game/game/suika_game.dart';
@@ -135,42 +134,6 @@ class SettingsMenu extends StatelessWidget {
                               ),
                               child: const Text('Reset to Defaults'),
                             ),
-                            if (kDebugMode) ...[
-                              const SizedBox(height: 20),
-                              Text(
-                                'Debug',
-                                style: textTheme.labelLarge?.copyWith(
-                                  color: Colors.white,
-                                ),
-                              ),
-                              const SizedBox(height: 8),
-                              Wrap(
-                                spacing: 8,
-                                runSpacing: 8,
-                                children: [
-                                  OutlinedButton(
-                                    onPressed: game.debugShowGameOver,
-                                    style: OutlinedButton.styleFrom(
-                                      foregroundColor: Colors.white,
-                                      side: const BorderSide(
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                    child: const Text('Show Game Over'),
-                                  ),
-                                  OutlinedButton(
-                                    onPressed: game.debugShowCongratulations,
-                                    style: OutlinedButton.styleFrom(
-                                      foregroundColor: Colors.white,
-                                      side: const BorderSide(
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                    child: const Text('Show Congratulations'),
-                                  ),
-                                ],
-                              ),
-                            ],
                           ],
                         ),
                       );
