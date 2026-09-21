@@ -40,6 +40,7 @@ class SuikaGame extends Forge2DGame
   final List<AlienBall> _ballsToRemove = [];
   final List<AlienBall> _ballsToAdd = [];
   final Random _random = Random();
+  int _ballCount = 0;
 
   late final XmlSpriteSheet aliens;
   late final XmlSpriteSheet elements;
@@ -161,6 +162,7 @@ class SuikaGame extends Forge2DGame
     }
     _ballsToRemove.clear();
     _ballsToAdd.clear();
+    _ballCount = 0;
     _objectHeight = 0;
     session.reset();
     overlays.remove(GameOverlay.gameOver);
@@ -196,6 +198,8 @@ class SuikaGame extends Forge2DGame
         hasFirstCollisionExecuted: true,
       ),
     );
+    // 2つ消えて1つ増えるので、combine 1回につき差し引き1個減る。
+    _ballCount--;
     if (newLevel == 10) {
       _showCongratulations();
     }
@@ -262,6 +266,7 @@ class SuikaGame extends Forge2DGame
         hasFirstCollisionExecuted: false,
       ),
     );
+    _ballCount++;
     return true;
   }
 
@@ -324,9 +329,7 @@ class SuikaGame extends Forge2DGame
         (isEasyMode ? gameOverHeightMultiplierEasy : 1);
     DebugInfo.add('Obj Height: $_objectHeight');
     DebugInfo.add('Threshold: $threshold');
-    DebugInfo.add(
-      'Ball count: ${world.children.whereType<AlienBall>().length}',
-    );
+    DebugInfo.add('Ball count: $_ballCount');
     DebugInfo.add(_lastTapLog);
   }
 
