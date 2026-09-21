@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:forge2d_game/game/model/game_mode.dart';
 import 'package:forge2d_game/game/suika_game.dart';
 
+const _deepViolet = Color(0xFF3D0080);
+
 class ModeSelectMenu extends StatelessWidget {
   final SuikaGame game;
 
@@ -52,7 +54,7 @@ class ModeSelectMenu extends StatelessWidget {
               _ModeButton(
                 label: 'NORMAL',
                 icon: Icons.sports_esports,
-                color: colorScheme.primary,
+                color: _deepViolet,
                 description: 'Standard ball sizes',
                 onTap: () => game.startGame(GameMode.normal),
               ),
@@ -62,7 +64,7 @@ class ModeSelectMenu extends StatelessWidget {
               _ModeButton(
                 label: 'EASY',
                 icon: Icons.sentiment_satisfied_alt,
-                color: colorScheme.primary,
+                color: _deepViolet,
                 description: 'Balls are half the size',
                 onTap: () => game.startGame(GameMode.easy),
               ),

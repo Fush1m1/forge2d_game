@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:forge2d_game/game/suika_game.dart';
 
+const _deepViolet = Color(0xFF3D0080);
+
 class EvolutionGuideButton extends StatelessWidget {
   final SuikaGame game;
 
@@ -13,6 +15,8 @@ class EvolutionGuideButton extends StatelessWidget {
       onPressed: game.openEvolutionGuide,
       icon: const Icon(Icons.info, size: 20),
       style: IconButton.styleFrom(
+        backgroundColor: _deepViolet,
+        foregroundColor: colorScheme.onPrimary,
         shape: CircleBorder(
           side: BorderSide(color: colorScheme.onPrimary, width: 2),
         ),
