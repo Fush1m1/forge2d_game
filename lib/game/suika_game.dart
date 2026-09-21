@@ -19,6 +19,7 @@ import 'components/ground.dart';
 import 'config/game_constants.dart';
 import 'input/drop_controller.dart';
 import 'model/ball_definition.dart';
+import 'model/brick_file_names.dart';
 import 'model/game_mode.dart';
 import 'model/game_overlay.dart';
 import 'model/game_state.dart';

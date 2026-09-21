@@ -97,9 +97,7 @@ class BallBody extends BodyComponent with ContactCallbacks {
     required this.posi,
     required this.ballSize,
     required this.speed,
-  }) {
-    opacity = 0.0;
-  }
+  });
   @override
   Body createBody() {
     final shape = CircleShape()..radius = (ballSize) / 2;
