@@ -34,8 +34,8 @@ class CongratulationsMenu extends StatelessWidget {
                 icon: const Icon(Icons.refresh),
                 label: const Text('NEW GAME'),
                 style: FilledButton.styleFrom(
-                  backgroundColor: colorScheme.tertiary,
-                  foregroundColor: colorScheme.onTertiary,
+                  backgroundColor: colorScheme.primaryContainer,
+                  foregroundColor: colorScheme.onPrimaryContainer,
                   padding: const EdgeInsets.symmetric(
                     horizontal: 50,
                     vertical: 20,
