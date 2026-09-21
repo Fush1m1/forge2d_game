@@ -2,8 +2,8 @@
 
 ## Password gate
 
-- Not a real security control — just friction against an accidental tap
-  burning through Jev credits.
+Not a real security control — just friction against an accidental tap
+burning through Jev credits.
 
 ## What gets sent
 
