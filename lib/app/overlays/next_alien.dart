@@ -2,8 +2,6 @@ import 'package:flame/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:forge2d_game/game/suika_game.dart';
 
-const _cardViolet = Color(0xFF5E17EB);
-
 class NextAlien extends StatelessWidget {
   final SuikaGame game;
 
@@ -14,7 +12,7 @@ class NextAlien extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
     return Card(
       margin: EdgeInsets.zero,
-      color: _cardViolet,
+      color: Colors.black,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(8),
         side: BorderSide(color: colorScheme.tertiary, width: 2),

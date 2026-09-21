@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:forge2d_game/game/suika_game.dart';
 
-const _cardViolet = Color(0xFF5E17EB);
-
 class CongratulationsMenu extends StatelessWidget {
   final SuikaGame game;
 
@@ -15,7 +13,7 @@ class CongratulationsMenu extends StatelessWidget {
     return Center(
       child: Card(
         margin: EdgeInsets.zero,
-        color: _cardViolet,
+        color: Colors.black,
         elevation: 12,
         shadowColor: colorScheme.tertiary,
         shape: RoundedRectangleBorder(
