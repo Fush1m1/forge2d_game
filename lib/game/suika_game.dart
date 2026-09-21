@@ -164,14 +164,7 @@ class SuikaGame extends Forge2DGame
     );
   }
 
-  void startGame(GameMode selectedMode) {
-    session.start(selectedMode);
-    overlays.remove(GameOverlay.modeSelect);
-    overlays.add(GameOverlay.topControls);
-    resumeEngine();
-  }
-
-  void resetGame() {
+  void _clearBoard() {
     for (final ball in world.children.whereType<AlienBall>().toList()) {
       ball.removeFromParent();
     }
@@ -182,12 +175,23 @@ class SuikaGame extends Forge2DGame
     _tiltController.reset();
     _appliedTiltGravityX = 0;
     world.gravity = Vector2(0, worldGravity);
+  }
+
+  void startGame(GameMode selectedMode) {
+    _clearBoard();
+    session.start(selectedMode);
+    overlays.remove(GameOverlay.modeSelect);
+    overlays.add(GameOverlay.topControls);
+    resumeEngine();
+  }
+
+  void resetGame() {
+    _clearBoard();
     session.reset();
     overlays.remove(GameOverlay.gameOver);
     overlays.remove(GameOverlay.congratulations);
     overlays.remove(GameOverlay.topControls);
     overlays.remove(GameOverlay.evolutionGuide);
-    overlays.remove(GameOverlay.confirmNewGame);
     pauseEngine();
     overlays.add(GameOverlay.modeSelect);
   }
@@ -196,9 +200,13 @@ class SuikaGame extends Forge2DGame
 
   void closeEvolutionGuide() => overlays.remove(GameOverlay.evolutionGuide);
 
-  void requestResetGame() => overlays.add(GameOverlay.confirmNewGame);
+  /// Shows the mode-select dialog on top of the current game, without
+  /// touching it. Used by the mid-play "New Game" button: picking a mode
+  /// commits to a fresh game via [startGame]; dismissing it via
+  /// [closeModeSelect] leaves the current game untouched.
+  void openModeSelect() => overlays.add(GameOverlay.modeSelect);
 
-  void cancelResetGame() => overlays.remove(GameOverlay.confirmNewGame);
+  void closeModeSelect() => overlays.remove(GameOverlay.modeSelect);
 
   void requestMerge(AlienBall first, AlienBall second) {
     if (first.number != second.number ||

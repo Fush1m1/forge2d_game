@@ -10,7 +10,15 @@ class ModeSelectMenu extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
+    // Mid-play "New Game" opens this dialog on top of the current game
+    // without touching it, so it can be dismissed by tapping outside. At
+    // launch / after game over there is no game to return to, so it must
+    // stay a mandatory choice.
+    final canDismiss = game.session.isPlaying;
+
+    final card = GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: () {},
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 36, vertical: 40),
         decoration: BoxDecoration(
@@ -63,6 +71,23 @@ class ModeSelectMenu extends StatelessWidget {
           ],
         ),
       ),
+    );
+
+    if (!canDismiss) {
+      return Center(child: card);
+    }
+
+    return Stack(
+      children: [
+        Positioned.fill(
+          child: GestureDetector(
+            behavior: HitTestBehavior.opaque,
+            onTap: game.closeModeSelect,
+            child: ColoredBox(color: Colors.black.withValues(alpha: 0.55)),
+          ),
+        ),
+        Center(child: card),
+      ],
     );
   }
 }
