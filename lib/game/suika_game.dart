@@ -232,6 +232,13 @@ class SuikaGame extends Forge2DGame
     overlays.add(GameOverlay.congratulations);
   }
 
+  /// Debug-only: clears the remembered Jev password authentication, so the
+  /// "Ask Jev" password prompt can be re-tested without clearing all app
+  /// data.
+  void debugResetJevAuthentication() {
+    appSettings.setJevAuthenticated(false);
+  }
+
   void requestMerge(AlienBall first, AlienBall second) {
     if (first.number != second.number ||
         first.hasCombined ||

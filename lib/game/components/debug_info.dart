@@ -21,12 +21,13 @@ class DebugInfo {
 
 /// Toggleable debug log overlay. Tapping it shows/hides the log lines
 /// (Obj Height, Threshold, Ball count, last tap). In debug builds it also
-/// grows two extra tappable rows below the log to jump straight to the
-/// Game Over / Congratulations overlays, so they can be checked without
-/// having to actually lose or win a round.
+/// grows three extra tappable rows below the log: two to jump straight to
+/// the Game Over / Congratulations overlays, and one to reset the
+/// remembered Jev password authentication, so all three can be re-tested
+/// without having to actually lose/win a round or clear all app data.
 class DebugInfoComponent extends PositionComponent
     with TapCallbacks, HasGameReference<SuikaGame> {
-  DebugInfoComponent() : super(size: Vector2(220, 150));
+  DebugInfoComponent() : super(size: Vector2(220, 170));
 
   static const double _lineHeight = 20;
   static const double _top = 10;
@@ -55,6 +56,8 @@ class DebugInfoComponent extends PositionComponent
 
   double get _congratulationsButtonTop => _gameOverButtonTop + _lineHeight;
 
+  double get _resetJevAuthButtonTop => _congratulationsButtonTop + _lineHeight;
+
   @override
   void render(Canvas canvas) {
     if (!isVisible) return;
@@ -76,6 +79,11 @@ class DebugInfoComponent extends PositionComponent
         canvas,
         '[ Show Congratulations ]',
         Vector2(_left, _congratulationsButtonTop),
+      );
+      _buttonPaint.render(
+        canvas,
+        '[ Reset Jev Auth ]',
+        Vector2(_left, _resetJevAuthButtonTop),
       );
     }
   }
@@ -99,6 +107,11 @@ class DebugInfoComponent extends PositionComponent
       if (tapY >= _congratulationsButtonTop &&
           tapY < _congratulationsButtonTop + _lineHeight) {
         game.debugShowCongratulations();
+        return;
+      }
+      if (tapY >= _resetJevAuthButtonTop &&
+          tapY < _resetJevAuthButtonTop + _lineHeight) {
+        game.debugResetJevAuthentication();
         return;
       }
     }
