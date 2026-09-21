@@ -126,6 +126,9 @@ class JevAssistant {
     switch (statusCode) {
       case 401:
         return 'Jev APIキーが無効です。$suffix';
+      case 402:
+        return 'Jevアカウントのクレジット残高が不足しています。'
+            'jevtypesafeai.comのダッシュボードでチャージしてください。$suffix';
       case 422:
         return 'Jevへのリクエストが不正でした。$suffix';
       case 429:
