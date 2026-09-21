@@ -16,3 +16,6 @@ const double collisionSettleDuration = 0.5;
 const String mergeSoundFile = 'merge.wav';
 const String gameOverSoundFile = 'game_over.wav';
 const String congratulationsSoundFile = 'congratulations.wav';
+const double shakeMaxHorizontalVelocity = 12;
+const double shakeMaxUpwardVelocity = 14;
+const double shakeMaxAngularVelocity = 6;
