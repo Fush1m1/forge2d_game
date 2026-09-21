@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:forge2d_game/app/overlays/evolution_guide_button.dart';
 import 'package:forge2d_game/app/overlays/new_game_button.dart';
 import 'package:forge2d_game/app/overlays/next_alien.dart';
+import 'package:forge2d_game/app/overlays/settings_button.dart';
 import 'package:forge2d_game/game/suika_game.dart';
 
 class TopControls extends StatelessWidget {
@@ -23,6 +24,8 @@ class TopControls extends StatelessWidget {
               Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
+                  SettingsButton(game: game),
+                  const SizedBox(width: 12),
                   EvolutionGuideButton(game: game),
                   const SizedBox(width: 12),
                   NewGameButton(game: game),

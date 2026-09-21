@@ -15,13 +15,16 @@ class MergeBurstComponent extends PositionComponent {
     required Vector2 position,
     required double ballSize,
     required int level,
+    double scaleBoost = mergeBurstScaleBoost,
   }) : _ballSize = ballSize,
+       _scaleBoost = scaleBoost,
        _intensity = ((level - mergeBurstMinLevel) /
                (mergeBurstMaxLevel - mergeBurstMinLevel))
            .clamp(0, 1),
        super(position: position, anchor: Anchor.center);
 
   final double _ballSize;
+  final double _scaleBoost;
   final double _intensity;
 
   @override
@@ -31,7 +34,7 @@ class MergeBurstComponent extends PositionComponent {
         mergeBurstBaseDuration + _intensity * mergeBurstDurationBoost;
     final color =
         Color.lerp(mergeBurstColorLow, mergeBurstColorHigh, _intensity)!;
-    final scale = mergeBurstBaseScale + _intensity * mergeBurstScaleBoost;
+    final scale = mergeBurstBaseScale + _intensity * _scaleBoost;
 
     final glow = CircleComponent(
       radius: _ballSize / 2,
