@@ -23,7 +23,6 @@ class GameApp extends StatelessWidget {
           brightness: Brightness.dark,
           dynamicSchemeVariant: DynamicSchemeVariant.vibrant,
         ),
-        scaffoldBackgroundColor: const Color(0xFF0D0221),
       ),
       home: Scaffold(
         body: SafeArea(
