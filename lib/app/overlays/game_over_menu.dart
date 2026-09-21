@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:forge2d_game/game/suika_game.dart';
 
-const _cardGreen = Color(0xFF1FB65A);
-
 class GameOverMenu extends StatelessWidget {
   final SuikaGame game;
 
@@ -15,7 +13,7 @@ class GameOverMenu extends StatelessWidget {
     return Center(
       child: Card(
         margin: EdgeInsets.zero,
-        color: _cardGreen,
+        color: colorScheme.primary,
         elevation: 12,
         shadowColor: colorScheme.error,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
