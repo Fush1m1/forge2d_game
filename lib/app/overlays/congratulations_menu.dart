@@ -13,9 +13,13 @@ class CongratulationsMenu extends StatelessWidget {
     return Center(
       child: Card(
         margin: EdgeInsets.zero,
-        color: colorScheme.tertiaryContainer,
-        elevation: 8,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
+        color: Colors.black,
+        elevation: 12,
+        shadowColor: colorScheme.tertiary,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+          side: BorderSide(color: colorScheme.tertiary, width: 4),
+        ),
         child: Padding(
           padding: const EdgeInsets.all(30),
           child: Column(
@@ -23,16 +27,14 @@ class CongratulationsMenu extends StatelessWidget {
             children: [
               FittedBox(
                 child: Text(
-                  'Congratulations!',
+                  'CONGRATULATIONS!',
                   style: textTheme.headlineLarge?.copyWith(
-                    color: colorScheme.onTertiaryContainer,
-                    fontWeight: FontWeight.bold,
-                    shadows: const [
-                      Shadow(
-                        color: Colors.white,
-                        offset: Offset(2, 2),
-                        blurRadius: 2,
-                      ),
+                    color: colorScheme.tertiary,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: 2,
+                    shadows: [
+                      Shadow(color: colorScheme.tertiary, blurRadius: 30),
+                      const Shadow(color: Colors.black, blurRadius: 2),
                     ],
                   ),
                 ),
@@ -41,17 +43,21 @@ class CongratulationsMenu extends StatelessWidget {
               FilledButton.icon(
                 onPressed: game.resetGame,
                 icon: const Icon(Icons.refresh),
-                label: const Text('New Game'),
+                label: const Text('NEW GAME'),
                 style: FilledButton.styleFrom(
                   backgroundColor: colorScheme.tertiary,
                   foregroundColor: colorScheme.onTertiary,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
                   padding: const EdgeInsets.symmetric(
                     horizontal: 50,
                     vertical: 20,
                   ),
                   textStyle: const TextStyle(
-                    fontSize: 28,
-                    fontWeight: FontWeight.bold,
+                    fontSize: 24,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: 1.5,
                   ),
                 ),
               ),

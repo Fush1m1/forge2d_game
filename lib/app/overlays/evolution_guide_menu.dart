@@ -44,10 +44,12 @@ class EvolutionGuideMenu extends StatelessWidget {
         height: 420,
         child: Card(
           margin: EdgeInsets.zero,
-          color: colorScheme.secondaryContainer,
-          elevation: 8,
+          color: Colors.black,
+          elevation: 12,
+          shadowColor: colorScheme.secondary,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(28),
+            borderRadius: BorderRadius.circular(12),
+            side: BorderSide(color: colorScheme.secondary, width: 4),
           ),
           child: Padding(
             padding: const EdgeInsets.all(20),
@@ -60,18 +62,18 @@ class EvolutionGuideMenu extends StatelessWidget {
                     Text(
                       '進化の輪',
                       style: TextStyle(
-                        color: colorScheme.onSecondaryContainer,
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                        letterSpacing: 2,
+                        color: colorScheme.secondary,
+                        fontSize: 22,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: 3,
+                        shadows: [
+                          Shadow(color: colorScheme.secondary, blurRadius: 20),
+                        ],
                       ),
                     ),
                     IconButton(
                       onPressed: game.closeEvolutionGuide,
-                      icon: Icon(
-                        Icons.close,
-                        color: colorScheme.onSecondaryContainer,
-                      ),
+                      icon: Icon(Icons.close, color: colorScheme.secondary),
                     ),
                   ],
                 ),
@@ -94,7 +96,7 @@ class EvolutionGuideMenu extends StatelessWidget {
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
                                 border: Border.all(
-                                  color: colorScheme.outlineVariant,
+                                  color: colorScheme.secondary,
                                   width: 2,
                                 ),
                               ),
@@ -103,7 +105,7 @@ class EvolutionGuideMenu extends StatelessWidget {
                               size: Size.square(diameter),
                               painter: _EvolutionArrowsPainter(
                                 ringRadius: ringRadius,
-                                color: colorScheme.primary,
+                                color: colorScheme.tertiary,
                               ),
                             ),
                             for (
@@ -192,8 +194,12 @@ class _EvolutionArrowsPainter extends CustomPainter {
           ..color = color
           ..style = PaintingStyle.stroke
           ..strokeWidth = 2.5
-          ..strokeCap = StrokeCap.round;
-    final fillPaint = Paint()..color = color;
+          ..strokeCap = StrokeCap.round
+          ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 3);
+    final fillPaint =
+        Paint()
+          ..color = color
+          ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 3);
 
     for (
       var level = EvolutionGuideMenu._minLevel;

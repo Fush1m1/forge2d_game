@@ -24,26 +24,34 @@ class ModeSelectMenu extends StatelessWidget {
       child: Card(
         margin: EdgeInsets.zero,
         color: colorScheme.primaryContainer,
-        elevation: 8,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
+        elevation: 12,
+        shadowColor: colorScheme.primary,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+          side: BorderSide(color: colorScheme.primary, width: 4),
+        ),
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 36, vertical: 40),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                'Select Mode',
+                'SELECT MODE',
                 style: textTheme.headlineMedium?.copyWith(
-                  color: colorScheme.onPrimaryContainer,
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: 2,
+                  color: colorScheme.primary,
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: 4,
+                  shadows: [
+                    Shadow(color: colorScheme.primary, blurRadius: 24),
+                    const Shadow(color: Colors.black, blurRadius: 2),
+                  ],
                 ),
               ),
               const SizedBox(height: 36),
 
               // Normal Mode
               _ModeButton(
-                label: 'Normal',
+                label: 'NORMAL',
                 icon: Icons.sports_esports,
                 color: colorScheme.primary,
                 description: 'Standard ball sizes',
@@ -53,9 +61,9 @@ class ModeSelectMenu extends StatelessWidget {
 
               // Easy Mode
               _ModeButton(
-                label: 'Easy',
+                label: 'EASY',
                 icon: Icons.sentiment_satisfied_alt,
-                color: colorScheme.secondary,
+                color: colorScheme.tertiary,
                 description: 'Balls are half the size',
                 onTap: () => game.startGame(GameMode.easy),
               ),
@@ -75,7 +83,7 @@ class ModeSelectMenu extends StatelessWidget {
           child: GestureDetector(
             behavior: HitTestBehavior.opaque,
             onTap: game.closeModeSelect,
-            child: ColoredBox(color: Colors.black.withValues(alpha: 0.55)),
+            child: ColoredBox(color: Colors.black.withValues(alpha: 0.7)),
           ),
         ),
         Center(child: card),
@@ -103,15 +111,16 @@ class _ModeButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       margin: EdgeInsets.zero,
-      color: color.withValues(alpha: 0.15),
-      elevation: 0,
+      color: Colors.black,
+      elevation: 6,
+      shadowColor: color,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(20),
-        side: BorderSide(color: color, width: 2.5),
+        borderRadius: BorderRadius.circular(8),
+        side: BorderSide(color: color, width: 3),
       ),
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(8),
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
           child: SizedBox(
@@ -128,15 +137,17 @@ class _ModeButton extends StatelessWidget {
                       label,
                       style: TextStyle(
                         color: color,
-                        fontSize: 26,
-                        fontWeight: FontWeight.bold,
+                        fontSize: 24,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: 1.5,
+                        shadows: [Shadow(color: color, blurRadius: 10)],
                       ),
                     ),
                     Text(
                       description,
-                      style: TextStyle(
-                        color: color.withValues(alpha: 0.75),
-                        fontSize: 14,
+                      style: const TextStyle(
+                        color: Colors.white70,
+                        fontSize: 13,
                       ),
                     ),
                   ],

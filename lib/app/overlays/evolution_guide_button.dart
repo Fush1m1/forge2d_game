@@ -8,9 +8,15 @@ class EvolutionGuideButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return IconButton.filled(
       onPressed: game.openEvolutionGuide,
       icon: const Icon(Icons.info, size: 20),
+      style: IconButton.styleFrom(
+        shape: CircleBorder(
+          side: BorderSide(color: colorScheme.onPrimary, width: 2),
+        ),
+      ),
     );
   }
 }
