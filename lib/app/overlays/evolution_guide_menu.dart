@@ -86,15 +86,6 @@ class EvolutionGuideMenu extends StatelessWidget {
                         child: Stack(
                           alignment: Alignment.center,
                           children: [
-                            Container(
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                border: Border.all(
-                                  color: colorScheme.secondary,
-                                  width: 2,
-                                ),
-                              ),
-                            ),
                             CustomPaint(
                               size: Size.square(diameter),
                               painter: _EvolutionArrowsPainter(
