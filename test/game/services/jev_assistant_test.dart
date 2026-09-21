@@ -25,10 +25,13 @@ void main() {
   test('returns the chosen lane on a successful response', () async {
     final assistant = JevAssistant(
       client: MockClient((request) async {
-        expect(request.url.toString(), 'https://api.typesafe.ai/v1/systemone');
+        expect(
+          request.url.toString(),
+          'https://jevtypesafeai.com/api/v1/decide',
+        );
         expect(request.headers['Authorization'], 'Bearer test-key');
         final body = jsonDecode(request.body) as Map<String, dynamic>;
-        expect(body['model'], 'jev-latest');
+        expect(body.containsKey('model'), isFalse);
         expect(body['questions']['lane']['type'], 'choice');
 
         return http.Response(

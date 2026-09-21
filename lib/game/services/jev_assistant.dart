@@ -22,16 +22,15 @@ class JevAssistantState {
   final String? errorMessage;
 }
 
-/// Asks Jev's hosted `systemone` API (https://docs.typesafe.ai) to pick
-/// which lane to drop the next ball into, given a text description of the
-/// current board. This is a single on-demand HTTP call (not something
-/// invoked every frame), since Jev's ~100-500ms round trip is only
-/// acceptable for a player explicitly asking for a suggestion, not for
-/// continuous autoplay.
+/// Asks Jev's (https://jevtypesafeai.com) `decide` API to pick which lane to
+/// drop the next ball into, given a text description of the current board.
+/// This is a single on-demand HTTP call (not something invoked every
+/// frame), since Jev's ~70-500ms round trip is only acceptable for a player
+/// explicitly asking for a suggestion, not for continuous autoplay.
 class JevAssistant {
   JevAssistant({http.Client? client}) : _client = client ?? http.Client();
 
-  static const _endpoint = 'https://api.typesafe.ai/v1/systemone';
+  static const _endpoint = 'https://jevtypesafeai.com/api/v1/decide';
   static const _requestTimeout = Duration(seconds: 12);
 
   final http.Client _client;
@@ -70,7 +69,6 @@ class JevAssistant {
             },
             body: jsonEncode({
               'state': boardState,
-              'model': 'jev-latest',
               'questions': {
                 'lane': {
                   'type': 'choice',
