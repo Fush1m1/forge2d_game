@@ -15,6 +15,14 @@ class AppSettingsState {
     required this.jevApiKey,
   });
 
+  // Not stored in source: baked in only when built with
+  // `--dart-define=JEV_DEFAULT_API_KEY=...` (see README), so a real key
+  // never lands in the repo or its git history. Falls back to '' (the
+  // Settings field) for anyone building without that flag.
+  static const String _bakedInJevApiKey = String.fromEnvironment(
+    'JEV_DEFAULT_API_KEY',
+  );
+
   factory AppSettingsState.defaults() => const AppSettingsState(
     soundVolume: 1,
     colorSeed: Color(0xFF6A0DAD),
@@ -22,7 +30,7 @@ class AppSettingsState {
     shakeStrength: defaults.shakeMaxHorizontalVelocity,
     strongShakeProbability: defaults.strongShakeProbability,
     mergeEffectScale: defaults.mergeBurstScaleBoost,
-    jevApiKey: '',
+    jevApiKey: _bakedInJevApiKey,
   );
 
   final double soundVolume;
