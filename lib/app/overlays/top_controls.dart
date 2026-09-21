@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:forge2d_game/app/overlays/evolution_guide_button.dart';
 import 'package:forge2d_game/app/overlays/new_game_button.dart';
 import 'package:forge2d_game/app/overlays/next_alien.dart';
 import 'package:forge2d_game/game/suika_game.dart';
@@ -19,7 +20,14 @@ class TopControls extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              NewGameButton(game: game),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  EvolutionGuideButton(game: game),
+                  const SizedBox(width: 12),
+                  NewGameButton(game: game),
+                ],
+              ),
               const SizedBox(height: 16),
               NextAlien(game: game),
             ],
