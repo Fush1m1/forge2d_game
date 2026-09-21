@@ -2,9 +2,10 @@ import 'dart:math' as math;
 
 import 'package:flame/widgets.dart';
 import 'package:flutter/material.dart';
-import 'package:forge2d_game/app/theme/app_theme.dart';
 import 'package:forge2d_game/game/model/ball_definition.dart';
 import 'package:forge2d_game/game/suika_game.dart';
+
+const _deepViolet = Color(0xFF3D0080);
 
 /// Shows every ball level arranged in a ring ("進化の輪"), from level 1 at
 /// the top going clockwise to level 10, connected by arrows so players can
@@ -36,94 +37,91 @@ class EvolutionGuideMenu extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
     final card = GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: () {},
-      child: Container(
+      child: SizedBox(
         width: 360,
         height: 420,
-        padding: const EdgeInsets.all(20),
-        decoration: BoxDecoration(
-          color: AppTheme.overlayBackground.withValues(alpha: 0.97),
-          borderRadius: BorderRadius.circular(AppTheme.borderRadiusLarge),
-          border: Border.all(
-            color: AppTheme.overlayBorder,
-            width: AppTheme.borderWidth / 2,
+        child: Card(
+          margin: EdgeInsets.zero,
+          color: colorScheme.primary,
+          elevation: 12,
+          shadowColor: colorScheme.secondary,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(28),
           ),
-          boxShadow: [
-            BoxShadow(
-              color: AppTheme.shadowColor.withValues(alpha: 0.2),
-              blurRadius: 30,
-              spreadRadius: 8,
-            ),
-          ],
-        ),
-        child: Column(
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: Column(
               children: [
-                const SizedBox(width: 32),
-                const Text(
-                  '進化の輪',
-                  style: TextStyle(
-                    color: AppTheme.titleText,
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: 2,
-                  ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const SizedBox(width: 32),
+                    Text(
+                      '進化の輪',
+                      style: textTheme.titleLarge?.copyWith(color: _deepViolet),
+                    ),
+                    IconButton(
+                      onPressed: game.closeEvolutionGuide,
+                      icon: const Icon(Icons.close, color: _deepViolet),
+                    ),
+                  ],
                 ),
-                IconButton(
-                  onPressed: game.closeEvolutionGuide,
-                  icon: const Icon(Icons.close, color: AppTheme.shadowColor),
+                Expanded(
+                  child: LayoutBuilder(
+                    builder: (context, constraints) {
+                      final diameter = math.min(
+                        constraints.maxWidth,
+                        constraints.maxHeight,
+                      );
+                      final ringRadius =
+                          diameter / 2 - _maxIconSize / 2 - _ringMargin;
+                      return SizedBox(
+                        width: diameter,
+                        height: diameter,
+                        child: Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            Container(
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                border: Border.all(
+                                  color: colorScheme.secondary,
+                                  width: 2,
+                                ),
+                              ),
+                            ),
+                            CustomPaint(
+                              size: Size.square(diameter),
+                              painter: _EvolutionArrowsPainter(
+                                ringRadius: ringRadius,
+                                color: Colors.white,
+                              ),
+                            ),
+                            for (
+                              var level = _minLevel;
+                              level <= _maxLevel;
+                              level++
+                            )
+                              _positionedBall(
+                                game: game,
+                                level: level,
+                                ringDiameter: diameter,
+                                ringRadius: ringRadius,
+                              ),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
                 ),
               ],
             ),
-            Expanded(
-              child: LayoutBuilder(
-                builder: (context, constraints) {
-                  final diameter = math.min(
-                    constraints.maxWidth,
-                    constraints.maxHeight,
-                  );
-                  final ringRadius =
-                      diameter / 2 - _maxIconSize / 2 - _ringMargin;
-                  return SizedBox(
-                    width: diameter,
-                    height: diameter,
-                    child: Stack(
-                      alignment: Alignment.center,
-                      children: [
-                        Container(
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            border: Border.all(
-                              color: AppTheme.overlayBorder,
-                              width: 2,
-                            ),
-                          ),
-                        ),
-                        CustomPaint(
-                          size: Size.square(diameter),
-                          painter: _EvolutionArrowsPainter(
-                            ringRadius: ringRadius,
-                            color: AppTheme.buttonBackground,
-                          ),
-                        ),
-                        for (var level = _minLevel; level <= _maxLevel; level++)
-                          _positionedBall(
-                            game: game,
-                            level: level,
-                            ringDiameter: diameter,
-                            ringRadius: ringRadius,
-                          ),
-                      ],
-                    ),
-                  );
-                },
-              ),
-            ),
-          ],
+          ),
         ),
       ),
     );

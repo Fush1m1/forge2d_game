@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:forge2d_game/app/theme/app_theme.dart';
 import 'package:forge2d_game/game/suika_game.dart';
+
+const _cardGreen = Color(0xFF1FB65A);
 
 class CongratulationsMenu extends StatelessWidget {
   final SuikaGame game;
@@ -9,68 +10,44 @@ class CongratulationsMenu extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
     return Center(
-      child: Container(
-        padding: const EdgeInsets.all(30),
-        decoration: BoxDecoration(
-          color: AppTheme.overlayBackground.withValues(alpha: 0.9),
-          borderRadius: BorderRadius.circular(AppTheme.borderRadiusLarge),
-          border: Border.all(
-            color: AppTheme.overlayBorder,
-            width: AppTheme.borderWidth,
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: AppTheme.shadowColor.withValues(alpha: 0.2),
-              blurRadius: 20,
-              spreadRadius: 5,
-            ),
-          ],
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            FittedBox(
-              child: const Text(
-                'Congratulations!',
-                style: TextStyle(
-                  color: AppTheme.congratulationsText,
-                  fontSize: 48,
-                  fontWeight: FontWeight.bold,
-                  shadows: [
-                    Shadow(
-                      color: Colors.white,
-                      offset: Offset(2, 2),
-                      blurRadius: 2,
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            const SizedBox(height: 30),
-            ElevatedButton(
-              onPressed: game.resetGame,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppTheme.secondaryButtonBackground,
-                foregroundColor: Colors.white,
-                elevation: 5,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(
-                    AppTheme.borderRadiusMedium,
+      child: Card(
+        margin: EdgeInsets.zero,
+        color: _cardGreen,
+        elevation: 12,
+        shadowColor: colorScheme.tertiary,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
+        child: Padding(
+          padding: const EdgeInsets.all(30),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              FittedBox(
+                child: Text(
+                  'CONGRATULATIONS!',
+                  style: textTheme.headlineLarge?.copyWith(
+                    color: colorScheme.tertiary,
                   ),
                 ),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 50,
-                  vertical: 20,
-                ),
-                textStyle: const TextStyle(
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
+              ),
+              const SizedBox(height: 30),
+              FilledButton.icon(
+                onPressed: game.resetGame,
+                icon: const Icon(Icons.refresh),
+                label: const Text('NEW GAME'),
+                style: FilledButton.styleFrom(
+                  backgroundColor: colorScheme.tertiary,
+                  foregroundColor: colorScheme.onTertiary,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 50,
+                    vertical: 20,
+                  ),
                 ),
               ),
-              child: const Text('New Game'),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

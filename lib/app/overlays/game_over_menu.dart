@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:forge2d_game/app/theme/app_theme.dart';
 import 'package:forge2d_game/game/suika_game.dart';
+
+const _cardGreen = Color(0xFF1FB65A);
 
 class GameOverMenu extends StatelessWidget {
   final SuikaGame game;
@@ -9,66 +10,42 @@ class GameOverMenu extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
     return Center(
-      child: Container(
-        padding: const EdgeInsets.all(30),
-        decoration: BoxDecoration(
-          color: AppTheme.overlayBackground.withValues(alpha: 0.9),
-          borderRadius: BorderRadius.circular(AppTheme.borderRadiusLarge),
-          border: Border.all(
-            color: AppTheme.overlayBorder,
-            width: AppTheme.borderWidth,
+      child: Card(
+        margin: EdgeInsets.zero,
+        color: _cardGreen,
+        elevation: 12,
+        shadowColor: colorScheme.error,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
+        child: Padding(
+          padding: const EdgeInsets.all(30),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                'GAME OVER',
+                style: textTheme.headlineLarge?.copyWith(
+                  color: colorScheme.error,
+                ),
+              ),
+              const SizedBox(height: 30),
+              FilledButton.icon(
+                onPressed: game.resetGame,
+                icon: const Icon(Icons.refresh),
+                label: const Text('NEW GAME'),
+                style: FilledButton.styleFrom(
+                  backgroundColor: colorScheme.primaryContainer,
+                  foregroundColor: colorScheme.onPrimaryContainer,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 50,
+                    vertical: 20,
+                  ),
+                ),
+              ),
+            ],
           ),
-          boxShadow: [
-            BoxShadow(
-              color: AppTheme.shadowColor.withValues(alpha: 0.2),
-              blurRadius: 20,
-              spreadRadius: 5,
-            ),
-          ],
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Text(
-              'Game Over',
-              style: TextStyle(
-                color: AppTheme.gameOverText,
-                fontSize: 56,
-                fontWeight: FontWeight.bold,
-                shadows: [
-                  Shadow(
-                    color: Colors.white,
-                    offset: Offset(2, 2),
-                    blurRadius: 2,
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 30),
-            ElevatedButton(
-              onPressed: game.resetGame,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppTheme.buttonBackground,
-                foregroundColor: AppTheme.buttonText,
-                elevation: 5,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(
-                    AppTheme.borderRadiusMedium,
-                  ),
-                ),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 50,
-                  vertical: 20,
-                ),
-                textStyle: const TextStyle(
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              child: const Text('New Game'),
-            ),
-          ],
         ),
       ),
     );

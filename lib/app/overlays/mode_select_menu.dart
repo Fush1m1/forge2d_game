@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:forge2d_game/app/theme/app_theme.dart';
 import 'package:forge2d_game/game/model/game_mode.dart';
 import 'package:forge2d_game/game/suika_game.dart';
 
@@ -10,6 +9,9 @@ class ModeSelectMenu extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+
     // Mid-play "New Game" opens this dialog on top of the current game
     // without touching it, so it can be dismissed by tapping outside. At
     // launch / after game over there is no game to return to, so it must
@@ -19,56 +21,45 @@ class ModeSelectMenu extends StatelessWidget {
     final card = GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: () {},
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 36, vertical: 40),
-        decoration: BoxDecoration(
-          color: AppTheme.overlayBackground.withValues(alpha: 0.95),
-          borderRadius: BorderRadius.circular(AppTheme.borderRadiusLarge),
-          border: Border.all(
-            color: AppTheme.overlayBorder,
-            width: AppTheme.borderWidth / 2,
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: AppTheme.shadowColor.withValues(alpha: 0.2),
-              blurRadius: 30,
-              spreadRadius: 8,
-            ),
-          ],
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Text(
-              'Select Mode',
-              style: TextStyle(
-                color: AppTheme.titleText,
-                fontSize: 40,
-                fontWeight: FontWeight.bold,
-                letterSpacing: 2,
+      child: Card(
+        margin: EdgeInsets.zero,
+        color: colorScheme.primary,
+        elevation: 8,
+        shadowColor: Colors.black,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 36, vertical: 40),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                'SELECT MODE',
+                style: textTheme.headlineMedium?.copyWith(color: Colors.white),
               ),
-            ),
-            const SizedBox(height: 36),
+              const SizedBox(height: 36),
 
-            // Normal Mode
-            _ModeButton(
-              label: 'Normal',
-              icon: Icons.sports_esports,
-              color: AppTheme.normalMode,
-              description: 'Standard ball sizes',
-              onTap: () => game.startGame(GameMode.normal),
-            ),
-            const SizedBox(height: 20),
+              // Normal Mode
+              _ModeButton(
+                label: 'NORMAL',
+                icon: Icons.sports_esports,
+                color: colorScheme.primaryContainer,
+                onColor: colorScheme.onPrimaryContainer,
+                description: 'Standard ball sizes',
+                onTap: () => game.startGame(GameMode.normal),
+              ),
+              const SizedBox(height: 20),
 
-            // Easy Mode
-            _ModeButton(
-              label: 'Easy',
-              icon: Icons.sentiment_satisfied_alt,
-              color: AppTheme.easyMode,
-              description: 'Balls are half the size',
-              onTap: () => game.startGame(GameMode.easy),
-            ),
-          ],
+              // Easy Mode
+              _ModeButton(
+                label: 'EASY',
+                icon: Icons.sentiment_satisfied_alt,
+                color: colorScheme.primaryContainer,
+                onColor: colorScheme.onPrimaryContainer,
+                description: 'Balls are half the size',
+                onTap: () => game.startGame(GameMode.easy),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -83,7 +74,7 @@ class ModeSelectMenu extends StatelessWidget {
           child: GestureDetector(
             behavior: HitTestBehavior.opaque,
             onTap: game.closeModeSelect,
-            child: ColoredBox(color: Colors.black.withValues(alpha: 0.55)),
+            child: ColoredBox(color: Colors.black.withValues(alpha: 0.6)),
           ),
         ),
         Center(child: card),
@@ -96,6 +87,7 @@ class _ModeButton extends StatelessWidget {
   final String label;
   final IconData icon;
   final Color color;
+  final Color onColor;
   final String description;
   final VoidCallback onTap;
 
@@ -103,54 +95,45 @@ class _ModeButton extends StatelessWidget {
     required this.label,
     required this.icon,
     required this.color,
+    required this.onColor,
     required this.description,
     required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: Colors.transparent,
+    final textTheme = Theme.of(context).textTheme;
+    return Card(
+      margin: EdgeInsets.zero,
+      color: color,
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(20),
-        child: Ink(
-          decoration: BoxDecoration(
-            color: color.withValues(alpha: 0.15),
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: color, width: 2.5),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
-            child: SizedBox(
-              height: 60,
-              width: 200,
-              child: Row(
-                children: [
-                  Icon(icon, color: color, size: 32),
-                  const SizedBox(width: 16),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        label,
-                        style: TextStyle(
-                          color: color,
-                          fontSize: 26,
-                          fontWeight: FontWeight.bold,
-                        ),
+        borderRadius: BorderRadius.circular(12),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+          child: SizedBox(
+            height: 60,
+            width: 200,
+            child: Row(
+              children: [
+                Icon(icon, color: onColor, size: 32),
+                const SizedBox(width: 16),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      label,
+                      style: textTheme.titleMedium?.copyWith(color: onColor),
+                    ),
+                    Text(
+                      description,
+                      style: textTheme.bodySmall?.copyWith(
+                        color: onColor.withValues(alpha: 0.7),
                       ),
-                      Text(
-                        description,
-                        style: TextStyle(
-                          color: color.withValues(alpha: 0.75),
-                          fontSize: 14,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
+                    ),
+                  ],
+                ),
+              ],
             ),
           ),
         ),
