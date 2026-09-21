@@ -21,19 +21,22 @@ class GameApp extends StatelessWidget {
         colorSchemeSeed: Colors.deepPurple,
         brightness: Brightness.light,
       ),
-      home: SafeArea(
-        child: GameWidget<SuikaGame>.controlled(
-          gameFactory: SuikaGame.new,
-          overlayBuilderMap: {
-            GameOverlay.gameOver: (context, game) => GameOverMenu(game: game),
-            GameOverlay.congratulations:
-                (context, game) => CongratulationsMenu(game: game),
-            GameOverlay.modeSelect:
-                (context, game) => ModeSelectMenu(game: game),
-            GameOverlay.topControls: (context, game) => TopControls(game: game),
-            GameOverlay.evolutionGuide:
-                (context, game) => EvolutionGuideMenu(game: game),
-          },
+      home: Scaffold(
+        body: SafeArea(
+          child: GameWidget<SuikaGame>.controlled(
+            gameFactory: SuikaGame.new,
+            overlayBuilderMap: {
+              GameOverlay.gameOver: (context, game) => GameOverMenu(game: game),
+              GameOverlay.congratulations:
+                  (context, game) => CongratulationsMenu(game: game),
+              GameOverlay.modeSelect:
+                  (context, game) => ModeSelectMenu(game: game),
+              GameOverlay.topControls:
+                  (context, game) => TopControls(game: game),
+              GameOverlay.evolutionGuide:
+                  (context, game) => EvolutionGuideMenu(game: game),
+            },
+          ),
         ),
       ),
     );
