@@ -32,10 +32,12 @@ class JevDropButton extends StatelessWidget {
 
   Future<void> _onPressed(BuildContext context) async {
     if (!game.appSettings.state.value.isJevAuthenticatedToday) {
+      final controller = TextEditingController();
       final authenticated = await showDialog<bool>(
         context: context,
-        builder: (_) => const _JevPasswordDialog(),
+        builder: (_) => _JevPasswordDialog(controller: controller),
       );
+      controller.dispose();
       if (authenticated != true) return;
       await game.appSettings.markJevAuthenticatedToday();
       if (!context.mounted) return;
@@ -78,50 +80,52 @@ class JevDropButton extends StatelessWidget {
   }
 }
 
-class _JevPasswordDialog extends StatefulWidget {
-  const _JevPasswordDialog();
+/// Stateless by design: the controller is owned by the caller (so it can be
+/// disposed alongside the showDialog await), and the inline error text is
+/// held via [StatefulBuilder] instead of a dedicated StatefulWidget/State
+/// pair — the closure below is only ever rebuilt by that StatefulBuilder's
+/// own setState, so `errorText` safely persists across those rebuilds.
+class _JevPasswordDialog extends StatelessWidget {
+  const _JevPasswordDialog({required this.controller});
 
-  @override
-  State<_JevPasswordDialog> createState() => _JevPasswordDialogState();
-}
-
-class _JevPasswordDialogState extends State<_JevPasswordDialog> {
-  final _controller = TextEditingController();
-  String? _errorText;
-
-  void _submit() {
-    if (_controller.text == _todaysJevPassword()) {
-      Navigator.of(context).pop(true);
-    } else {
-      setState(() => _errorText = 'パスワードが違います');
-    }
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
+  final TextEditingController controller;
 
   @override
   Widget build(BuildContext context) {
-    return AlertDialog(
-      title: const Text('Jevを使用'),
-      content: TextField(
-        controller: _controller,
-        obscureText: true,
-        autofocus: true,
-        keyboardType: TextInputType.number,
-        decoration: InputDecoration(labelText: 'パスワード', errorText: _errorText),
-        onSubmitted: (_) => _submit(),
-      ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.of(context).pop(false),
-          child: const Text('キャンセル'),
-        ),
-        FilledButton(onPressed: _submit, child: const Text('OK')),
-      ],
+    String? errorText;
+
+    return StatefulBuilder(
+      builder: (context, setState) {
+        void submit() {
+          if (controller.text == _todaysJevPassword()) {
+            Navigator.of(context).pop(true);
+          } else {
+            setState(() => errorText = 'パスワードが違います');
+          }
+        }
+
+        return AlertDialog(
+          title: const Text('Jevを使用'),
+          content: TextField(
+            controller: controller,
+            obscureText: true,
+            autofocus: true,
+            keyboardType: TextInputType.number,
+            decoration: InputDecoration(
+              labelText: 'パスワード',
+              errorText: errorText,
+            ),
+            onSubmitted: (_) => submit(),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: const Text('キャンセル'),
+            ),
+            FilledButton(onPressed: submit, child: const Text('OK')),
+          ],
+        );
+      },
     );
   }
 }
