@@ -23,7 +23,7 @@ class ModeSelectMenu extends StatelessWidget {
       onTap: () {},
       child: Card(
         margin: EdgeInsets.zero,
-        color: Colors.white,
+        color: colorScheme.primary,
         elevation: 8,
         shadowColor: Colors.black,
         shape: RoundedRectangleBorder(
@@ -38,7 +38,7 @@ class ModeSelectMenu extends StatelessWidget {
               Text(
                 'SELECT MODE',
                 style: textTheme.headlineMedium?.copyWith(
-                  color: colorScheme.primary,
+                  color: Colors.white,
                   fontWeight: FontWeight.w900,
                   letterSpacing: 4,
                   shadows: const [
@@ -110,7 +110,7 @@ class _ModeButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       margin: EdgeInsets.zero,
-      color: Colors.white,
+      color: color,
       elevation: 4,
       shadowColor: Colors.black,
       shape: RoundedRectangleBorder(
@@ -127,19 +127,19 @@ class _ModeButton extends StatelessWidget {
             width: 200,
             child: Row(
               children: [
-                Icon(icon, color: color, size: 32),
+                Icon(icon, color: Colors.white, size: 32),
                 const SizedBox(width: 16),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       label,
-                      style: TextStyle(
-                        color: color,
+                      style: const TextStyle(
+                        color: Colors.white,
                         fontSize: 24,
                         fontWeight: FontWeight.w900,
                         letterSpacing: 1.5,
-                        shadows: const [
+                        shadows: [
                           Shadow(color: Colors.black45, offset: Offset(1, 1)),
                         ],
                       ),
@@ -147,7 +147,7 @@ class _ModeButton extends StatelessWidget {
                     Text(
                       description,
                       style: const TextStyle(
-                        color: Colors.black54,
+                        color: Colors.white70,
                         fontSize: 13,
                       ),
                     ),
