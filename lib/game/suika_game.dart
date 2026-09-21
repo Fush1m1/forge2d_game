@@ -8,6 +8,7 @@ import 'package:flame_forge2d/flame_forge2d.dart';
 import 'package:flame_kenney_xml/flame_kenney_xml.dart';
 import 'package:flutter/material.dart'
     hide PointerCancelEvent, PointerDownEvent, PointerMoveEvent, PointerUpEvent;
+import 'package:sensors_plus/sensors_plus.dart';
 import 'package:shake/shake.dart';
 
 import 'components/alien_ball.dart';
@@ -18,6 +19,7 @@ import 'components/easy_mode_message.dart';
 import 'components/ground.dart';
 import 'config/game_constants.dart';
 import 'input/drop_controller.dart';
+import 'input/tilt_controller.dart';
 import 'model/ball_definition.dart';
 import 'model/brick_file_names.dart';
 import 'model/game_mode.dart';
@@ -37,16 +39,19 @@ class SuikaGame extends Forge2DGame
 
   final GameSession session;
   final DropController _dropController = DropController();
+  final TiltController _tiltController = TiltController();
   final List<AlienBall> _ballsToRemove = [];
   final List<AlienBall> _ballsToAdd = [];
   final Random _random = Random();
   int _ballCount = 0;
+  double _appliedTiltGravityX = 0;
 
   late final XmlSpriteSheet aliens;
   late final XmlSpriteSheet elements;
   late final XmlSpriteSheet tiles;
   late final AudioPool _soundPool;
   late final ShakeDetector _shakeDetector;
+  StreamSubscription<AccelerometerEvent>? _accelerometerSubscription;
 
   Vector2 _dropPosition = Vector2.zero();
   double _objectHeight = 0;
@@ -95,6 +100,13 @@ class SuikaGame extends Forge2DGame
     _shakeDetector = ShakeDetector.autoStart(
       onPhoneShake: (event) => _shakeStackedBalls(),
     );
+    _accelerometerSubscription = accelerometerEventStream(
+      samplingPeriod: SensorInterval.gameInterval,
+    ).listen(
+      (event) => _tiltController.update(event.x),
+      onError: (Object _) {},
+      cancelOnError: true,
+    );
 
     await world.add(Background(sprite: Sprite(backgroundImage)));
     await _buildInitialLevel();
@@ -108,6 +120,7 @@ class SuikaGame extends Forge2DGame
     session.dispose();
     _soundPool.dispose();
     _shakeDetector.stopListening();
+    _accelerometerSubscription?.cancel();
     super.onRemove();
   }
 
@@ -164,6 +177,9 @@ class SuikaGame extends Forge2DGame
     _ballsToAdd.clear();
     _ballCount = 0;
     _objectHeight = 0;
+    _tiltController.reset();
+    _appliedTiltGravityX = 0;
+    world.gravity = Vector2(0, worldGravity);
     session.reset();
     overlays.remove(GameOverlay.gameOver);
     overlays.remove(GameOverlay.congratulations);
@@ -298,8 +314,22 @@ class SuikaGame extends Forge2DGame
       _dropBall(allowWhileBusy: true);
     }
     _applyPendingBallChanges();
+    _updateTiltGravity();
     _updateDebugInfo();
     _updateGameOver();
+  }
+
+  void _updateTiltGravity() {
+    final targetGravityX =
+        session.isPlaying ? _tiltController.horizontalGravity : 0.0;
+    // Setting world.gravity wakes up every body, so only do it when the
+    // tilt actually changed enough to matter, otherwise settled balls would
+    // never be able to fall back asleep.
+    if ((targetGravityX - _appliedTiltGravityX).abs() < tiltGravityEpsilon) {
+      return;
+    }
+    _appliedTiltGravityX = targetGravityX;
+    world.gravity = Vector2(targetGravityX, worldGravity);
   }
 
   Vector2 _canvasToWorld(Vector2 canvasPosition) {
