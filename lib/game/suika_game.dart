@@ -567,9 +567,33 @@ class SuikaGame extends Forge2DGame
       _dropBall(allowWhileBusy: true);
     }
     _applyPendingBallChanges();
+    _removeOffscreenBalls();
     _updateTiltGravity();
     _updateDebugInfo();
     _updateGameOver();
+  }
+
+  /// Removes any ball that has drifted outside the playfield — e.g. tilt
+  /// gravity pushing it past the left/right edge, since there are no side
+  /// walls, or one somehow falling through the floor — so it doesn't sit
+  /// forever as an uncountable, unmergeable ball inflating [_ballCount].
+  /// Deliberately does NOT check the top edge: every dropped ball starts
+  /// above [camera.visibleWorldRect] at [dropY] and falls in from there, so
+  /// that would remove balls the instant they're dropped.
+  void _removeOffscreenBalls() {
+    final visibleRect = camera.visibleWorldRect;
+    for (final ball in world.children.whereType<AlienBall>().toList()) {
+      final position = ball.bodyComponent.body.position;
+      final margin = ball.ballSize / 2;
+      final isOffscreen =
+          position.x < visibleRect.left - margin ||
+          position.x > visibleRect.right + margin ||
+          position.y > visibleRect.bottom + margin;
+      if (isOffscreen) {
+        _removeBall(ball);
+        _ballCount--;
+      }
+    }
   }
 
   void _updateTiltGravity() {
