@@ -36,6 +36,10 @@ class DebugInfoComponent extends PositionComponent
   static const double _top = 10;
   static const double _left = 10;
 
+  static const _gameOverLabel = '[ Show Game Over ]';
+  static const _congratulationsLabel = '[ Show Congratulations ]';
+  static const _resetJevAuthLabel = '[ Reset Jev Auth ]';
+
   final TextPaint _textPaint = TextPaint(
     style: const TextStyle(
       fontSize: 14.0,
@@ -60,6 +64,15 @@ class DebugInfoComponent extends PositionComponent
   double get _congratulationsButtonTop => _gameOverButtonTop + _lineHeight;
 
   double get _resetJevAuthButtonTop => _congratulationsButtonTop + _lineHeight;
+
+  double get _gameOverLabelWidth =>
+      _buttonPaint.getLineMetrics(_gameOverLabel).width;
+
+  double get _congratulationsLabelWidth =>
+      _buttonPaint.getLineMetrics(_congratulationsLabel).width;
+
+  double get _resetJevAuthLabelWidth =>
+      _buttonPaint.getLineMetrics(_resetJevAuthLabel).width;
 
   /// How big the tappable hit-box needs to be to cover every currently
   /// showing log line plus the debug-only button rows (if any) — see the
@@ -86,17 +99,17 @@ class DebugInfoComponent extends PositionComponent
     if (kDebugMode) {
       _buttonPaint.render(
         canvas,
-        '[ Show Game Over ]',
+        _gameOverLabel,
         Vector2(_left, _gameOverButtonTop),
       );
       _buttonPaint.render(
         canvas,
-        '[ Show Congratulations ]',
+        _congratulationsLabel,
         Vector2(_left, _congratulationsButtonTop),
       );
       _buttonPaint.render(
         canvas,
-        '[ Reset Jev Auth ]',
+        _resetJevAuthLabel,
         Vector2(_left, _resetJevAuthButtonTop),
       );
     }
@@ -118,19 +131,26 @@ class DebugInfoComponent extends PositionComponent
   void onTapDown(TapDownEvent event) {
     event.handled = true;
     if (kDebugMode && isVisible) {
+      final tapX = event.localPosition.x;
       final tapY = event.localPosition.y;
       if (tapY >= _gameOverButtonTop &&
-          tapY < _gameOverButtonTop + _lineHeight) {
+          tapY < _gameOverButtonTop + _lineHeight &&
+          tapX >= _left &&
+          tapX < _left + _gameOverLabelWidth) {
         game.debugShowGameOver();
         return;
       }
       if (tapY >= _congratulationsButtonTop &&
-          tapY < _congratulationsButtonTop + _lineHeight) {
+          tapY < _congratulationsButtonTop + _lineHeight &&
+          tapX >= _left &&
+          tapX < _left + _congratulationsLabelWidth) {
         game.debugShowCongratulations();
         return;
       }
       if (tapY >= _resetJevAuthButtonTop &&
-          tapY < _resetJevAuthButtonTop + _lineHeight) {
+          tapY < _resetJevAuthButtonTop + _lineHeight &&
+          tapX >= _left &&
+          tapX < _left + _resetJevAuthLabelWidth) {
         game.debugResetJevAuthentication();
         return;
       }
