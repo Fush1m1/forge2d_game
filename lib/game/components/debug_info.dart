@@ -19,15 +19,16 @@ class DebugInfo {
   static List<String> get messages => _messages;
 }
 
-/// Toggleable debug log overlay. Tapping it shows/hides the log lines
-/// (Obj Height, Threshold, Ball count, last tap, last Jev response — the
-/// last one is shown in release builds too, since there's no other way to
-/// inspect what Jev actually returned outside of a debug session). In
-/// debug builds it also grows three extra tappable rows below the log: two
-/// to jump straight to the Game Over / Congratulations overlays, and one
-/// to reset the remembered Jev password authentication, so all three can
-/// be re-tested without having to actually lose/win a round or clear all
-/// app data.
+/// Toggleable debug log overlay. Showing the log lines (Obj Height,
+/// Threshold, Ball count, last tap, last Jev response — the last one is
+/// shown in release builds too, since there's no other way to inspect what
+/// Jev actually returned outside of a debug session) takes 3 taps in a row,
+/// so it isn't revealed by an accidental single tap; hiding it again is a
+/// single tap. In debug builds it also grows three extra tappable rows
+/// below the log: two to jump straight to the Game Over / Congratulations
+/// overlays, and one to reset the remembered Jev password authentication,
+/// so all three can be re-tested without having to actually lose/win a
+/// round or clear all app data.
 class DebugInfoComponent extends PositionComponent
     with TapCallbacks, HasGameReference<SuikaGame> {
   DebugInfoComponent() : super(size: Vector2(220, _top + _lineHeight));
@@ -35,6 +36,8 @@ class DebugInfoComponent extends PositionComponent
   static const double _lineHeight = 20;
   static const double _top = 10;
   static const double _left = 10;
+
+  static const _tapsRequiredToShow = 3;
 
   static const _gameOverLabel = '[ Show Game Over ]';
   static const _congratulationsLabel = '[ Show Congratulations ]';
@@ -57,6 +60,7 @@ class DebugInfoComponent extends PositionComponent
   );
 
   bool isVisible = false;
+  int _tapsToShow = 0;
 
   double get _gameOverButtonTop =>
       _top + DebugInfo.messages.length * _lineHeight + _lineHeight / 2;
@@ -155,6 +159,16 @@ class DebugInfoComponent extends PositionComponent
         return;
       }
     }
-    isVisible = !isVisible;
+    if (isVisible) {
+      // Hiding stays a single tap.
+      isVisible = false;
+      _tapsToShow = 0;
+      return;
+    }
+    _tapsToShow++;
+    if (_tapsToShow >= _tapsRequiredToShow) {
+      isVisible = true;
+      _tapsToShow = 0;
+    }
   }
 }
