@@ -20,7 +20,7 @@ class NewGameButton extends StatelessWidget {
         ],
       ),
       child: ElevatedButton.icon(
-        onPressed: game.resetGame,
+        onPressed: game.openModeSelect,
         icon: const Icon(Icons.refresh, size: 20),
         label: const Text('New Game'),
         style: ElevatedButton.styleFrom(
