@@ -18,6 +18,7 @@ import 'components/debug_info.dart';
 import 'components/easy_mode_message.dart';
 import 'components/ground.dart';
 import 'components/screen_flash.dart';
+import 'components/merge_burst.dart';
 import 'config/game_constants.dart';
 import 'input/drop_controller.dart';
 import 'input/tilt_controller.dart';
@@ -205,14 +206,22 @@ class SuikaGame extends Forge2DGame
         (first.bodyComponent.body.position +
             second.bodyComponent.body.position) /
         2;
+    final newBallSize = ballDefinitionFor(newLevel).diameterFor(mode!);
     _ballsToRemove.addAll([first, second]);
     _ballsToAdd.add(
       AlienBall(
         posi: newPosition,
         number: newLevel,
-        ballSize: ballDefinitionFor(newLevel).diameterFor(mode!),
+        ballSize: newBallSize,
         speed: 0,
         hasFirstCollisionExecuted: true,
+      ),
+    );
+    world.add(
+      MergeBurstComponent(
+        position: newPosition,
+        ballSize: newBallSize,
+        level: newLevel,
       ),
     );
     // 2つ消えて1つ増えるので、combine 1回につき差し引き1個減る。
