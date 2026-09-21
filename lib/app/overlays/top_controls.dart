@@ -27,8 +27,6 @@ class TopControls extends StatelessWidget {
                 children: [
                   SettingsButton(game: game),
                   const SizedBox(width: 12),
-                  JevDropButton(game: game),
-                  const SizedBox(width: 12),
                   EvolutionGuideButton(game: game),
                   const SizedBox(width: 12),
                   NewGameButton(game: game),
@@ -36,6 +34,8 @@ class TopControls extends StatelessWidget {
               ),
               const SizedBox(height: 16),
               NextAlien(game: game),
+              const SizedBox(height: 12),
+              JevDropButton(game: game),
             ],
           ),
         ),
