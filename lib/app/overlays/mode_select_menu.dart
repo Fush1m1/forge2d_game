@@ -52,7 +52,8 @@ class ModeSelectMenu extends StatelessWidget {
               _ModeButton(
                 label: 'NORMAL',
                 icon: Icons.sports_esports,
-                color: colorScheme.primary,
+                color: colorScheme.primaryContainer,
+                onColor: colorScheme.onPrimaryContainer,
                 description: 'Standard ball sizes',
                 onTap: () => game.startGame(GameMode.normal),
               ),
@@ -62,7 +63,8 @@ class ModeSelectMenu extends StatelessWidget {
               _ModeButton(
                 label: 'EASY',
                 icon: Icons.sentiment_satisfied_alt,
-                color: colorScheme.primary,
+                color: colorScheme.primaryContainer,
+                onColor: colorScheme.onPrimaryContainer,
                 description: 'Balls are half the size',
                 onTap: () => game.startGame(GameMode.easy),
               ),
@@ -95,6 +97,7 @@ class _ModeButton extends StatelessWidget {
   final String label;
   final IconData icon;
   final Color color;
+  final Color onColor;
   final String description;
   final VoidCallback onTap;
 
@@ -102,6 +105,7 @@ class _ModeButton extends StatelessWidget {
     required this.label,
     required this.icon,
     required this.color,
+    required this.onColor,
     required this.description,
     required this.onTap,
   });
@@ -127,27 +131,24 @@ class _ModeButton extends StatelessWidget {
             width: 200,
             child: Row(
               children: [
-                Icon(icon, color: Colors.white, size: 32),
+                Icon(icon, color: onColor, size: 32),
                 const SizedBox(width: 16),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       label,
-                      style: const TextStyle(
-                        color: Colors.white,
+                      style: TextStyle(
+                        color: onColor,
                         fontSize: 24,
                         fontWeight: FontWeight.w900,
                         letterSpacing: 1.5,
-                        shadows: [
-                          Shadow(color: Colors.black45, offset: Offset(1, 1)),
-                        ],
                       ),
                     ),
                     Text(
                       description,
-                      style: const TextStyle(
-                        color: Colors.white70,
+                      style: TextStyle(
+                        color: onColor.withValues(alpha: 0.7),
                         fontSize: 13,
                       ),
                     ),

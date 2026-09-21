@@ -45,6 +45,8 @@ class GameOverMenu extends StatelessWidget {
                 icon: const Icon(Icons.refresh),
                 label: const Text('NEW GAME'),
                 style: FilledButton.styleFrom(
+                  backgroundColor: colorScheme.primaryContainer,
+                  foregroundColor: colorScheme.onPrimaryContainer,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8),
                   ),

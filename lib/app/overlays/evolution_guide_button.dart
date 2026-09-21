@@ -13,8 +13,10 @@ class EvolutionGuideButton extends StatelessWidget {
       onPressed: game.openEvolutionGuide,
       icon: const Icon(Icons.info, size: 20),
       style: IconButton.styleFrom(
+        backgroundColor: colorScheme.primaryContainer,
+        foregroundColor: colorScheme.onPrimaryContainer,
         shape: CircleBorder(
-          side: BorderSide(color: colorScheme.onPrimary, width: 2),
+          side: BorderSide(color: colorScheme.onPrimaryContainer, width: 2),
         ),
       ),
     );

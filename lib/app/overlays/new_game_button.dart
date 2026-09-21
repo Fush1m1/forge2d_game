@@ -17,9 +17,11 @@ class NewGameButton extends StatelessWidget {
         style: TextStyle(fontWeight: FontWeight.w900, letterSpacing: 1),
       ),
       style: FilledButton.styleFrom(
+        backgroundColor: colorScheme.primaryContainer,
+        foregroundColor: colorScheme.onPrimaryContainer,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(8),
-          side: BorderSide(color: colorScheme.onPrimary, width: 2),
+          side: BorderSide(color: colorScheme.onPrimaryContainer, width: 2),
         ),
       ),
     );
