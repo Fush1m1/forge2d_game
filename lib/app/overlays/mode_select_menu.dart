@@ -10,6 +10,7 @@ class ModeSelectMenu extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
 
     // Mid-play "New Game" opens this dialog on top of the current game
     // without touching it, so it can be dismissed by tapping outside. At
@@ -20,53 +21,46 @@ class ModeSelectMenu extends StatelessWidget {
     final card = GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: () {},
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 36, vertical: 40),
-        decoration: BoxDecoration(
-          color: colorScheme.surfaceContainerHigh.withValues(alpha: 0.95),
-          borderRadius: BorderRadius.circular(28),
-          border: Border.all(color: colorScheme.outlineVariant, width: 3),
-          boxShadow: [
-            BoxShadow(
-              color: colorScheme.shadow.withValues(alpha: 0.2),
-              blurRadius: 30,
-              spreadRadius: 8,
-            ),
-          ],
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              'Select Mode',
-              style: TextStyle(
-                color: colorScheme.primary,
-                fontSize: 40,
-                fontWeight: FontWeight.bold,
-                letterSpacing: 2,
+      child: Card(
+        margin: EdgeInsets.zero,
+        color: colorScheme.surfaceContainerHigh,
+        elevation: 8,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 36, vertical: 40),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                'Select Mode',
+                style: textTheme.headlineMedium?.copyWith(
+                  color: colorScheme.primary,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 2,
+                ),
               ),
-            ),
-            const SizedBox(height: 36),
+              const SizedBox(height: 36),
 
-            // Normal Mode
-            _ModeButton(
-              label: 'Normal',
-              icon: Icons.sports_esports,
-              color: colorScheme.primary,
-              description: 'Standard ball sizes',
-              onTap: () => game.startGame(GameMode.normal),
-            ),
-            const SizedBox(height: 20),
+              // Normal Mode
+              _ModeButton(
+                label: 'Normal',
+                icon: Icons.sports_esports,
+                color: colorScheme.primary,
+                description: 'Standard ball sizes',
+                onTap: () => game.startGame(GameMode.normal),
+              ),
+              const SizedBox(height: 20),
 
-            // Easy Mode
-            _ModeButton(
-              label: 'Easy',
-              icon: Icons.sentiment_satisfied_alt,
-              color: colorScheme.secondary,
-              description: 'Balls are half the size',
-              onTap: () => game.startGame(GameMode.easy),
-            ),
-          ],
+              // Easy Mode
+              _ModeButton(
+                label: 'Easy',
+                icon: Icons.sentiment_satisfied_alt,
+                color: colorScheme.secondary,
+                description: 'Balls are half the size',
+                onTap: () => game.startGame(GameMode.easy),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -107,48 +101,47 @@ class _ModeButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: Colors.transparent,
+    return Card(
+      margin: EdgeInsets.zero,
+      color: color.withValues(alpha: 0.15),
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(20),
+        side: BorderSide(color: color, width: 2.5),
+      ),
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(20),
-        child: Ink(
-          decoration: BoxDecoration(
-            color: color.withValues(alpha: 0.15),
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: color, width: 2.5),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
-            child: SizedBox(
-              height: 60,
-              width: 200,
-              child: Row(
-                children: [
-                  Icon(icon, color: color, size: 32),
-                  const SizedBox(width: 16),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        label,
-                        style: TextStyle(
-                          color: color,
-                          fontSize: 26,
-                          fontWeight: FontWeight.bold,
-                        ),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+          child: SizedBox(
+            height: 60,
+            width: 200,
+            child: Row(
+              children: [
+                Icon(icon, color: color, size: 32),
+                const SizedBox(width: 16),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      label,
+                      style: TextStyle(
+                        color: color,
+                        fontSize: 26,
+                        fontWeight: FontWeight.bold,
                       ),
-                      Text(
-                        description,
-                        style: TextStyle(
-                          color: color.withValues(alpha: 0.75),
-                          fontSize: 14,
-                        ),
+                    ),
+                    Text(
+                      description,
+                      style: TextStyle(
+                        color: color.withValues(alpha: 0.75),
+                        fontSize: 14,
                       ),
-                    ],
-                  ),
-                ],
-              ),
+                    ),
+                  ],
+                ),
+              ],
             ),
           ),
         ),

@@ -39,88 +39,93 @@ class EvolutionGuideMenu extends StatelessWidget {
     final card = GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: () {},
-      child: Container(
+      child: SizedBox(
         width: 360,
         height: 420,
-        padding: const EdgeInsets.all(20),
-        decoration: BoxDecoration(
-          color: colorScheme.surfaceContainerHigh.withValues(alpha: 0.97),
-          borderRadius: BorderRadius.circular(28),
-          border: Border.all(color: colorScheme.outlineVariant, width: 3),
-          boxShadow: [
-            BoxShadow(
-              color: colorScheme.shadow.withValues(alpha: 0.2),
-              blurRadius: 30,
-              spreadRadius: 8,
-            ),
-          ],
-        ),
-        child: Column(
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        child: Card(
+          margin: EdgeInsets.zero,
+          color: colorScheme.surfaceContainerHigh,
+          elevation: 8,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(28),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: Column(
               children: [
-                const SizedBox(width: 32),
-                Text(
-                  '進化の輪',
-                  style: TextStyle(
-                    color: colorScheme.primary,
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: 2,
-                  ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const SizedBox(width: 32),
+                    Text(
+                      '進化の輪',
+                      style: TextStyle(
+                        color: colorScheme.primary,
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 2,
+                      ),
+                    ),
+                    IconButton(
+                      onPressed: game.closeEvolutionGuide,
+                      icon: Icon(
+                        Icons.close,
+                        color: colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                  ],
                 ),
-                IconButton(
-                  onPressed: game.closeEvolutionGuide,
-                  icon: Icon(Icons.close, color: colorScheme.onSurfaceVariant),
+                Expanded(
+                  child: LayoutBuilder(
+                    builder: (context, constraints) {
+                      final diameter = math.min(
+                        constraints.maxWidth,
+                        constraints.maxHeight,
+                      );
+                      final ringRadius =
+                          diameter / 2 - _maxIconSize / 2 - _ringMargin;
+                      return SizedBox(
+                        width: diameter,
+                        height: diameter,
+                        child: Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            Container(
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                border: Border.all(
+                                  color: colorScheme.outlineVariant,
+                                  width: 2,
+                                ),
+                              ),
+                            ),
+                            CustomPaint(
+                              size: Size.square(diameter),
+                              painter: _EvolutionArrowsPainter(
+                                ringRadius: ringRadius,
+                                color: colorScheme.primary,
+                              ),
+                            ),
+                            for (
+                              var level = _minLevel;
+                              level <= _maxLevel;
+                              level++
+                            )
+                              _positionedBall(
+                                game: game,
+                                level: level,
+                                ringDiameter: diameter,
+                                ringRadius: ringRadius,
+                              ),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
                 ),
               ],
             ),
-            Expanded(
-              child: LayoutBuilder(
-                builder: (context, constraints) {
-                  final diameter = math.min(
-                    constraints.maxWidth,
-                    constraints.maxHeight,
-                  );
-                  final ringRadius =
-                      diameter / 2 - _maxIconSize / 2 - _ringMargin;
-                  return SizedBox(
-                    width: diameter,
-                    height: diameter,
-                    child: Stack(
-                      alignment: Alignment.center,
-                      children: [
-                        Container(
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            border: Border.all(
-                              color: colorScheme.outlineVariant,
-                              width: 2,
-                            ),
-                          ),
-                        ),
-                        CustomPaint(
-                          size: Size.square(diameter),
-                          painter: _EvolutionArrowsPainter(
-                            ringRadius: ringRadius,
-                            color: colorScheme.primary,
-                          ),
-                        ),
-                        for (var level = _minLevel; level <= _maxLevel; level++)
-                          _positionedBall(
-                            game: game,
-                            level: level,
-                            ringDiameter: diameter,
-                            ringRadius: ringRadius,
-                          ),
-                      ],
-                    ),
-                  );
-                },
-              ),
-            ),
-          ],
+          ),
         ),
       ),
     );

@@ -9,61 +9,54 @@ class CongratulationsMenu extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
     return Center(
-      child: Container(
-        padding: const EdgeInsets.all(30),
-        decoration: BoxDecoration(
-          color: colorScheme.surfaceContainerHigh.withValues(alpha: 0.9),
-          borderRadius: BorderRadius.circular(28),
-          border: Border.all(color: colorScheme.outlineVariant, width: 6),
-          boxShadow: [
-            BoxShadow(
-              color: colorScheme.shadow.withValues(alpha: 0.2),
-              blurRadius: 20,
-              spreadRadius: 5,
-            ),
-          ],
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            FittedBox(
-              child: Text(
-                'Congratulations!',
-                style: TextStyle(
-                  color: colorScheme.tertiary,
-                  fontSize: 48,
-                  fontWeight: FontWeight.bold,
-                  shadows: const [
-                    Shadow(
-                      color: Colors.white,
-                      offset: Offset(2, 2),
-                      blurRadius: 2,
-                    ),
-                  ],
+      child: Card(
+        margin: EdgeInsets.zero,
+        color: colorScheme.surfaceContainerHigh,
+        elevation: 8,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
+        child: Padding(
+          padding: const EdgeInsets.all(30),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              FittedBox(
+                child: Text(
+                  'Congratulations!',
+                  style: textTheme.headlineLarge?.copyWith(
+                    color: colorScheme.tertiary,
+                    fontWeight: FontWeight.bold,
+                    shadows: const [
+                      Shadow(
+                        color: Colors.white,
+                        offset: Offset(2, 2),
+                        blurRadius: 2,
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            ),
-            const SizedBox(height: 30),
-            ElevatedButton(
-              onPressed: game.resetGame,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: colorScheme.tertiary,
-                foregroundColor: colorScheme.onTertiary,
-                elevation: 5,
-                shape: const StadiumBorder(),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 50,
-                  vertical: 20,
-                ),
-                textStyle: const TextStyle(
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
+              const SizedBox(height: 30),
+              FilledButton.icon(
+                onPressed: game.resetGame,
+                icon: const Icon(Icons.refresh),
+                label: const Text('New Game'),
+                style: FilledButton.styleFrom(
+                  backgroundColor: colorScheme.tertiary,
+                  foregroundColor: colorScheme.onTertiary,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 50,
+                    vertical: 20,
+                  ),
+                  textStyle: const TextStyle(
+                    fontSize: 28,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
-              child: const Text('New Game'),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

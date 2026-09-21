@@ -8,29 +8,10 @@ class NewGameButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    return Container(
-      decoration: BoxDecoration(
-        boxShadow: [
-          BoxShadow(
-            color: colorScheme.shadow.withValues(alpha: 0.3),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: ElevatedButton.icon(
-        onPressed: game.openModeSelect,
-        icon: const Icon(Icons.refresh, size: 20),
-        label: const Text('New Game'),
-        style: ElevatedButton.styleFrom(
-          backgroundColor: colorScheme.primary,
-          foregroundColor: colorScheme.onPrimary,
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          shape: const StadiumBorder(),
-          elevation: 0,
-        ),
-      ),
+    return FilledButton.icon(
+      onPressed: game.openModeSelect,
+      icon: const Icon(Icons.refresh, size: 20),
+      label: const Text('New Game'),
     );
   }
 }

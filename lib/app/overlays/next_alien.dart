@@ -10,49 +10,41 @@ class NextAlien extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: colorScheme.surfaceContainerHigh.withValues(alpha: 0.9),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: colorScheme.outlineVariant, width: 2),
-        boxShadow: [
-          BoxShadow(
-            color: colorScheme.shadow.withValues(alpha: 0.1),
-            blurRadius: 8,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.end,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            'NEXT',
-            style: TextStyle(
-              color: colorScheme.onSurfaceVariant,
-              fontWeight: FontWeight.bold,
-              fontSize: 12,
-              letterSpacing: 1.2,
+    return Card(
+      margin: EdgeInsets.zero,
+      color: colorScheme.surfaceContainerHigh,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              'NEXT',
+              style: TextStyle(
+                color: colorScheme.onSurfaceVariant,
+                fontWeight: FontWeight.bold,
+                fontSize: 12,
+                letterSpacing: 1.2,
+              ),
             ),
-          ),
-          const SizedBox(width: 8),
-          ValueListenableBuilder(
-            valueListenable: game.gameState,
-            builder: (context, state, _) {
-              return SizedBox(
-                width: 20,
-                height: 20,
-                child: SpriteWidget(
-                  sprite: game.aliens.getSprite(
-                    game.ballDefinitionFor(state.nextBallLevel).spriteName,
+            const SizedBox(width: 8),
+            ValueListenableBuilder(
+              valueListenable: game.gameState,
+              builder: (context, state, _) {
+                return SizedBox(
+                  width: 20,
+                  height: 20,
+                  child: SpriteWidget(
+                    sprite: game.aliens.getSprite(
+                      game.ballDefinitionFor(state.nextBallLevel).spriteName,
+                    ),
                   ),
-                ),
-              );
-            },
-          ),
-        ],
+                );
+              },
+            ),
+          ],
+        ),
       ),
     );
   }
