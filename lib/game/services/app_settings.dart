@@ -12,6 +12,7 @@ class AppSettingsState {
     required this.shakeStrength,
     required this.strongShakeProbability,
     required this.mergeEffectScale,
+    required this.jevAuthenticated,
   });
 
   factory AppSettingsState.defaults() => const AppSettingsState(
@@ -21,6 +22,7 @@ class AppSettingsState {
     shakeStrength: defaults.shakeMaxHorizontalVelocity,
     strongShakeProbability: defaults.strongShakeProbability,
     mergeEffectScale: defaults.mergeBurstScaleBoost,
+    jevAuthenticated: false,
   );
 
   final double soundVolume;
@@ -29,6 +31,7 @@ class AppSettingsState {
   final double shakeStrength;
   final double strongShakeProbability;
   final double mergeEffectScale;
+  final bool jevAuthenticated;
 
   AppSettingsState copyWith({
     double? soundVolume,
@@ -37,6 +40,7 @@ class AppSettingsState {
     double? shakeStrength,
     double? strongShakeProbability,
     double? mergeEffectScale,
+    bool? jevAuthenticated,
   }) {
     return AppSettingsState(
       soundVolume: soundVolume ?? this.soundVolume,
@@ -46,6 +50,7 @@ class AppSettingsState {
       strongShakeProbability:
           strongShakeProbability ?? this.strongShakeProbability,
       mergeEffectScale: mergeEffectScale ?? this.mergeEffectScale,
+      jevAuthenticated: jevAuthenticated ?? this.jevAuthenticated,
     );
   }
 }
@@ -65,6 +70,7 @@ class AppSettings {
   static const _keyShakeStrength = 'settings.shakeStrength';
   static const _keyStrongShakeProbability = 'settings.strongShakeProbability';
   static const _keyMergeEffectScale = 'settings.mergeEffectScale';
+  static const _keyJevAuthenticated = 'settings.jevAuthenticated';
 
   final ValueNotifier<AppSettingsState> state;
 
@@ -88,6 +94,7 @@ class AppSettings {
       shakeStrength: prefs.getDouble(_keyShakeStrength),
       strongShakeProbability: prefs.getDouble(_keyStrongShakeProbability),
       mergeEffectScale: prefs.getDouble(_keyMergeEffectScale),
+      jevAuthenticated: prefs.getBool(_keyJevAuthenticated),
     );
   }
 
@@ -130,6 +137,14 @@ class AppSettings {
     );
   }
 
+  Future<void> setJevAuthenticated(bool value) async {
+    state.value = state.value.copyWith(jevAuthenticated: value);
+    (await SharedPreferences.getInstance()).setBool(
+      _keyJevAuthenticated,
+      value,
+    );
+  }
+
   Future<void> resetToDefaults() async {
     state.value = AppSettingsState.defaults();
     final prefs = await SharedPreferences.getInstance();
@@ -140,6 +155,7 @@ class AppSettings {
       prefs.remove(_keyShakeStrength),
       prefs.remove(_keyStrongShakeProbability),
       prefs.remove(_keyMergeEffectScale),
+      prefs.remove(_keyJevAuthenticated),
     ]);
   }
 

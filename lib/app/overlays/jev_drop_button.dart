@@ -5,22 +5,26 @@ import 'package:forge2d_game/game/suika_game.dart';
 const _jevPassword = '2026';
 
 /// Button that asks Jev (https://typesafe.ai) to pick a lane for the next
-/// ball and drops it there (issue #48). Gated behind a password prompt
-/// first (to avoid burning through Jev credits by accident), then shows a
-/// spinner while the request is in flight and a SnackBar if it fails (e.g.
-/// missing/invalid API key).
+/// ball and drops it there (issue #48). Gated behind a password prompt the
+/// first time (to avoid burning through Jev credits by accident); once
+/// entered correctly it's remembered in [AppSettings] so it's never asked
+/// again on that device. Shows a spinner while the request is in flight and
+/// a SnackBar if it fails (e.g. missing/invalid API key).
 class JevDropButton extends StatelessWidget {
   final SuikaGame game;
 
   const JevDropButton({super.key, required this.game});
 
   Future<void> _onPressed(BuildContext context) async {
-    final authenticated = await showDialog<bool>(
-      context: context,
-      builder: (_) => const _JevPasswordDialog(),
-    );
-    if (authenticated != true) return;
-    if (!context.mounted) return;
+    if (!game.appSettings.state.value.jevAuthenticated) {
+      final authenticated = await showDialog<bool>(
+        context: context,
+        builder: (_) => const _JevPasswordDialog(),
+      );
+      if (authenticated != true) return;
+      await game.appSettings.setJevAuthenticated(true);
+      if (!context.mounted) return;
+    }
 
     await game.requestJevDrop();
     if (!context.mounted) return;

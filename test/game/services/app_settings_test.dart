@@ -58,4 +58,22 @@ void main() {
       AppSettingsState.defaults().soundVolume,
     );
   });
+
+  test(
+    'persists Jev authentication across a new AppSettings instance',
+    () async {
+      final settings = AppSettings();
+      addTearDown(settings.dispose);
+      await settings.ready;
+
+      expect(settings.state.value.jevAuthenticated, isFalse);
+      await settings.setJevAuthenticated(true);
+
+      final reloaded = AppSettings();
+      addTearDown(reloaded.dispose);
+      await reloaded.ready;
+
+      expect(reloaded.state.value.jevAuthenticated, isTrue);
+    },
+  );
 }
