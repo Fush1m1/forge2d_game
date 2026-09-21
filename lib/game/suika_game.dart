@@ -29,6 +29,7 @@ import 'model/game_overlay.dart';
 import 'model/game_state.dart';
 import 'services/app_settings.dart';
 import 'services/game_session.dart';
+import 'services/jev_assistant.dart';
 
 class SuikaGame extends Forge2DGame
     with
@@ -43,6 +44,7 @@ class SuikaGame extends Forge2DGame
 
   final GameSession session;
   final AppSettings appSettings;
+  final JevAssistant jevAssistant = JevAssistant();
   final DropController _dropController = DropController();
   final TiltController _tiltController = TiltController();
   final List<AlienBall> _ballsToRemove = [];
@@ -126,6 +128,7 @@ class SuikaGame extends Forge2DGame
     _soundPool.dispose();
     _shakeDetector.stopListening();
     _accelerometerSubscription?.cancel();
+    jevAssistant.dispose();
     super.onRemove();
   }
 
@@ -320,10 +323,7 @@ class SuikaGame extends Forge2DGame
   double _calculateObjectHeight() {
     var height = 0.0;
     for (final ball in world.children.whereType<AlienBall>()) {
-      final ballHeight =
-          (camera.visibleWorldRect.bottom - groundTileSize) -
-          ball.bodyComponent.body.position.y;
-      height = max(height, ballHeight);
+      height = max(height, _heightOf(ball));
     }
     return height;
   }
@@ -356,6 +356,76 @@ class SuikaGame extends Forge2DGame
     _ballCount++;
     return true;
   }
+
+  /// Asks Jev to pick which lane to drop the next ball into (issue #48),
+  /// then drops it there. This is an on-demand, single HTTP call kicked off
+  /// by a player tapping the "Ask Jev" button — not something run every
+  /// frame, since Jev's API latency only makes sense for a one-shot
+  /// decision, not continuous autoplay.
+  Future<void> requestJevDrop() async {
+    if (!session.isPlaying || !session.isDropReady) {
+      jevAssistant.state.value = const JevAssistantState(
+        status: JevRequestStatus.error,
+        errorMessage: 'ゲームがプレイ中でないため、Jevに依頼できません。',
+      );
+      return;
+    }
+
+    final visibleRect = camera.visibleWorldRect;
+    final laneWidth = visibleRect.width / jevLaneCount;
+    final nextLevel = session.state.value.nextBallLevel;
+    final laneCriteria = <String, String>{};
+    final laneCenterX = <String, double>{};
+
+    for (var i = 0; i < jevLaneCount; i++) {
+      final laneKey = jevLaneKeys[i];
+      final left = visibleRect.left + laneWidth * i;
+      final right = left + laneWidth;
+      laneCenterX[laneKey] = (left + right) / 2;
+
+      AlienBall? topBall;
+      for (final ball in world.children.whereType<AlienBall>()) {
+        final x = ball.bodyComponent.body.position.x;
+        if (x < left || x >= right) continue;
+        if (topBall == null ||
+            ball.bodyComponent.body.position.y <
+                topBall.bodyComponent.body.position.y) {
+          topBall = ball;
+        }
+      }
+      laneCriteria[laneKey] =
+          topBall == null
+              ? 'Empty lane, no balls stacked yet.'
+              : 'Topmost ball here is level ${topBall.number} out of 10, '
+                  'stack height '
+                  '${_heightOf(topBall).toStringAsFixed(1)} world units.';
+    }
+
+    final boardState =
+        'This is a Suika-style merge puzzle. Balls are numbered 1 to 10; '
+        'when two balls of the same number touch they merge into one ball '
+        'of the next number up. The board is divided into $jevLaneCount '
+        'lanes from left to right (${jevLaneKeys.join(', ')}). The next '
+        'ball about to be dropped is level $nextLevel. Choose the lane '
+        'that is most likely to merge this ball with an existing one of '
+        'the same level, or failing that, the lane that keeps the overall '
+        'stack lowest.';
+
+    final chosenLane = await jevAssistant.chooseLane(
+      apiKey: appSettings.state.value.jevApiKey,
+      boardState: boardState,
+      laneCriteria: laneCriteria,
+    );
+    final centerX = chosenLane == null ? null : laneCenterX[chosenLane];
+    if (centerX == null) return;
+
+    _dropPosition = Vector2(centerX, 0);
+    _dropBall();
+  }
+
+  double _heightOf(AlienBall ball) =>
+      (camera.visibleWorldRect.bottom - groundTileSize) -
+      ball.bodyComponent.body.position.y;
 
   @override
   void onTapDown(TapDownEvent event) {

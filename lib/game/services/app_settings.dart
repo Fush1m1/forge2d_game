@@ -12,6 +12,7 @@ class AppSettingsState {
     required this.shakeStrength,
     required this.strongShakeProbability,
     required this.mergeEffectScale,
+    required this.jevApiKey,
   });
 
   factory AppSettingsState.defaults() => const AppSettingsState(
@@ -21,6 +22,7 @@ class AppSettingsState {
     shakeStrength: defaults.shakeMaxHorizontalVelocity,
     strongShakeProbability: defaults.strongShakeProbability,
     mergeEffectScale: defaults.mergeBurstScaleBoost,
+    jevApiKey: '',
   );
 
   final double soundVolume;
@@ -29,6 +31,7 @@ class AppSettingsState {
   final double shakeStrength;
   final double strongShakeProbability;
   final double mergeEffectScale;
+  final String jevApiKey;
 
   AppSettingsState copyWith({
     double? soundVolume,
@@ -37,6 +40,7 @@ class AppSettingsState {
     double? shakeStrength,
     double? strongShakeProbability,
     double? mergeEffectScale,
+    String? jevApiKey,
   }) {
     return AppSettingsState(
       soundVolume: soundVolume ?? this.soundVolume,
@@ -46,6 +50,7 @@ class AppSettingsState {
       strongShakeProbability:
           strongShakeProbability ?? this.strongShakeProbability,
       mergeEffectScale: mergeEffectScale ?? this.mergeEffectScale,
+      jevApiKey: jevApiKey ?? this.jevApiKey,
     );
   }
 }
@@ -65,6 +70,7 @@ class AppSettings {
   static const _keyShakeStrength = 'settings.shakeStrength';
   static const _keyStrongShakeProbability = 'settings.strongShakeProbability';
   static const _keyMergeEffectScale = 'settings.mergeEffectScale';
+  static const _keyJevApiKey = 'settings.jevApiKey';
 
   final ValueNotifier<AppSettingsState> state;
 
@@ -88,6 +94,7 @@ class AppSettings {
       shakeStrength: prefs.getDouble(_keyShakeStrength),
       strongShakeProbability: prefs.getDouble(_keyStrongShakeProbability),
       mergeEffectScale: prefs.getDouble(_keyMergeEffectScale),
+      jevApiKey: prefs.getString(_keyJevApiKey),
     );
   }
 
@@ -130,6 +137,11 @@ class AppSettings {
     );
   }
 
+  Future<void> setJevApiKey(String value) async {
+    state.value = state.value.copyWith(jevApiKey: value);
+    (await SharedPreferences.getInstance()).setString(_keyJevApiKey, value);
+  }
+
   Future<void> resetToDefaults() async {
     state.value = AppSettingsState.defaults();
     final prefs = await SharedPreferences.getInstance();
@@ -140,6 +152,7 @@ class AppSettings {
       prefs.remove(_keyShakeStrength),
       prefs.remove(_keyStrongShakeProbability),
       prefs.remove(_keyMergeEffectScale),
+      prefs.remove(_keyJevApiKey),
     ]);
   }
 

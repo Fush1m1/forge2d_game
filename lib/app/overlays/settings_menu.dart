@@ -126,6 +126,18 @@ class SettingsMenu extends StatelessWidget {
                               ],
                             ),
                             const SizedBox(height: 16),
+                            Text(
+                              'Jev API Key',
+                              style: textTheme.labelLarge?.copyWith(
+                                color: Colors.white,
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            _JevApiKeyField(
+                              initialValue: settings.jevApiKey,
+                              onChanged: game.appSettings.setJevApiKey,
+                            ),
+                            const SizedBox(height: 16),
                             OutlinedButton(
                               onPressed: game.appSettings.resetToDefaults,
                               style: OutlinedButton.styleFrom(
@@ -201,6 +213,34 @@ class _SettingSlider extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+class _JevApiKeyField extends StatelessWidget {
+  final String initialValue;
+  final ValueChanged<String> onChanged;
+
+  const _JevApiKeyField({required this.initialValue, required this.onChanged});
+
+  @override
+  Widget build(BuildContext context) {
+    return TextFormField(
+      initialValue: initialValue,
+      onChanged: onChanged,
+      obscureText: true,
+      style: const TextStyle(color: Colors.white),
+      decoration: InputDecoration(
+        isDense: true,
+        hintText: 'sk-...',
+        hintStyle: TextStyle(color: Colors.white.withValues(alpha: 0.5)),
+        enabledBorder: const UnderlineInputBorder(
+          borderSide: BorderSide(color: Colors.white54),
+        ),
+        focusedBorder: const UnderlineInputBorder(
+          borderSide: BorderSide(color: Colors.white),
+        ),
+      ),
     );
   }
 }
