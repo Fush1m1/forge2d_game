@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:forge2d_game/game/services/jev_assistant.dart';
 import 'package:forge2d_game/game/suika_game.dart';
 
-const _jevPassword = '2026';
+const _jevPassword = '20260922';
 
 /// Button that asks Jev (https://typesafe.ai) to pick a lane for the next
 /// ball and drops it there (issue #48). Gated behind a password prompt the
