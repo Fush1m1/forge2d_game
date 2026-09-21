@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:forge2d_game/game/model/ball_definition.dart';
 import 'package:forge2d_game/game/suika_game.dart';
 
-const _cardViolet = Color(0xFF5E17EB);
+const _cardGreen = Color(0xFF1FB65A);
 
 /// Shows every ball level arranged in a ring ("進化の輪"), from level 1 at
 /// the top going clockwise to level 10, connected by arrows so players can
@@ -46,7 +46,7 @@ class EvolutionGuideMenu extends StatelessWidget {
         height: 420,
         child: Card(
           margin: EdgeInsets.zero,
-          color: _cardViolet,
+          color: _cardGreen,
           elevation: 12,
           shadowColor: colorScheme.secondary,
           shape: RoundedRectangleBorder(

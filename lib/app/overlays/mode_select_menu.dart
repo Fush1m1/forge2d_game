@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:forge2d_game/game/model/game_mode.dart';
 import 'package:forge2d_game/game/suika_game.dart';
 
-const _cardViolet = Color(0xFF5E17EB);
+const _cardGreen = Color(0xFF1FB65A);
 
 class ModeSelectMenu extends StatelessWidget {
   final SuikaGame game;
@@ -25,7 +25,7 @@ class ModeSelectMenu extends StatelessWidget {
       onTap: () {},
       child: Card(
         margin: EdgeInsets.zero,
-        color: _cardViolet,
+        color: _cardGreen,
         elevation: 8,
         shadowColor: Colors.black,
         shape: RoundedRectangleBorder(
@@ -112,7 +112,7 @@ class _ModeButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       margin: EdgeInsets.zero,
-      color: Color.alphaBlend(color.withValues(alpha: 0.3), _cardViolet),
+      color: Color.alphaBlend(color.withValues(alpha: 0.3), _cardGreen),
       elevation: 4,
       shadowColor: Colors.black,
       shape: RoundedRectangleBorder(
