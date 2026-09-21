@@ -11,6 +11,7 @@ import 'package:flutter/material.dart'
 import 'package:sensors_plus/sensors_plus.dart';
 import 'package:shake/shake.dart';
 
+import '../shared/forge2d/body_removal.dart';
 import 'components/alien_ball.dart';
 import 'components/background.dart';
 import 'components/brick.dart';
@@ -22,8 +23,8 @@ import 'components/merge_burst.dart';
 import 'config/game_constants.dart';
 import 'input/drop_controller.dart';
 import 'input/tilt_controller.dart';
+import 'level_builder.dart';
 import 'model/ball_definition.dart';
-import 'model/brick_file_names.dart';
 import 'model/game_mode.dart';
 import 'model/game_overlay.dart';
 import 'model/game_state.dart';
@@ -57,6 +58,7 @@ class SuikaGame extends Forge2DGame
   late final XmlSpriteSheet aliens;
   late final XmlSpriteSheet elements;
   late final XmlSpriteSheet tiles;
+  late final LevelBuilder _levelBuilder;
   late final AudioPool _soundPool;
   late final ShakeDetector _shakeDetector;
   StreamSubscription<AccelerometerEvent>? _accelerometerSubscription;
@@ -97,6 +99,13 @@ class SuikaGame extends Forge2DGame
     aliens = spriteSheets[0];
     elements = spriteSheets[1];
     tiles = spriteSheets[2];
+    _levelBuilder = LevelBuilder(
+      world: world,
+      camera: camera,
+      tiles: tiles,
+      elements: elements,
+      random: _random,
+    );
     await FlameAudio.audioCache.loadAll([
       gameOverSoundFile,
       congratulationsSoundFile,
@@ -118,7 +127,7 @@ class SuikaGame extends Forge2DGame
     );
 
     await world.add(Background(sprite: Sprite(backgroundImage)));
-    await _buildLevel(Stage.classic);
+    await _levelBuilder.build(Stage.classic);
     pauseEngine();
     overlays.add(GameOverlay.modeSelect);
   }
@@ -134,106 +143,15 @@ class SuikaGame extends Forge2DGame
     super.onRemove();
   }
 
-  /// Builds the floor and obstacle bricks for [stage] (issue #20). Called
-  /// once at launch with [Stage.classic] (so there's something behind the
-  /// mandatory first mode-select dialog), then again from [startGame] with
-  /// whichever stage the player picked.
-  Future<void> _buildLevel(Stage stage) async {
-    final visibleRect = camera.visibleWorldRect;
-    final bumpAmplitude = stage.floorBumpAmplitude;
-    await world.addAll([
-      for (
-        var x = visibleRect.left;
-        x < visibleRect.right + groundTileSize;
-        x += groundTileSize
-      )
-        Ground(
-          Vector2(
-            x,
-            (visibleRect.height - groundTileSize) / 2 +
-                (bumpAmplitude == 0
-                    ? 0
-                    : (_random.nextDouble() * 2 - 1) * bumpAmplitude),
-          ),
-          tiles.getSprite('grass.png'),
-        ),
-    ]);
-
-    if (stage == Stage.classic) {
-      // Reproduces the original fixed layout exactly: 3 rows, symmetric
-      // metal columns, no randomness.
-      for (var row = 0; row < initialBrickRowCount; row++) {
-        final height = firstBrickHeight + brickHeightInterval * row;
-        await _addBrick(
-          visibleRect.left / 3 * 2,
-          height,
-          BrickType.metal,
-          BrickSize.size70x140,
-        );
-        await _addBrick(
-          visibleRect.right / 3 * 2,
-          height,
-          BrickType.metal,
-          BrickSize.size70x140,
-        );
-      }
-      return;
-    }
-
-    final (minCount, maxCount) = stage.obstacleCountRange;
-    final obstacleCount =
-        minCount == maxCount
-            ? minCount
-            : minCount + _random.nextInt(maxCount - minCount + 1);
-    // Keep obstacles away from the very edges of the playfield.
-    final inset = visibleRect.width * 0.15;
-    for (var i = 0; i < obstacleCount; i++) {
-      final type =
-          stage.randomizeBrickVariety ? BrickType.randomType : BrickType.metal;
-      final size =
-          stage.randomizeBrickVariety
-              ? BrickSize.randomSize
-              : BrickSize.size70x140;
-      final x =
-          visibleRect.left +
-          inset +
-          _random.nextDouble() * (visibleRect.width - 2 * inset);
-      final height =
-          firstBrickHeight + brickHeightInterval * (i % initialBrickRowCount);
-      await _addBrick(x, height, type, size);
-    }
-  }
-
-  Future<void> _addBrick(
-    double x,
-    double height,
-    BrickType type,
-    BrickSize size,
-  ) async {
-    final y = camera.visibleWorldRect.bottom - (height + groundTileSize);
-    await world.add(
-      Brick(
-        type: type,
-        size: size,
-        damage: BrickDamage.none,
-        position: Vector2(x, y),
-        sprites: brickFileNames(
-          type,
-          size,
-        ).map((key, filename) => MapEntry(key, elements.getSprite(filename))),
-      ),
-    );
-  }
-
   void _clearBoard() {
     for (final ball in world.children.whereType<AlienBall>().toList()) {
       _removeBall(ball);
     }
     for (final ground in world.children.whereType<Ground>().toList()) {
-      _removeBodyComponent(ground);
+      removeBodyComponent(world, ground);
     }
     for (final brick in world.children.whereType<Brick>().toList()) {
-      _removeBodyComponent(brick);
+      removeBodyComponent(world, brick);
     }
     _ballsToRemove.clear();
     _ballsToAdd.clear();
@@ -244,41 +162,19 @@ class SuikaGame extends Forge2DGame
     world.gravity = Vector2(0, appSettings.state.value.worldGravity);
   }
 
-  /// Destroys [body]'s Forge2D body if it hasn't mounted yet, working
-  /// around a Forge2D body leak: Flame only calls [Component.onRemove] for
-  /// a component that was previously mounted (see Component's own doc
-  /// comment), so [BodyComponent.onRemove] — which destroys the Forge2D
-  /// body — never runs for one that's removed before it ever mounted.
-  /// That's exactly what happens to the level built in [onLoad]: it's
-  /// added while the engine is about to be paused (`pauseEngine()` right
-  /// after), so its components sit loaded-but-not-mounted for as long as
-  /// the mode-select screen is up, since mounting only happens as part of
-  /// the (paused) per-frame update loop. It can also happen to a ball that
-  /// merges (via [requestMerge]) on the very frame it was dropped, before
-  /// it's had a chance to mount. Without this, removing either would leak
-  /// an invisible-but-solid phantom body. Call this before
-  /// `removeFromParent()`, which makes its own (otherwise-skipped) destroy
-  /// path a no-op for the normal, already-mounted case.
-  void _destroyBodyIfUnmounted(BodyComponent<Forge2DGame> body) {
-    if (body.isLoaded && !body.isMounted) {
-      world.destroyBody(body.body);
-    }
-  }
-
-  void _removeBodyComponent(BodyComponent<Forge2DGame> component) {
-    _destroyBodyIfUnmounted(component);
-    component.removeFromParent();
-  }
-
+  /// Removes [ball], first destroying its [BallBody]'s Forge2D body if it
+  /// never mounted — see [destroyBodyIfUnmounted]. [AlienBall] isn't itself
+  /// a [BodyComponent] (its body lives on the child [AlienBall.bodyComponent]),
+  /// so it needs this thin wrapper rather than [removeBodyComponent].
   void _removeBall(AlienBall ball) {
-    _destroyBodyIfUnmounted(ball.bodyComponent);
+    destroyBodyIfUnmounted(world, ball.bodyComponent);
     ball.removeFromParent();
   }
 
   void startGame(GameMode selectedMode, Stage selectedStage) {
     _clearBoard();
     session.start(selectedMode, selectedStage);
-    unawaited(_buildLevel(selectedStage));
+    unawaited(_levelBuilder.build(selectedStage));
     overlays.remove(GameOverlay.modeSelect);
     overlays.add(GameOverlay.topControls);
     resumeEngine();
