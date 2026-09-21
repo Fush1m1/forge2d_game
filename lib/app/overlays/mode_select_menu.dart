@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:forge2d_game/app/theme/app_theme.dart';
 import 'package:forge2d_game/game/model/game_mode.dart';
 import 'package:forge2d_game/game/suika_game.dart';
 
@@ -10,6 +9,8 @@ class ModeSelectMenu extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     // Mid-play "New Game" opens this dialog on top of the current game
     // without touching it, so it can be dismissed by tapping outside. At
     // launch / after game over there is no game to return to, so it must
@@ -22,15 +23,12 @@ class ModeSelectMenu extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 36, vertical: 40),
         decoration: BoxDecoration(
-          color: AppTheme.overlayBackground.withValues(alpha: 0.95),
-          borderRadius: BorderRadius.circular(AppTheme.borderRadiusLarge),
-          border: Border.all(
-            color: AppTheme.overlayBorder,
-            width: AppTheme.borderWidth / 2,
-          ),
+          color: colorScheme.surfaceContainerHigh.withValues(alpha: 0.95),
+          borderRadius: BorderRadius.circular(28),
+          border: Border.all(color: colorScheme.outlineVariant, width: 3),
           boxShadow: [
             BoxShadow(
-              color: AppTheme.shadowColor.withValues(alpha: 0.2),
+              color: colorScheme.shadow.withValues(alpha: 0.2),
               blurRadius: 30,
               spreadRadius: 8,
             ),
@@ -39,10 +37,10 @@ class ModeSelectMenu extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Text(
+            Text(
               'Select Mode',
               style: TextStyle(
-                color: AppTheme.titleText,
+                color: colorScheme.primary,
                 fontSize: 40,
                 fontWeight: FontWeight.bold,
                 letterSpacing: 2,
@@ -54,7 +52,7 @@ class ModeSelectMenu extends StatelessWidget {
             _ModeButton(
               label: 'Normal',
               icon: Icons.sports_esports,
-              color: AppTheme.normalMode,
+              color: colorScheme.primary,
               description: 'Standard ball sizes',
               onTap: () => game.startGame(GameMode.normal),
             ),
@@ -64,7 +62,7 @@ class ModeSelectMenu extends StatelessWidget {
             _ModeButton(
               label: 'Easy',
               icon: Icons.sentiment_satisfied_alt,
-              color: AppTheme.easyMode,
+              color: colorScheme.secondary,
               description: 'Balls are half the size',
               onTap: () => game.startGame(GameMode.easy),
             ),

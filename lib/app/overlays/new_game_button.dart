@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:forge2d_game/app/theme/app_theme.dart';
 import 'package:forge2d_game/game/suika_game.dart';
 
 class NewGameButton extends StatelessWidget {
@@ -9,11 +8,12 @@ class NewGameButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Container(
       decoration: BoxDecoration(
         boxShadow: [
           BoxShadow(
-            color: AppTheme.shadowColor.withValues(alpha: 0.3),
+            color: colorScheme.shadow.withValues(alpha: 0.3),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -24,12 +24,10 @@ class NewGameButton extends StatelessWidget {
         icon: const Icon(Icons.refresh, size: 20),
         label: const Text('New Game'),
         style: ElevatedButton.styleFrom(
-          backgroundColor: AppTheme.buttonBackground,
-          foregroundColor: AppTheme.buttonText,
+          backgroundColor: colorScheme.primary,
+          foregroundColor: colorScheme.onPrimary,
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(AppTheme.borderRadiusMedium),
-          ),
+          shape: const StadiumBorder(),
           elevation: 0,
         ),
       ),

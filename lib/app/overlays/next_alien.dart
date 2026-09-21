@@ -1,6 +1,5 @@
 import 'package:flame/widgets.dart';
 import 'package:flutter/material.dart';
-import 'package:forge2d_game/app/theme/app_theme.dart';
 import 'package:forge2d_game/game/suika_game.dart';
 
 class NextAlien extends StatelessWidget {
@@ -10,15 +9,16 @@ class NextAlien extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: AppTheme.overlayBackground.withValues(alpha: 0.9),
-        borderRadius: BorderRadius.circular(AppTheme.borderRadiusMedium),
-        border: Border.all(color: AppTheme.overlayBorder, width: 2),
+        color: colorScheme.surfaceContainerHigh.withValues(alpha: 0.9),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: colorScheme.outlineVariant, width: 2),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.1),
+            color: colorScheme.shadow.withValues(alpha: 0.1),
             blurRadius: 8,
             offset: const Offset(0, 4),
           ),
@@ -28,10 +28,10 @@ class NextAlien extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.end,
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Text(
+          Text(
             'NEXT',
             style: TextStyle(
-              color: AppTheme.shadowColor,
+              color: colorScheme.onSurfaceVariant,
               fontWeight: FontWeight.bold,
               fontSize: 12,
               letterSpacing: 1.2,

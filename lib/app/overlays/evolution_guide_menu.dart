@@ -2,7 +2,6 @@ import 'dart:math' as math;
 
 import 'package:flame/widgets.dart';
 import 'package:flutter/material.dart';
-import 'package:forge2d_game/app/theme/app_theme.dart';
 import 'package:forge2d_game/game/model/ball_definition.dart';
 import 'package:forge2d_game/game/suika_game.dart';
 
@@ -36,6 +35,7 @@ class EvolutionGuideMenu extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     final card = GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: () {},
@@ -44,15 +44,12 @@ class EvolutionGuideMenu extends StatelessWidget {
         height: 420,
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: AppTheme.overlayBackground.withValues(alpha: 0.97),
-          borderRadius: BorderRadius.circular(AppTheme.borderRadiusLarge),
-          border: Border.all(
-            color: AppTheme.overlayBorder,
-            width: AppTheme.borderWidth / 2,
-          ),
+          color: colorScheme.surfaceContainerHigh.withValues(alpha: 0.97),
+          borderRadius: BorderRadius.circular(28),
+          border: Border.all(color: colorScheme.outlineVariant, width: 3),
           boxShadow: [
             BoxShadow(
-              color: AppTheme.shadowColor.withValues(alpha: 0.2),
+              color: colorScheme.shadow.withValues(alpha: 0.2),
               blurRadius: 30,
               spreadRadius: 8,
             ),
@@ -64,10 +61,10 @@ class EvolutionGuideMenu extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 const SizedBox(width: 32),
-                const Text(
+                Text(
                   '進化の輪',
                   style: TextStyle(
-                    color: AppTheme.titleText,
+                    color: colorScheme.primary,
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
                     letterSpacing: 2,
@@ -75,7 +72,7 @@ class EvolutionGuideMenu extends StatelessWidget {
                 ),
                 IconButton(
                   onPressed: game.closeEvolutionGuide,
-                  icon: const Icon(Icons.close, color: AppTheme.shadowColor),
+                  icon: Icon(Icons.close, color: colorScheme.onSurfaceVariant),
                 ),
               ],
             ),
@@ -98,7 +95,7 @@ class EvolutionGuideMenu extends StatelessWidget {
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
                             border: Border.all(
-                              color: AppTheme.overlayBorder,
+                              color: colorScheme.outlineVariant,
                               width: 2,
                             ),
                           ),
@@ -107,7 +104,7 @@ class EvolutionGuideMenu extends StatelessWidget {
                           size: Size.square(diameter),
                           painter: _EvolutionArrowsPainter(
                             ringRadius: ringRadius,
-                            color: AppTheme.buttonBackground,
+                            color: colorScheme.primary,
                           ),
                         ),
                         for (var level = _minLevel; level <= _maxLevel; level++)

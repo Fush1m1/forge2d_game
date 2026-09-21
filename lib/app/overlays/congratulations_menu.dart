@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:forge2d_game/app/theme/app_theme.dart';
 import 'package:forge2d_game/game/suika_game.dart';
 
 class CongratulationsMenu extends StatelessWidget {
@@ -9,19 +8,17 @@ class CongratulationsMenu extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Center(
       child: Container(
         padding: const EdgeInsets.all(30),
         decoration: BoxDecoration(
-          color: AppTheme.overlayBackground.withValues(alpha: 0.9),
-          borderRadius: BorderRadius.circular(AppTheme.borderRadiusLarge),
-          border: Border.all(
-            color: AppTheme.overlayBorder,
-            width: AppTheme.borderWidth,
-          ),
+          color: colorScheme.surfaceContainerHigh.withValues(alpha: 0.9),
+          borderRadius: BorderRadius.circular(28),
+          border: Border.all(color: colorScheme.outlineVariant, width: 6),
           boxShadow: [
             BoxShadow(
-              color: AppTheme.shadowColor.withValues(alpha: 0.2),
+              color: colorScheme.shadow.withValues(alpha: 0.2),
               blurRadius: 20,
               spreadRadius: 5,
             ),
@@ -31,13 +28,13 @@ class CongratulationsMenu extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             FittedBox(
-              child: const Text(
+              child: Text(
                 'Congratulations!',
                 style: TextStyle(
-                  color: AppTheme.congratulationsText,
+                  color: colorScheme.tertiary,
                   fontSize: 48,
                   fontWeight: FontWeight.bold,
-                  shadows: [
+                  shadows: const [
                     Shadow(
                       color: Colors.white,
                       offset: Offset(2, 2),
@@ -51,14 +48,10 @@ class CongratulationsMenu extends StatelessWidget {
             ElevatedButton(
               onPressed: game.resetGame,
               style: ElevatedButton.styleFrom(
-                backgroundColor: AppTheme.secondaryButtonBackground,
-                foregroundColor: Colors.white,
+                backgroundColor: colorScheme.tertiary,
+                foregroundColor: colorScheme.onTertiary,
                 elevation: 5,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(
-                    AppTheme.borderRadiusMedium,
-                  ),
-                ),
+                shape: const StadiumBorder(),
                 padding: const EdgeInsets.symmetric(
                   horizontal: 50,
                   vertical: 20,

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:forge2d_game/app/theme/app_theme.dart';
 import 'package:forge2d_game/game/suika_game.dart';
 
 class GameOverMenu extends StatelessWidget {
@@ -9,19 +8,17 @@ class GameOverMenu extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Center(
       child: Container(
         padding: const EdgeInsets.all(30),
         decoration: BoxDecoration(
-          color: AppTheme.overlayBackground.withValues(alpha: 0.9),
-          borderRadius: BorderRadius.circular(AppTheme.borderRadiusLarge),
-          border: Border.all(
-            color: AppTheme.overlayBorder,
-            width: AppTheme.borderWidth,
-          ),
+          color: colorScheme.surfaceContainerHigh.withValues(alpha: 0.9),
+          borderRadius: BorderRadius.circular(28),
+          border: Border.all(color: colorScheme.outlineVariant, width: 6),
           boxShadow: [
             BoxShadow(
-              color: AppTheme.shadowColor.withValues(alpha: 0.2),
+              color: colorScheme.shadow.withValues(alpha: 0.2),
               blurRadius: 20,
               spreadRadius: 5,
             ),
@@ -30,13 +27,13 @@ class GameOverMenu extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Text(
+            Text(
               'Game Over',
               style: TextStyle(
-                color: AppTheme.gameOverText,
+                color: colorScheme.error,
                 fontSize: 56,
                 fontWeight: FontWeight.bold,
-                shadows: [
+                shadows: const [
                   Shadow(
                     color: Colors.white,
                     offset: Offset(2, 2),
@@ -49,14 +46,10 @@ class GameOverMenu extends StatelessWidget {
             ElevatedButton(
               onPressed: game.resetGame,
               style: ElevatedButton.styleFrom(
-                backgroundColor: AppTheme.buttonBackground,
-                foregroundColor: AppTheme.buttonText,
+                backgroundColor: colorScheme.primary,
+                foregroundColor: colorScheme.onPrimary,
                 elevation: 5,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(
-                    AppTheme.borderRadiusMedium,
-                  ),
-                ),
+                shape: const StadiumBorder(),
                 padding: const EdgeInsets.symmetric(
                   horizontal: 50,
                   vertical: 20,
