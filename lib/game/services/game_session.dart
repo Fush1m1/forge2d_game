@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import '../model/game_mode.dart';
 import '../model/game_phase.dart';
 import '../model/game_state.dart';
+import '../model/stage.dart';
 
 class GameSession {
   GameSession({Random? random}) : _random = random ?? Random() {
@@ -20,11 +21,12 @@ class GameSession {
   bool _isDropReady = true;
 
   GameMode? get mode => state.value.mode;
+  Stage? get stage => state.value.stage;
   bool get isPlaying => state.value.phase == GamePhase.playing;
   bool get isDropReady => _isDropReady;
 
-  void start(GameMode mode) {
-    _publish(phase: GamePhase.playing, mode: mode);
+  void start(GameMode mode, Stage stage) {
+    _publish(phase: GamePhase.playing, mode: mode, stage: stage);
   }
 
   int takeNextBall({bool allowWhileBusy = false}) {
@@ -35,15 +37,17 @@ class GameSession {
     _currentBallLevel = _followingBallLevel;
     _followingBallLevel = _randomBallLevel();
     _isDropReady = false;
-    _publish(phase: GamePhase.playing, mode: mode);
+    _publish(phase: GamePhase.playing, mode: mode, stage: stage);
     return ballLevel;
   }
 
-  void gameOver() => _publish(phase: GamePhase.gameOver, mode: mode);
+  void gameOver() =>
+      _publish(phase: GamePhase.gameOver, mode: mode, stage: stage);
 
   void markDropReady() => _isDropReady = true;
 
-  void congratulate() => _publish(phase: GamePhase.congratulations, mode: mode);
+  void congratulate() =>
+      _publish(phase: GamePhase.congratulations, mode: mode, stage: stage);
 
   void reset() {
     _currentBallLevel = _randomBallLevel();
@@ -56,10 +60,11 @@ class GameSession {
 
   int _randomBallLevel() => _random.nextInt(2) + 1;
 
-  void _publish({required GamePhase phase, GameMode? mode}) {
+  void _publish({required GamePhase phase, GameMode? mode, Stage? stage}) {
     state.value = GameState(
       phase: phase,
       mode: mode,
+      stage: stage,
       nextBallLevel: _currentBallLevel,
     );
   }

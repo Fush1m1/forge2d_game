@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:forge2d_game/game/model/game_mode.dart';
+import 'package:forge2d_game/game/model/stage.dart';
 import 'package:forge2d_game/game/suika_game.dart';
 
 class ModeSelectMenu extends StatelessWidget {
@@ -18,6 +19,11 @@ class ModeSelectMenu extends StatelessWidget {
     // stay a mandatory choice.
     final canDismiss = game.session.isPlaying;
 
+    // Kept outside the StatefulBuilder below so it survives its rebuilds
+    // (the same pattern as _JevPasswordDialog's errorText) without needing
+    // a dedicated StatefulWidget/State pair just for this one selection.
+    var selectedStage = Stage.classic;
+
     final card = GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: () {},
@@ -29,36 +35,74 @@ class ModeSelectMenu extends StatelessWidget {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 36, vertical: 40),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                'SELECT MODE',
-                style: textTheme.headlineMedium?.copyWith(color: Colors.white),
-              ),
-              const SizedBox(height: 36),
+          child: StatefulBuilder(
+            builder: (context, setState) {
+              return Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    'SELECT MODE',
+                    style: textTheme.headlineMedium?.copyWith(
+                      color: Colors.white,
+                    ),
+                  ),
+                  const SizedBox(height: 28),
 
-              // Normal Mode
-              _ModeButton(
-                label: 'NORMAL',
-                icon: Icons.sports_esports,
-                color: colorScheme.primaryContainer,
-                onColor: colorScheme.onPrimaryContainer,
-                description: 'Standard ball sizes',
-                onTap: () => game.startGame(GameMode.normal),
-              ),
-              const SizedBox(height: 20),
+                  Text(
+                    'STAGE',
+                    style: textTheme.labelLarge?.copyWith(
+                      color: Colors.white70,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Wrap(
+                    alignment: WrapAlignment.center,
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: [
+                      for (final stage in Stage.values)
+                        ChoiceChip(
+                          label: Text(stage.label),
+                          selected: selectedStage == stage,
+                          selectedColor: colorScheme.primaryContainer,
+                          backgroundColor: Colors.white.withValues(alpha: 0.15),
+                          labelStyle: TextStyle(
+                            color:
+                                selectedStage == stage
+                                    ? colorScheme.onPrimaryContainer
+                                    : Colors.white,
+                          ),
+                          onSelected: (_) {
+                            setState(() => selectedStage = stage);
+                          },
+                        ),
+                    ],
+                  ),
+                  const SizedBox(height: 28),
 
-              // Easy Mode
-              _ModeButton(
-                label: 'EASY',
-                icon: Icons.sentiment_satisfied_alt,
-                color: colorScheme.primaryContainer,
-                onColor: colorScheme.onPrimaryContainer,
-                description: 'Balls are half the size',
-                onTap: () => game.startGame(GameMode.easy),
-              ),
-            ],
+                  // Normal Mode
+                  _ModeButton(
+                    label: 'NORMAL',
+                    icon: Icons.sports_esports,
+                    color: colorScheme.primaryContainer,
+                    onColor: colorScheme.onPrimaryContainer,
+                    description: 'Standard ball sizes',
+                    onTap: () => game.startGame(GameMode.normal, selectedStage),
+                  ),
+                  const SizedBox(height: 20),
+
+                  // Easy Mode
+                  _ModeButton(
+                    label: 'EASY',
+                    icon: Icons.sentiment_satisfied_alt,
+                    color: colorScheme.primaryContainer,
+                    onColor: colorScheme.onPrimaryContainer,
+                    description: 'Balls are half the size',
+                    onTap: () => game.startGame(GameMode.easy, selectedStage),
+                  ),
+                ],
+              );
+            },
           ),
         ),
       ),

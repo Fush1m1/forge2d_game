@@ -27,6 +27,7 @@ import 'model/brick_file_names.dart';
 import 'model/game_mode.dart';
 import 'model/game_overlay.dart';
 import 'model/game_state.dart';
+import 'model/stage.dart';
 import 'services/app_settings.dart';
 import 'services/game_session.dart';
 import 'services/jev_assistant.dart';
@@ -117,7 +118,7 @@ class SuikaGame extends Forge2DGame
     );
 
     await world.add(Background(sprite: Sprite(backgroundImage)));
-    await _buildInitialLevel();
+    await _buildLevel(Stage.classic);
     pauseEngine();
     overlays.add(GameOverlay.modeSelect);
   }
@@ -133,8 +134,13 @@ class SuikaGame extends Forge2DGame
     super.onRemove();
   }
 
-  Future<void> _buildInitialLevel() async {
+  /// Builds the floor and obstacle bricks for [stage] (issue #20). Called
+  /// once at launch with [Stage.classic] (so there's something behind the
+  /// mandatory first mode-select dialog), then again from [startGame] with
+  /// whichever stage the player picked.
+  Future<void> _buildLevel(Stage stage) async {
     final visibleRect = camera.visibleWorldRect;
+    final bumpAmplitude = stage.floorBumpAmplitude;
     await world.addAll([
       for (
         var x = visibleRect.left;
@@ -142,21 +148,69 @@ class SuikaGame extends Forge2DGame
         x += groundTileSize
       )
         Ground(
-          Vector2(x, (visibleRect.height - groundTileSize) / 2),
+          Vector2(
+            x,
+            (visibleRect.height - groundTileSize) / 2 +
+                (bumpAmplitude == 0
+                    ? 0
+                    : (_random.nextDouble() * 2 - 1) * bumpAmplitude),
+          ),
           tiles.getSprite('grass.png'),
         ),
     ]);
-    for (var row = 0; row < initialBrickRowCount; row++) {
-      final height = firstBrickHeight + brickHeightInterval * row;
-      await _addBrick(visibleRect.left / 3 * 2, height);
-      await _addBrick(visibleRect.right / 3 * 2, height);
+
+    if (stage == Stage.classic) {
+      // Reproduces the original fixed layout exactly: 3 rows, symmetric
+      // metal columns, no randomness.
+      for (var row = 0; row < initialBrickRowCount; row++) {
+        final height = firstBrickHeight + brickHeightInterval * row;
+        await _addBrick(
+          visibleRect.left / 3 * 2,
+          height,
+          BrickType.metal,
+          BrickSize.size70x140,
+        );
+        await _addBrick(
+          visibleRect.right / 3 * 2,
+          height,
+          BrickType.metal,
+          BrickSize.size70x140,
+        );
+      }
+      return;
+    }
+
+    final (minCount, maxCount) = stage.obstacleCountRange;
+    final obstacleCount =
+        minCount == maxCount
+            ? minCount
+            : minCount + _random.nextInt(maxCount - minCount + 1);
+    // Keep obstacles away from the very edges of the playfield.
+    final inset = visibleRect.width * 0.15;
+    for (var i = 0; i < obstacleCount; i++) {
+      final type =
+          stage.randomizeBrickVariety ? BrickType.randomType : BrickType.metal;
+      final size =
+          stage.randomizeBrickVariety
+              ? BrickSize.randomSize
+              : BrickSize.size70x140;
+      final x =
+          visibleRect.left +
+          inset +
+          _random.nextDouble() * (visibleRect.width - 2 * inset);
+      final height =
+          firstBrickHeight + brickHeightInterval * (i % initialBrickRowCount);
+      await _addBrick(x, height, type, size);
     }
   }
 
-  Future<void> _addBrick(double x, double height) async {
+  Future<void> _addBrick(
+    double x,
+    double height,
+    BrickType type,
+    BrickSize size,
+  ) async {
     final y = camera.visibleWorldRect.bottom - (height + groundTileSize);
-    final type = BrickType.metal;
-    final size = BrickSize.size70x140;
     await world.add(
       Brick(
         type: type,
@@ -175,6 +229,12 @@ class SuikaGame extends Forge2DGame
     for (final ball in world.children.whereType<AlienBall>().toList()) {
       ball.removeFromParent();
     }
+    for (final ground in world.children.whereType<Ground>().toList()) {
+      ground.removeFromParent();
+    }
+    for (final brick in world.children.whereType<Brick>().toList()) {
+      brick.removeFromParent();
+    }
     _ballsToRemove.clear();
     _ballsToAdd.clear();
     _ballCount = 0;
@@ -184,9 +244,10 @@ class SuikaGame extends Forge2DGame
     world.gravity = Vector2(0, appSettings.state.value.worldGravity);
   }
 
-  void startGame(GameMode selectedMode) {
+  void startGame(GameMode selectedMode, Stage selectedStage) {
     _clearBoard();
-    session.start(selectedMode);
+    session.start(selectedMode, selectedStage);
+    unawaited(_buildLevel(selectedStage));
     overlays.remove(GameOverlay.modeSelect);
     overlays.add(GameOverlay.topControls);
     resumeEngine();
