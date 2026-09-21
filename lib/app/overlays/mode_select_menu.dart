@@ -62,7 +62,7 @@ class ModeSelectMenu extends StatelessWidget {
               _ModeButton(
                 label: 'EASY',
                 icon: Icons.sentiment_satisfied_alt,
-                color: colorScheme.tertiary,
+                color: colorScheme.primary,
                 description: 'Balls are half the size',
                 onTap: () => game.startGame(GameMode.easy),
               ),
