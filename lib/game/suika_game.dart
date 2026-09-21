@@ -44,6 +44,7 @@ class SuikaGame extends Forge2DGame
   late final XmlSpriteSheet aliens;
   late final XmlSpriteSheet elements;
   late final XmlSpriteSheet tiles;
+  late final AudioPool _soundPool;
   late final ShakeDetector _shakeDetector;
 
   Vector2 _dropPosition = Vector2.zero();
@@ -82,10 +83,14 @@ class SuikaGame extends Forge2DGame
     elements = spriteSheets[1];
     tiles = spriteSheets[2];
     await FlameAudio.audioCache.loadAll([
-      mergeSoundFile,
       gameOverSoundFile,
       congratulationsSoundFile,
     ]);
+    _soundPool = await FlameAudio.createPool(
+      mergeSoundFile,
+      minPlayers: 2,
+      maxPlayers: 4,
+    );
     _shakeDetector = ShakeDetector.autoStart(
       onPhoneShake: (event) => _shakeStackedBalls(),
     );
@@ -100,6 +105,7 @@ class SuikaGame extends Forge2DGame
   void onRemove() {
     WidgetsBinding.instance.removeObserver(this);
     session.dispose();
+    _soundPool.dispose();
     _shakeDetector.stopListening();
     super.onRemove();
   }
@@ -174,7 +180,7 @@ class SuikaGame extends Forge2DGame
     second.hasCombined = true;
     if (first.number >= 10) return;
 
-    FlameAudio.play(mergeSoundFile);
+    _soundPool.start();
     final newLevel = first.number + 1;
     final newPosition =
         (first.bodyComponent.body.position +
