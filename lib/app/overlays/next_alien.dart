@@ -12,10 +12,10 @@ class NextAlien extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
     return Card(
       margin: EdgeInsets.zero,
-      color: colorScheme.primaryContainer,
+      color: colorScheme.primary,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(8),
-        side: BorderSide(color: colorScheme.onPrimaryContainer, width: 2),
+        side: BorderSide(color: colorScheme.onPrimary, width: 2),
       ),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -26,7 +26,7 @@ class NextAlien extends StatelessWidget {
             Text(
               'NEXT',
               style: TextStyle(
-                color: colorScheme.onPrimaryContainer,
+                color: colorScheme.onPrimary,
                 fontWeight: FontWeight.w900,
                 fontSize: 12,
                 letterSpacing: 1.5,
