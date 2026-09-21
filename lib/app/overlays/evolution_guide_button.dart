@@ -28,7 +28,7 @@ class EvolutionGuideButton extends StatelessWidget {
           shape: const CircleBorder(),
           elevation: 0,
         ),
-        child: const Icon(Icons.auto_awesome, size: 20),
+        child: const Icon(Icons.info, size: 20),
       ),
     );
   }
