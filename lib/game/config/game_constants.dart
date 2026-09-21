@@ -19,3 +19,4 @@ const String congratulationsSoundFile = 'congratulations.wav';
 const double shakeMaxHorizontalVelocity = 12;
 const double shakeMaxUpwardVelocity = 14;
 const double shakeMaxAngularVelocity = 6;
+const double tiltGravityEpsilon = 0.05;
