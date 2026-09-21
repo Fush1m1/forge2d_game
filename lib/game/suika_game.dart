@@ -17,6 +17,7 @@ import 'components/brick.dart';
 import 'components/debug_info.dart';
 import 'components/easy_mode_message.dart';
 import 'components/ground.dart';
+import 'components/screen_flash.dart';
 import 'config/game_constants.dart';
 import 'input/drop_controller.dart';
 import 'input/tilt_controller.dart';
@@ -228,14 +229,23 @@ class SuikaGame extends Forge2DGame
 
   void _shakeStackedBalls() {
     if (!session.isPlaying) return;
+    // ポップコーンみたいに、たまに通常より強いシェイクが来る。
+    final isStrongShake = _random.nextDouble() < strongShakeProbability;
+    final multiplier = isStrongShake ? strongShakeMultiplier : 1.0;
     for (final ball in world.children.whereType<AlienBall>()) {
       final body = ball.bodyComponent.body;
       final horizontal =
-          (_random.nextDouble() * 2 - 1) * shakeMaxHorizontalVelocity;
-      final upward = -_random.nextDouble() * shakeMaxUpwardVelocity;
+          (_random.nextDouble() * 2 - 1) *
+          shakeMaxHorizontalVelocity *
+          multiplier;
+      final upward =
+          -_random.nextDouble() * shakeMaxUpwardVelocity * multiplier;
       body.linearVelocity = body.linearVelocity + Vector2(horizontal, upward);
       body.angularVelocity +=
-          (_random.nextDouble() * 2 - 1) * shakeMaxAngularVelocity;
+          (_random.nextDouble() * 2 - 1) * shakeMaxAngularVelocity * multiplier;
+    }
+    if (isStrongShake) {
+      camera.viewport.add(ScreenFlashComponent());
     }
   }
 

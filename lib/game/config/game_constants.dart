@@ -20,3 +20,6 @@ const double shakeMaxHorizontalVelocity = 12;
 const double shakeMaxUpwardVelocity = 14;
 const double shakeMaxAngularVelocity = 6;
 const double tiltGravityEpsilon = 0.05;
+const double strongShakeProbability = 0.2;
+const double strongShakeMultiplier = 2.5;
+const double screenFlashDuration = 0.35;
