@@ -61,6 +61,17 @@ class DebugInfoComponent extends PositionComponent
 
   double get _resetJevAuthButtonTop => _congratulationsButtonTop + _lineHeight;
 
+  /// How big the tappable hit-box needs to be to cover every currently
+  /// showing log line plus the debug-only button rows (if any) — see the
+  /// comment on [update] for why this can't be a fixed constant.
+  Vector2 get _requiredTapAreaSize {
+    final buttonRows = kDebugMode ? 3 : 0;
+    return Vector2(
+      220,
+      _top + (DebugInfo.messages.length + buttonRows) * _lineHeight + 20,
+    );
+  }
+
   @override
   void render(Canvas canvas) {
     if (!isVisible) return;
@@ -94,15 +105,11 @@ class DebugInfoComponent extends PositionComponent
   @override
   void update(double dt) {
     // The Jev response log can wrap into a variable number of lines (see
-    // SuikaGame._updateDebugInfo), so size the tappable box to fit however
-    // many lines are actually showing right now (plus the debug-only
-    // button rows, when present) instead of a hand-tuned constant that
-    // would fall out of sync and make the lower rows untappable.
-    final buttonRows = kDebugMode ? 3 : 0;
-    size = Vector2(
-      220,
-      _top + (DebugInfo.messages.length + buttonRows) * _lineHeight + 20,
-    );
+    // SuikaGame._updateDebugInfo), so the tappable box is resized every
+    // frame to fit however many lines are actually showing right now,
+    // instead of a hand-tuned constant that would fall out of sync and
+    // make the lower rows untappable.
+    size = _requiredTapAreaSize;
     // This ensures the debug info is fresh every frame.
     DebugInfo.clear();
   }
