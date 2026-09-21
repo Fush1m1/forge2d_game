@@ -19,15 +19,18 @@ class DebugInfo {
   static List<String> get messages => _messages;
 }
 
-/// Toggleable debug log overlay. Tapping it shows/hides the log lines
-/// (Obj Height, Threshold, Ball count, last tap, last Jev response — the
-/// last one is shown in release builds too, since there's no other way to
-/// inspect what Jev actually returned outside of a debug session). In
-/// debug builds it also grows three extra tappable rows below the log: two
-/// to jump straight to the Game Over / Congratulations overlays, and one
-/// to reset the remembered Jev password authentication, so all three can
-/// be re-tested without having to actually lose/win a round or clear all
-/// app data.
+/// Toggleable debug log overlay. Showing the log lines (Obj Height,
+/// Threshold, Ball count, last tap, last Jev response — the last one is
+/// shown in release builds too, since there's no other way to inspect what
+/// Jev actually returned outside of a debug session) takes
+/// [_tapsRequiredToShow] taps within [_tapWindow] of each other, so it
+/// isn't revealed by an accidental single tap (or a few slow, unrelated
+/// ones); hiding it again is a single tap. In debug builds it also grows
+/// three extra tappable rows
+/// below the log: two to jump straight to the Game Over / Congratulations
+/// overlays, and one to reset the remembered Jev password authentication,
+/// so all three can be re-tested without having to actually lose/win a
+/// round or clear all app data.
 class DebugInfoComponent extends PositionComponent
     with TapCallbacks, HasGameReference<SuikaGame> {
   DebugInfoComponent() : super(size: Vector2(220, _top + _lineHeight));
@@ -35,6 +38,13 @@ class DebugInfoComponent extends PositionComponent
   static const double _lineHeight = 20;
   static const double _top = 10;
   static const double _left = 10;
+
+  static const _tapsRequiredToShow = 3;
+  static const _tapWindow = Duration(milliseconds: 600);
+
+  static const _gameOverLabel = '[ Show Game Over ]';
+  static const _congratulationsLabel = '[ Show Congratulations ]';
+  static const _resetJevAuthLabel = '[ Reset Jev Auth ]';
 
   final TextPaint _textPaint = TextPaint(
     style: const TextStyle(
@@ -53,6 +63,8 @@ class DebugInfoComponent extends PositionComponent
   );
 
   bool isVisible = false;
+  int _tapsToShow = 0;
+  DateTime? _lastTapTime;
 
   double get _gameOverButtonTop =>
       _top + DebugInfo.messages.length * _lineHeight + _lineHeight / 2;
@@ -60,6 +72,15 @@ class DebugInfoComponent extends PositionComponent
   double get _congratulationsButtonTop => _gameOverButtonTop + _lineHeight;
 
   double get _resetJevAuthButtonTop => _congratulationsButtonTop + _lineHeight;
+
+  double get _gameOverLabelWidth =>
+      _buttonPaint.getLineMetrics(_gameOverLabel).width;
+
+  double get _congratulationsLabelWidth =>
+      _buttonPaint.getLineMetrics(_congratulationsLabel).width;
+
+  double get _resetJevAuthLabelWidth =>
+      _buttonPaint.getLineMetrics(_resetJevAuthLabel).width;
 
   /// How big the tappable hit-box needs to be to cover every currently
   /// showing log line plus the debug-only button rows (if any) — see the
@@ -86,17 +107,17 @@ class DebugInfoComponent extends PositionComponent
     if (kDebugMode) {
       _buttonPaint.render(
         canvas,
-        '[ Show Game Over ]',
+        _gameOverLabel,
         Vector2(_left, _gameOverButtonTop),
       );
       _buttonPaint.render(
         canvas,
-        '[ Show Congratulations ]',
+        _congratulationsLabel,
         Vector2(_left, _congratulationsButtonTop),
       );
       _buttonPaint.render(
         canvas,
-        '[ Reset Jev Auth ]',
+        _resetJevAuthLabel,
         Vector2(_left, _resetJevAuthButtonTop),
       );
     }
@@ -118,23 +139,49 @@ class DebugInfoComponent extends PositionComponent
   void onTapDown(TapDownEvent event) {
     event.handled = true;
     if (kDebugMode && isVisible) {
+      final tapX = event.localPosition.x;
       final tapY = event.localPosition.y;
       if (tapY >= _gameOverButtonTop &&
-          tapY < _gameOverButtonTop + _lineHeight) {
+          tapY < _gameOverButtonTop + _lineHeight &&
+          tapX >= _left &&
+          tapX < _left + _gameOverLabelWidth) {
         game.debugShowGameOver();
         return;
       }
       if (tapY >= _congratulationsButtonTop &&
-          tapY < _congratulationsButtonTop + _lineHeight) {
+          tapY < _congratulationsButtonTop + _lineHeight &&
+          tapX >= _left &&
+          tapX < _left + _congratulationsLabelWidth) {
         game.debugShowCongratulations();
         return;
       }
       if (tapY >= _resetJevAuthButtonTop &&
-          tapY < _resetJevAuthButtonTop + _lineHeight) {
+          tapY < _resetJevAuthButtonTop + _lineHeight &&
+          tapX >= _left &&
+          tapX < _left + _resetJevAuthLabelWidth) {
         game.debugResetJevAuthentication();
         return;
       }
     }
-    isVisible = !isVisible;
+    if (isVisible) {
+      // Hiding stays a single tap.
+      isVisible = false;
+      _tapsToShow = 0;
+      _lastTapTime = null;
+      return;
+    }
+    final now = DateTime.now();
+    if (_lastTapTime == null || now.difference(_lastTapTime!) > _tapWindow) {
+      // Too long since the last tap (or this is the first one) — start a
+      // fresh sequence instead of counting it toward an old one.
+      _tapsToShow = 0;
+    }
+    _lastTapTime = now;
+    _tapsToShow++;
+    if (_tapsToShow >= _tapsRequiredToShow) {
+      isVisible = true;
+      _tapsToShow = 0;
+      _lastTapTime = null;
+    }
   }
 }

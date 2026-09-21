@@ -27,6 +27,7 @@ import 'model/brick_file_names.dart';
 import 'model/game_mode.dart';
 import 'model/game_overlay.dart';
 import 'model/game_state.dart';
+import 'model/stage.dart';
 import 'services/app_settings.dart';
 import 'services/game_session.dart';
 import 'services/jev_assistant.dart';
@@ -117,7 +118,7 @@ class SuikaGame extends Forge2DGame
     );
 
     await world.add(Background(sprite: Sprite(backgroundImage)));
-    await _buildInitialLevel();
+    await _buildLevel(Stage.classic);
     pauseEngine();
     overlays.add(GameOverlay.modeSelect);
   }
@@ -133,8 +134,13 @@ class SuikaGame extends Forge2DGame
     super.onRemove();
   }
 
-  Future<void> _buildInitialLevel() async {
+  /// Builds the floor and obstacle bricks for [stage] (issue #20). Called
+  /// once at launch with [Stage.classic] (so there's something behind the
+  /// mandatory first mode-select dialog), then again from [startGame] with
+  /// whichever stage the player picked.
+  Future<void> _buildLevel(Stage stage) async {
     final visibleRect = camera.visibleWorldRect;
+    final bumpAmplitude = stage.floorBumpAmplitude;
     await world.addAll([
       for (
         var x = visibleRect.left;
@@ -142,21 +148,69 @@ class SuikaGame extends Forge2DGame
         x += groundTileSize
       )
         Ground(
-          Vector2(x, (visibleRect.height - groundTileSize) / 2),
+          Vector2(
+            x,
+            (visibleRect.height - groundTileSize) / 2 +
+                (bumpAmplitude == 0
+                    ? 0
+                    : (_random.nextDouble() * 2 - 1) * bumpAmplitude),
+          ),
           tiles.getSprite('grass.png'),
         ),
     ]);
-    for (var row = 0; row < initialBrickRowCount; row++) {
-      final height = firstBrickHeight + brickHeightInterval * row;
-      await _addBrick(visibleRect.left / 3 * 2, height);
-      await _addBrick(visibleRect.right / 3 * 2, height);
+
+    if (stage == Stage.classic) {
+      // Reproduces the original fixed layout exactly: 3 rows, symmetric
+      // metal columns, no randomness.
+      for (var row = 0; row < initialBrickRowCount; row++) {
+        final height = firstBrickHeight + brickHeightInterval * row;
+        await _addBrick(
+          visibleRect.left / 3 * 2,
+          height,
+          BrickType.metal,
+          BrickSize.size70x140,
+        );
+        await _addBrick(
+          visibleRect.right / 3 * 2,
+          height,
+          BrickType.metal,
+          BrickSize.size70x140,
+        );
+      }
+      return;
+    }
+
+    final (minCount, maxCount) = stage.obstacleCountRange;
+    final obstacleCount =
+        minCount == maxCount
+            ? minCount
+            : minCount + _random.nextInt(maxCount - minCount + 1);
+    // Keep obstacles away from the very edges of the playfield.
+    final inset = visibleRect.width * 0.15;
+    for (var i = 0; i < obstacleCount; i++) {
+      final type =
+          stage.randomizeBrickVariety ? BrickType.randomType : BrickType.metal;
+      final size =
+          stage.randomizeBrickVariety
+              ? BrickSize.randomSize
+              : BrickSize.size70x140;
+      final x =
+          visibleRect.left +
+          inset +
+          _random.nextDouble() * (visibleRect.width - 2 * inset);
+      final height =
+          firstBrickHeight + brickHeightInterval * (i % initialBrickRowCount);
+      await _addBrick(x, height, type, size);
     }
   }
 
-  Future<void> _addBrick(double x, double height) async {
+  Future<void> _addBrick(
+    double x,
+    double height,
+    BrickType type,
+    BrickSize size,
+  ) async {
     final y = camera.visibleWorldRect.bottom - (height + groundTileSize);
-    final type = BrickType.metal;
-    final size = BrickSize.size70x140;
     await world.add(
       Brick(
         type: type,
@@ -173,7 +227,13 @@ class SuikaGame extends Forge2DGame
 
   void _clearBoard() {
     for (final ball in world.children.whereType<AlienBall>().toList()) {
-      ball.removeFromParent();
+      _removeBall(ball);
+    }
+    for (final ground in world.children.whereType<Ground>().toList()) {
+      _removeBodyComponent(ground);
+    }
+    for (final brick in world.children.whereType<Brick>().toList()) {
+      _removeBodyComponent(brick);
     }
     _ballsToRemove.clear();
     _ballsToAdd.clear();
@@ -184,9 +244,41 @@ class SuikaGame extends Forge2DGame
     world.gravity = Vector2(0, appSettings.state.value.worldGravity);
   }
 
-  void startGame(GameMode selectedMode) {
+  /// Destroys [body]'s Forge2D body if it hasn't mounted yet, working
+  /// around a Forge2D body leak: Flame only calls [Component.onRemove] for
+  /// a component that was previously mounted (see Component's own doc
+  /// comment), so [BodyComponent.onRemove] — which destroys the Forge2D
+  /// body — never runs for one that's removed before it ever mounted.
+  /// That's exactly what happens to the level built in [onLoad]: it's
+  /// added while the engine is about to be paused (`pauseEngine()` right
+  /// after), so its components sit loaded-but-not-mounted for as long as
+  /// the mode-select screen is up, since mounting only happens as part of
+  /// the (paused) per-frame update loop. It can also happen to a ball that
+  /// merges (via [requestMerge]) on the very frame it was dropped, before
+  /// it's had a chance to mount. Without this, removing either would leak
+  /// an invisible-but-solid phantom body. Call this before
+  /// `removeFromParent()`, which makes its own (otherwise-skipped) destroy
+  /// path a no-op for the normal, already-mounted case.
+  void _destroyBodyIfUnmounted(BodyComponent<Forge2DGame> body) {
+    if (body.isLoaded && !body.isMounted) {
+      world.destroyBody(body.body);
+    }
+  }
+
+  void _removeBodyComponent(BodyComponent<Forge2DGame> component) {
+    _destroyBodyIfUnmounted(component);
+    component.removeFromParent();
+  }
+
+  void _removeBall(AlienBall ball) {
+    _destroyBodyIfUnmounted(ball.bodyComponent);
+    ball.removeFromParent();
+  }
+
+  void startGame(GameMode selectedMode, Stage selectedStage) {
     _clearBoard();
-    session.start(selectedMode);
+    session.start(selectedMode, selectedStage);
+    unawaited(_buildLevel(selectedStage));
     overlays.remove(GameOverlay.modeSelect);
     overlays.add(GameOverlay.topControls);
     resumeEngine();
@@ -475,9 +567,33 @@ class SuikaGame extends Forge2DGame
       _dropBall(allowWhileBusy: true);
     }
     _applyPendingBallChanges();
+    _removeOffscreenBalls();
     _updateTiltGravity();
     _updateDebugInfo();
     _updateGameOver();
+  }
+
+  /// Removes any ball that has drifted outside the playfield — e.g. tilt
+  /// gravity pushing it past the left/right edge, since there are no side
+  /// walls, or one somehow falling through the floor — so it doesn't sit
+  /// forever as an uncountable, unmergeable ball inflating [_ballCount].
+  /// Deliberately does NOT check the top edge: every dropped ball starts
+  /// above [camera.visibleWorldRect] at [dropY] and falls in from there, so
+  /// that would remove balls the instant they're dropped.
+  void _removeOffscreenBalls() {
+    final visibleRect = camera.visibleWorldRect;
+    for (final ball in world.children.whereType<AlienBall>().toList()) {
+      final position = ball.bodyComponent.body.position;
+      final margin = ball.ballSize / 2;
+      final isOffscreen =
+          position.x < visibleRect.left - margin ||
+          position.x > visibleRect.right + margin ||
+          position.y > visibleRect.bottom + margin;
+      if (isOffscreen) {
+        _removeBall(ball);
+        _ballCount--;
+      }
+    }
   }
 
   void _updateTiltGravity() {
@@ -506,7 +622,7 @@ class SuikaGame extends Forge2DGame
 
   void _applyPendingBallChanges() {
     for (final ball in _ballsToRemove) {
-      ball.removeFromParent();
+      _removeBall(ball);
     }
     _ballsToRemove.clear();
     for (final ball in _ballsToAdd) {
