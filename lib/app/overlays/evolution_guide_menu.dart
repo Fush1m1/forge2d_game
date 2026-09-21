@@ -64,18 +64,18 @@ class EvolutionGuideMenu extends StatelessWidget {
                     Text(
                       '進化の輪',
                       style: TextStyle(
-                        color: colorScheme.secondary,
+                        color: colorScheme.primary,
                         fontSize: 22,
                         fontWeight: FontWeight.w900,
                         letterSpacing: 3,
                         shadows: [
-                          Shadow(color: colorScheme.secondary, blurRadius: 20),
+                          Shadow(color: colorScheme.primary, blurRadius: 20),
                         ],
                       ),
                     ),
                     IconButton(
                       onPressed: game.closeEvolutionGuide,
-                      icon: Icon(Icons.close, color: colorScheme.secondary),
+                      icon: Icon(Icons.close, color: colorScheme.primary),
                     ),
                   ],
                 ),
