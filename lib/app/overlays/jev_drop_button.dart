@@ -2,13 +2,23 @@ import 'package:flutter/material.dart';
 import 'package:forge2d_game/game/services/jev_assistant.dart';
 import 'package:forge2d_game/game/suika_game.dart';
 
-const _jevPassword = '20260922';
+/// Today's Jev password, e.g. 2026-09-22 -> '20260922'. Derived from the
+/// device clock rather than stored anywhere, so there's nothing secret to
+/// leak — the generation rule itself is documented in README.md. This is
+/// just friction against an accidental tap burning through Jev credits,
+/// not a real access control.
+String _todaysJevPassword() {
+  final now = DateTime.now();
+  return '${now.year.toString().padLeft(4, '0')}'
+      '${now.month.toString().padLeft(2, '0')}'
+      '${now.day.toString().padLeft(2, '0')}';
+}
 
 /// Button that asks Jev (https://typesafe.ai) to pick a lane for the next
 /// ball and drops it there (issue #48). Gated behind a password prompt (to
 /// avoid burning through Jev credits by accident); once entered correctly
 /// it's remembered in [AppSettings] for the rest of that calendar day, then
-/// asked again, since the password is meant to rotate daily. Shows a
+/// asked again, since [_todaysJevPassword] changes every day. Shows a
 /// spinner while the request is in flight and a SnackBar if it fails (e.g.
 /// missing/invalid API key).
 class JevDropButton extends StatelessWidget {
@@ -76,7 +86,7 @@ class _JevPasswordDialogState extends State<_JevPasswordDialog> {
   String? _errorText;
 
   void _submit() {
-    if (_controller.text == _jevPassword) {
+    if (_controller.text == _todaysJevPassword()) {
       Navigator.of(context).pop(true);
     } else {
       setState(() => _errorText = 'パスワードが違います');
