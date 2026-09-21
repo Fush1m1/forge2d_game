@@ -187,6 +187,7 @@ class SuikaGame extends Forge2DGame
     overlays.remove(GameOverlay.congratulations);
     overlays.remove(GameOverlay.topControls);
     overlays.remove(GameOverlay.evolutionGuide);
+    overlays.remove(GameOverlay.confirmNewGame);
     pauseEngine();
     overlays.add(GameOverlay.modeSelect);
   }
@@ -194,6 +195,10 @@ class SuikaGame extends Forge2DGame
   void openEvolutionGuide() => overlays.add(GameOverlay.evolutionGuide);
 
   void closeEvolutionGuide() => overlays.remove(GameOverlay.evolutionGuide);
+
+  void requestResetGame() => overlays.add(GameOverlay.confirmNewGame);
+
+  void cancelResetGame() => overlays.remove(GameOverlay.confirmNewGame);
 
   void requestMerge(AlienBall first, AlienBall second) {
     if (first.number != second.number ||

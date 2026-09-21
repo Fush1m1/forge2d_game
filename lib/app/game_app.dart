@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 import '../game/model/game_overlay.dart';
 import '../game/suika_game.dart';
+import 'overlays/confirm_new_game_menu.dart';
 import 'overlays/congratulations_menu.dart';
 import 'overlays/evolution_guide_menu.dart';
 import 'overlays/game_over_menu.dart';
@@ -25,6 +26,8 @@ class GameApp extends StatelessWidget {
           GameOverlay.topControls: (context, game) => TopControls(game: game),
           GameOverlay.evolutionGuide:
               (context, game) => EvolutionGuideMenu(game: game),
+          GameOverlay.confirmNewGame:
+              (context, game) => ConfirmNewGameMenu(game: game),
         },
       ),
     );
