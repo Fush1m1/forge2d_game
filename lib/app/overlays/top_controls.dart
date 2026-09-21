@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:forge2d_game/app/overlays/evolution_guide_button.dart';
+import 'package:forge2d_game/app/overlays/jev_drop_button.dart';
 import 'package:forge2d_game/app/overlays/new_game_button.dart';
 import 'package:forge2d_game/app/overlays/next_alien.dart';
 import 'package:forge2d_game/app/overlays/settings_button.dart';
@@ -33,6 +34,8 @@ class TopControls extends StatelessWidget {
               ),
               const SizedBox(height: 16),
               NextAlien(game: game),
+              const SizedBox(height: 12),
+              JevDropButton(game: game),
             ],
           ),
         ),

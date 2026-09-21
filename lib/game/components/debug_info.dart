@@ -20,13 +20,17 @@ class DebugInfo {
 }
 
 /// Toggleable debug log overlay. Tapping it shows/hides the log lines
-/// (Obj Height, Threshold, Ball count, last tap). In debug builds it also
-/// grows two extra tappable rows below the log to jump straight to the
-/// Game Over / Congratulations overlays, so they can be checked without
-/// having to actually lose or win a round.
+/// (Obj Height, Threshold, Ball count, last tap, last Jev response — the
+/// last one is shown in release builds too, since there's no other way to
+/// inspect what Jev actually returned outside of a debug session). In
+/// debug builds it also grows three extra tappable rows below the log: two
+/// to jump straight to the Game Over / Congratulations overlays, and one
+/// to reset the remembered Jev password authentication, so all three can
+/// be re-tested without having to actually lose/win a round or clear all
+/// app data.
 class DebugInfoComponent extends PositionComponent
     with TapCallbacks, HasGameReference<SuikaGame> {
-  DebugInfoComponent() : super(size: Vector2(220, 150));
+  DebugInfoComponent() : super(size: Vector2(220, _top + _lineHeight));
 
   static const double _lineHeight = 20;
   static const double _top = 10;
@@ -55,6 +59,19 @@ class DebugInfoComponent extends PositionComponent
 
   double get _congratulationsButtonTop => _gameOverButtonTop + _lineHeight;
 
+  double get _resetJevAuthButtonTop => _congratulationsButtonTop + _lineHeight;
+
+  /// How big the tappable hit-box needs to be to cover every currently
+  /// showing log line plus the debug-only button rows (if any) — see the
+  /// comment on [update] for why this can't be a fixed constant.
+  Vector2 get _requiredTapAreaSize {
+    final buttonRows = kDebugMode ? 3 : 0;
+    return Vector2(
+      220,
+      _top + (DebugInfo.messages.length + buttonRows) * _lineHeight + 20,
+    );
+  }
+
   @override
   void render(Canvas canvas) {
     if (!isVisible) return;
@@ -77,11 +94,22 @@ class DebugInfoComponent extends PositionComponent
         '[ Show Congratulations ]',
         Vector2(_left, _congratulationsButtonTop),
       );
+      _buttonPaint.render(
+        canvas,
+        '[ Reset Jev Auth ]',
+        Vector2(_left, _resetJevAuthButtonTop),
+      );
     }
   }
 
   @override
   void update(double dt) {
+    // The Jev response log can wrap into a variable number of lines (see
+    // SuikaGame._updateDebugInfo), so the tappable box is resized every
+    // frame to fit however many lines are actually showing right now,
+    // instead of a hand-tuned constant that would fall out of sync and
+    // make the lower rows untappable.
+    size = _requiredTapAreaSize;
     // This ensures the debug info is fresh every frame.
     DebugInfo.clear();
   }
@@ -99,6 +127,11 @@ class DebugInfoComponent extends PositionComponent
       if (tapY >= _congratulationsButtonTop &&
           tapY < _congratulationsButtonTop + _lineHeight) {
         game.debugShowCongratulations();
+        return;
+      }
+      if (tapY >= _resetJevAuthButtonTop &&
+          tapY < _resetJevAuthButtonTop + _lineHeight) {
+        game.debugResetJevAuthentication();
         return;
       }
     }

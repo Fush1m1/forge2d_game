@@ -58,4 +58,51 @@ void main() {
       AppSettingsState.defaults().soundVolume,
     );
   });
+
+  test(
+    'persists Jev authentication for today across a new AppSettings instance',
+    () async {
+      final settings = AppSettings();
+      addTearDown(settings.dispose);
+      await settings.ready;
+
+      expect(settings.state.value.isJevAuthenticatedToday, isFalse);
+      await settings.markJevAuthenticatedToday();
+
+      final reloaded = AppSettings();
+      addTearDown(reloaded.dispose);
+      await reloaded.ready;
+
+      expect(reloaded.state.value.isJevAuthenticatedToday, isTrue);
+    },
+  );
+
+  test('treats a stale (not-today) authentication date as expired', () async {
+    SharedPreferences.setMockInitialValues({
+      'settings.jevAuthenticatedDate': '2000-01-01',
+    });
+    final settings = AppSettings();
+    addTearDown(settings.dispose);
+    await settings.ready;
+
+    expect(settings.state.value.isJevAuthenticatedToday, isFalse);
+  });
+
+  test('resetJevAuthentication clears the remembered date', () async {
+    final settings = AppSettings();
+    addTearDown(settings.dispose);
+    await settings.ready;
+
+    await settings.markJevAuthenticatedToday();
+    expect(settings.state.value.isJevAuthenticatedToday, isTrue);
+
+    await settings.resetJevAuthentication();
+    expect(settings.state.value.isJevAuthenticatedToday, isFalse);
+
+    final reloaded = AppSettings();
+    addTearDown(reloaded.dispose);
+    await reloaded.ready;
+
+    expect(reloaded.state.value.isJevAuthenticatedToday, isFalse);
+  });
 }

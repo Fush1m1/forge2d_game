@@ -29,6 +29,7 @@ import 'model/game_overlay.dart';
 import 'model/game_state.dart';
 import 'services/app_settings.dart';
 import 'services/game_session.dart';
+import 'services/jev_assistant.dart';
 
 class SuikaGame extends Forge2DGame
     with
@@ -43,6 +44,7 @@ class SuikaGame extends Forge2DGame
 
   final GameSession session;
   final AppSettings appSettings;
+  final JevAssistant jevAssistant = JevAssistant();
   final DropController _dropController = DropController();
   final TiltController _tiltController = TiltController();
   final List<AlienBall> _ballsToRemove = [];
@@ -61,6 +63,7 @@ class SuikaGame extends Forge2DGame
   Vector2 _dropPosition = Vector2.zero();
   double _objectHeight = 0;
   String _lastTapLog = 'Tap: -';
+  String _lastJevResponseLog = 'Jev res: -';
 
   ValueNotifier<GameState> get gameState => session.state;
   GameMode? get mode => session.mode;
@@ -126,6 +129,7 @@ class SuikaGame extends Forge2DGame
     _soundPool.dispose();
     _shakeDetector.stopListening();
     _accelerometerSubscription?.cancel();
+    jevAssistant.dispose();
     super.onRemove();
   }
 
@@ -229,6 +233,13 @@ class SuikaGame extends Forge2DGame
     overlays.add(GameOverlay.congratulations);
   }
 
+  /// Debug-only: clears the remembered Jev password authentication, so the
+  /// "Ask Jev" password prompt can be re-tested without clearing all app
+  /// data.
+  void debugResetJevAuthentication() {
+    appSettings.resetJevAuthentication();
+  }
+
   void requestMerge(AlienBall first, AlienBall second) {
     if (first.number != second.number ||
         first.hasCombined ||
@@ -320,10 +331,7 @@ class SuikaGame extends Forge2DGame
   double _calculateObjectHeight() {
     var height = 0.0;
     for (final ball in world.children.whereType<AlienBall>()) {
-      final ballHeight =
-          (camera.visibleWorldRect.bottom - groundTileSize) -
-          ball.bodyComponent.body.position.y;
-      height = max(height, ballHeight);
+      height = max(height, _heightOf(ball));
     }
     return height;
   }
@@ -356,6 +364,88 @@ class SuikaGame extends Forge2DGame
     _ballCount++;
     return true;
   }
+
+  /// Asks Jev to pick which lane to drop the next ball into (issue #48),
+  /// then drops it there. This is an on-demand, single HTTP call kicked off
+  /// by a player tapping the "Ask Jev" button — not something run every
+  /// frame, since Jev's API latency only makes sense for a one-shot
+  /// decision, not continuous autoplay.
+  Future<void> requestJevDrop() async {
+    if (!session.isPlaying || !session.isDropReady) {
+      jevAssistant.state.value = const JevAssistantState(
+        status: JevRequestStatus.error,
+        errorMessage: 'ゲームがプレイ中でないため、Jevに依頼できません。',
+      );
+      return;
+    }
+
+    final visibleRect = camera.visibleWorldRect;
+    final laneWidth = visibleRect.width / jevLaneCount;
+    final nextLevel = session.state.value.nextBallLevel;
+    final laneCriteria = <String, String>{};
+    final laneCenterX = <String, double>{};
+
+    for (var i = 0; i < jevLaneCount; i++) {
+      final laneKey = jevLaneKeys[i];
+      final left = visibleRect.left + laneWidth * i;
+      final right = left + laneWidth;
+      laneCenterX[laneKey] = (left + right) / 2;
+
+      AlienBall? topBall;
+      for (final ball in world.children.whereType<AlienBall>()) {
+        final x = ball.bodyComponent.body.position.x;
+        if (x < left || x >= right) continue;
+        if (topBall == null ||
+            ball.bodyComponent.body.position.y <
+                topBall.bodyComponent.body.position.y) {
+          topBall = ball;
+        }
+      }
+      laneCriteria[laneKey] =
+          topBall == null
+              ? 'Empty lane, no balls stacked yet.'
+              : 'Topmost ball here is level ${topBall.number} out of 10, '
+                  'stack height '
+                  '${_heightOf(topBall).toStringAsFixed(1)} world units.';
+    }
+
+    final boardState =
+        'This is a Suika-style merge puzzle. Balls are numbered 1 to 10; '
+        'when two balls of the same number touch they merge into one ball '
+        'of the next number up. The board is divided into $jevLaneCount '
+        'lanes from left to right, numbered ${jevLaneKeys.first} (leftmost) '
+        'to ${jevLaneKeys.last} (rightmost). The next ball about to be '
+        'dropped is level $nextLevel. Choose the lane that is most likely '
+        'to merge this ball with an existing one of the same level, or '
+        'failing that, the lane that keeps the overall stack lowest.';
+
+    final chosenLane = await jevAssistant.chooseLane(
+      apiKey: jevDefaultApiKey,
+      boardState: boardState,
+      laneCriteria: laneCriteria,
+    );
+    _lastJevResponseLog = 'Jev res: ${_summarizeJevResponse()}';
+
+    final centerX = chosenLane == null ? null : laneCenterX[chosenLane];
+    if (centerX == null) return;
+
+    _dropPosition = Vector2(centerX, 0);
+    _dropBall();
+  }
+
+  /// Truncated summary of the last Jev response, shown in the debug
+  /// logging overlay (including release builds) so a real reply can be
+  /// checked without a device log/proxy.
+  String _summarizeJevResponse() {
+    final result = jevAssistant.state.value;
+    final body = result.rawResponseBody;
+    if (body == null) return result.errorMessage ?? '(no response)';
+    return body.length > 160 ? '${body.substring(0, 160)}...' : body;
+  }
+
+  double _heightOf(AlienBall ball) =>
+      (camera.visibleWorldRect.bottom - groundTileSize) -
+      ball.bodyComponent.body.position.y;
 
   @override
   void onTapDown(TapDownEvent event) {
@@ -435,6 +525,11 @@ class SuikaGame extends Forge2DGame
     DebugInfo.add('Threshold: ${threshold.toStringAsFixed(1)}');
     DebugInfo.add('Ball count: $_ballCount');
     DebugInfo.add(_lastTapLog);
+    // Split on commas so a long JSON response wraps onto multiple lines
+    // instead of running off the edge of the screen.
+    for (final line in _lastJevResponseLog.split(',')) {
+      DebugInfo.add(line);
+    }
   }
 
   void _updateGameOver() {
