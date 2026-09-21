@@ -11,6 +11,7 @@ class EvolutionGuideButton extends StatelessWidget {
     return IconButton.filled(
       onPressed: game.openEvolutionGuide,
       icon: const Icon(Icons.info, size: 20),
+      style: IconButton.styleFrom(elevation: 4, shadowColor: Colors.black),
     );
   }
 }

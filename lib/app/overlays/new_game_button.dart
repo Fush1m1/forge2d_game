@@ -12,6 +12,7 @@ class NewGameButton extends StatelessWidget {
       onPressed: game.openModeSelect,
       icon: const Icon(Icons.refresh, size: 20),
       label: const Text('NEW GAME'),
+      style: FilledButton.styleFrom(elevation: 4, shadowColor: Colors.black),
     );
   }
 }
