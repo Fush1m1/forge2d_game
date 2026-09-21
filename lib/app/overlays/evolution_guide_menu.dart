@@ -44,7 +44,7 @@ class EvolutionGuideMenu extends StatelessWidget {
         height: 420,
         child: Card(
           margin: EdgeInsets.zero,
-          color: Colors.white,
+          color: colorScheme.primary,
           elevation: 12,
           shadowColor: colorScheme.secondary,
           shape: RoundedRectangleBorder(
@@ -61,8 +61,8 @@ class EvolutionGuideMenu extends StatelessWidget {
                     const SizedBox(width: 32),
                     Text(
                       '進化の輪',
-                      style: TextStyle(
-                        color: colorScheme.primary,
+                      style: const TextStyle(
+                        color: Colors.white,
                         fontSize: 22,
                         fontWeight: FontWeight.w900,
                         letterSpacing: 3,
@@ -70,7 +70,7 @@ class EvolutionGuideMenu extends StatelessWidget {
                     ),
                     IconButton(
                       onPressed: game.closeEvolutionGuide,
-                      icon: Icon(Icons.close, color: colorScheme.primary),
+                      icon: const Icon(Icons.close, color: Colors.white),
                     ),
                   ],
                 ),
@@ -102,7 +102,7 @@ class EvolutionGuideMenu extends StatelessWidget {
                               size: Size.square(diameter),
                               painter: _EvolutionArrowsPainter(
                                 ringRadius: ringRadius,
-                                color: colorScheme.tertiary,
+                                color: Colors.white,
                               ),
                             ),
                             for (
