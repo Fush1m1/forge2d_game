@@ -36,101 +36,109 @@ class EvolutionGuideMenu extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: Colors.black.withValues(alpha: 0.55),
-      child: Center(
-        child: Container(
-          width: 360,
-          height: 420,
-          padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(
-            color: AppTheme.overlayBackground.withValues(alpha: 0.97),
-            borderRadius: BorderRadius.circular(AppTheme.borderRadiusLarge),
-            border: Border.all(
-              color: AppTheme.overlayBorder,
-              width: AppTheme.borderWidth / 2,
+    final card = GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: () {},
+      child: Container(
+        width: 360,
+        height: 420,
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: AppTheme.overlayBackground.withValues(alpha: 0.97),
+          borderRadius: BorderRadius.circular(AppTheme.borderRadiusLarge),
+          border: Border.all(
+            color: AppTheme.overlayBorder,
+            width: AppTheme.borderWidth / 2,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: AppTheme.shadowColor.withValues(alpha: 0.2),
+              blurRadius: 30,
+              spreadRadius: 8,
             ),
-            boxShadow: [
-              BoxShadow(
-                color: AppTheme.shadowColor.withValues(alpha: 0.2),
-                blurRadius: 30,
-                spreadRadius: 8,
-              ),
-            ],
-          ),
-          child: Column(
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const SizedBox(width: 32),
-                  const Text(
-                    '進化の輪',
-                    style: TextStyle(
-                      color: AppTheme.titleText,
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      letterSpacing: 2,
-                    ),
+          ],
+        ),
+        child: Column(
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const SizedBox(width: 32),
+                const Text(
+                  '進化の輪',
+                  style: TextStyle(
+                    color: AppTheme.titleText,
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 2,
                   ),
-                  IconButton(
-                    onPressed: game.closeEvolutionGuide,
-                    icon: const Icon(Icons.close, color: AppTheme.shadowColor),
-                  ),
-                ],
-              ),
-              Expanded(
-                child: LayoutBuilder(
-                  builder: (context, constraints) {
-                    final diameter = math.min(
-                      constraints.maxWidth,
-                      constraints.maxHeight,
-                    );
-                    final ringRadius =
-                        diameter / 2 - _maxIconSize / 2 - _ringMargin;
-                    return SizedBox(
-                      width: diameter,
-                      height: diameter,
-                      child: Stack(
-                        alignment: Alignment.center,
-                        children: [
-                          Container(
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              border: Border.all(
-                                color: AppTheme.overlayBorder,
-                                width: 2,
-                              ),
-                            ),
-                          ),
-                          CustomPaint(
-                            size: Size.square(diameter),
-                            painter: _EvolutionArrowsPainter(
-                              ringRadius: ringRadius,
-                              color: AppTheme.buttonBackground,
-                            ),
-                          ),
-                          for (
-                            var level = _minLevel;
-                            level <= _maxLevel;
-                            level++
-                          )
-                            _positionedBall(
-                              game: game,
-                              level: level,
-                              ringDiameter: diameter,
-                              ringRadius: ringRadius,
-                            ),
-                        ],
-                      ),
-                    );
-                  },
                 ),
+                IconButton(
+                  onPressed: game.closeEvolutionGuide,
+                  icon: const Icon(Icons.close, color: AppTheme.shadowColor),
+                ),
+              ],
+            ),
+            Expanded(
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  final diameter = math.min(
+                    constraints.maxWidth,
+                    constraints.maxHeight,
+                  );
+                  final ringRadius =
+                      diameter / 2 - _maxIconSize / 2 - _ringMargin;
+                  return SizedBox(
+                    width: diameter,
+                    height: diameter,
+                    child: Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        Container(
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: AppTheme.overlayBorder,
+                              width: 2,
+                            ),
+                          ),
+                        ),
+                        CustomPaint(
+                          size: Size.square(diameter),
+                          painter: _EvolutionArrowsPainter(
+                            ringRadius: ringRadius,
+                            color: AppTheme.buttonBackground,
+                          ),
+                        ),
+                        for (var level = _minLevel; level <= _maxLevel; level++)
+                          _positionedBall(
+                            game: game,
+                            level: level,
+                            ringDiameter: diameter,
+                            ringRadius: ringRadius,
+                          ),
+                      ],
+                    ),
+                  );
+                },
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
+    );
+
+    return Stack(
+      children: [
+        Positioned.fill(
+          child: GestureDetector(
+            behavior: HitTestBehavior.opaque,
+            onTap: game.closeEvolutionGuide,
+            child: ColoredBox(color: Colors.black.withValues(alpha: 0.55)),
+          ),
+        ),
+        Center(child: card),
+      ],
     );
   }
 
