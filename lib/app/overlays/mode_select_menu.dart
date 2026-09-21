@@ -23,7 +23,7 @@ class ModeSelectMenu extends StatelessWidget {
       onTap: () {},
       child: Card(
         margin: EdgeInsets.zero,
-        color: colorScheme.surfaceContainerHigh,
+        color: colorScheme.primaryContainer,
         elevation: 8,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
         child: Padding(
@@ -34,7 +34,7 @@ class ModeSelectMenu extends StatelessWidget {
               Text(
                 'Select Mode',
                 style: textTheme.headlineMedium?.copyWith(
-                  color: colorScheme.primary,
+                  color: colorScheme.onPrimaryContainer,
                   fontWeight: FontWeight.bold,
                   letterSpacing: 2,
                 ),

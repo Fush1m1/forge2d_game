@@ -13,7 +13,7 @@ class GameOverMenu extends StatelessWidget {
     return Center(
       child: Card(
         margin: EdgeInsets.zero,
-        color: colorScheme.surfaceContainerHigh,
+        color: colorScheme.errorContainer,
         elevation: 8,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
         child: Padding(
@@ -24,7 +24,7 @@ class GameOverMenu extends StatelessWidget {
               Text(
                 'Game Over',
                 style: textTheme.headlineLarge?.copyWith(
-                  color: colorScheme.error,
+                  color: colorScheme.onErrorContainer,
                   fontWeight: FontWeight.bold,
                   shadows: const [
                     Shadow(

@@ -13,7 +13,7 @@ class CongratulationsMenu extends StatelessWidget {
     return Center(
       child: Card(
         margin: EdgeInsets.zero,
-        color: colorScheme.surfaceContainerHigh,
+        color: colorScheme.tertiaryContainer,
         elevation: 8,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
         child: Padding(
@@ -25,7 +25,7 @@ class CongratulationsMenu extends StatelessWidget {
                 child: Text(
                   'Congratulations!',
                   style: textTheme.headlineLarge?.copyWith(
-                    color: colorScheme.tertiary,
+                    color: colorScheme.onTertiaryContainer,
                     fontWeight: FontWeight.bold,
                     shadows: const [
                       Shadow(

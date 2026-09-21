@@ -18,8 +18,11 @@ class GameApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         useMaterial3: true,
-        colorSchemeSeed: Colors.deepPurple,
-        brightness: Brightness.light,
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: const Color(0xFFFF6FA5),
+          brightness: Brightness.light,
+          dynamicSchemeVariant: DynamicSchemeVariant.expressive,
+        ),
       ),
       home: Scaffold(
         body: SafeArea(
