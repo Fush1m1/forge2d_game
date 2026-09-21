@@ -20,14 +20,17 @@ class DebugInfo {
 }
 
 /// Toggleable debug log overlay. Tapping it shows/hides the log lines
-/// (Obj Height, Threshold, Ball count, last tap). In debug builds it also
-/// grows three extra tappable rows below the log: two to jump straight to
-/// the Game Over / Congratulations overlays, and one to reset the
-/// remembered Jev password authentication, so all three can be re-tested
-/// without having to actually lose/win a round or clear all app data.
+/// (Obj Height, Threshold, Ball count, last tap, last Jev response — the
+/// last one is shown in release builds too, since there's no other way to
+/// inspect what Jev actually returned outside of a debug session). In
+/// debug builds it also grows three extra tappable rows below the log: two
+/// to jump straight to the Game Over / Congratulations overlays, and one
+/// to reset the remembered Jev password authentication, so all three can
+/// be re-tested without having to actually lose/win a round or clear all
+/// app data.
 class DebugInfoComponent extends PositionComponent
     with TapCallbacks, HasGameReference<SuikaGame> {
-  DebugInfoComponent() : super(size: Vector2(220, 170));
+  DebugInfoComponent() : super(size: Vector2(220, _top + _lineHeight));
 
   static const double _lineHeight = 20;
   static const double _top = 10;
@@ -90,6 +93,16 @@ class DebugInfoComponent extends PositionComponent
 
   @override
   void update(double dt) {
+    // The Jev response log can wrap into a variable number of lines (see
+    // SuikaGame._updateDebugInfo), so size the tappable box to fit however
+    // many lines are actually showing right now (plus the debug-only
+    // button rows, when present) instead of a hand-tuned constant that
+    // would fall out of sync and make the lower rows untappable.
+    final buttonRows = kDebugMode ? 3 : 0;
+    size = Vector2(
+      220,
+      _top + (DebugInfo.messages.length + buttonRows) * _lineHeight + 20,
+    );
     // This ensures the debug info is fresh every frame.
     DebugInfo.clear();
   }

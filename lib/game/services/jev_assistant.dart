@@ -14,12 +14,23 @@ const String jevDefaultApiKey = String.fromEnvironment('JEV_DEFAULT_API_KEY');
 /// Snapshot of the most recent request made to the Jev ("TypeSafe AI")
 /// `choice` primitive.
 class JevAssistantState {
-  const JevAssistantState({required this.status, this.errorMessage});
+  const JevAssistantState({
+    required this.status,
+    this.errorMessage,
+    this.rawResponseBody,
+  });
 
   static const idle = JevAssistantState(status: JevRequestStatus.idle);
 
   final JevRequestStatus status;
   final String? errorMessage;
+
+  /// The raw HTTP response body from Jev, when one was actually received
+  /// (success or a non-200 status) — null for network failures/timeouts
+  /// where there's no response to show. Surfaced in the debug logging
+  /// overlay (including in release builds) so a real reply can be
+  /// inspected without a device log/proxy.
+  final String? rawResponseBody;
 }
 
 /// Asks Jev's (https://jevtypesafeai.com) `decide` API to pick which lane to
@@ -87,6 +98,7 @@ class JevAssistant {
         state.value = JevAssistantState(
           status: JevRequestStatus.error,
           errorMessage: _messageForStatus(response.statusCode, response.body),
+          rawResponseBody: response.body,
         );
         return null;
       }
@@ -96,14 +108,18 @@ class JevAssistant {
       final laneAnswer = answers?['lane'] as Map<String, dynamic>?;
       final choice = laneAnswer?['choice'] as String?;
       if (choice == null) {
-        state.value = const JevAssistantState(
+        state.value = JevAssistantState(
           status: JevRequestStatus.error,
           errorMessage: 'Jevから予期しない応答が返されました。',
+          rawResponseBody: response.body,
         );
         return null;
       }
 
-      state.value = const JevAssistantState(status: JevRequestStatus.success);
+      state.value = JevAssistantState(
+        status: JevRequestStatus.success,
+        rawResponseBody: response.body,
+      );
       return choice;
     } on TimeoutException {
       state.value = const JevAssistantState(

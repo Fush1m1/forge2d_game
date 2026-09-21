@@ -63,6 +63,7 @@ class SuikaGame extends Forge2DGame
   Vector2 _dropPosition = Vector2.zero();
   double _objectHeight = 0;
   String _lastTapLog = 'Tap: -';
+  String _lastJevResponseLog = 'Jev res: -';
 
   ValueNotifier<GameState> get gameState => session.state;
   GameMode? get mode => session.mode;
@@ -423,11 +424,23 @@ class SuikaGame extends Forge2DGame
       boardState: boardState,
       laneCriteria: laneCriteria,
     );
+    _lastJevResponseLog = 'Jev res: ${_summarizeJevResponse()}';
+
     final centerX = chosenLane == null ? null : laneCenterX[chosenLane];
     if (centerX == null) return;
 
     _dropPosition = Vector2(centerX, 0);
     _dropBall();
+  }
+
+  /// Truncated summary of the last Jev response, shown in the debug
+  /// logging overlay (including release builds) so a real reply can be
+  /// checked without a device log/proxy.
+  String _summarizeJevResponse() {
+    final result = jevAssistant.state.value;
+    final body = result.rawResponseBody;
+    if (body == null) return result.errorMessage ?? '(no response)';
+    return body.length > 160 ? '${body.substring(0, 160)}...' : body;
   }
 
   double _heightOf(AlienBall ball) =>
@@ -512,6 +525,11 @@ class SuikaGame extends Forge2DGame
     DebugInfo.add('Threshold: ${threshold.toStringAsFixed(1)}');
     DebugInfo.add('Ball count: $_ballCount');
     DebugInfo.add(_lastTapLog);
+    // Split on commas so a long JSON response wraps onto multiple lines
+    // instead of running off the edge of the screen.
+    for (final line in _lastJevResponseLog.split(',')) {
+      DebugInfo.add(line);
+    }
   }
 
   void _updateGameOver() {
