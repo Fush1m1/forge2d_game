@@ -8,20 +8,10 @@ class NewGameButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
     return FilledButton.icon(
       onPressed: game.openModeSelect,
       icon: const Icon(Icons.refresh, size: 20),
-      label: const Text(
-        'NEW GAME',
-        style: TextStyle(fontWeight: FontWeight.w900, letterSpacing: 1),
-      ),
-      style: FilledButton.styleFrom(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
-          side: BorderSide(color: colorScheme.onPrimary, width: 2),
-        ),
-      ),
+      label: const Text('NEW GAME'),
     );
   }
 }

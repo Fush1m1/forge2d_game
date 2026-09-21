@@ -38,6 +38,7 @@ class EvolutionGuideMenu extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
     final card = GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: () {},
@@ -50,8 +51,7 @@ class EvolutionGuideMenu extends StatelessWidget {
           elevation: 12,
           shadowColor: colorScheme.secondary,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-            side: BorderSide(color: colorScheme.secondary, width: 4),
+            borderRadius: BorderRadius.circular(28),
           ),
           child: Padding(
             padding: const EdgeInsets.all(20),
@@ -63,12 +63,7 @@ class EvolutionGuideMenu extends StatelessWidget {
                     const SizedBox(width: 32),
                     Text(
                       '進化の輪',
-                      style: const TextStyle(
-                        color: _deepViolet,
-                        fontSize: 22,
-                        fontWeight: FontWeight.w900,
-                        letterSpacing: 3,
-                      ),
+                      style: textTheme.titleLarge?.copyWith(color: _deepViolet),
                     ),
                     IconButton(
                       onPressed: game.closeEvolutionGuide,

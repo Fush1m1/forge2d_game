@@ -26,10 +26,7 @@ class ModeSelectMenu extends StatelessWidget {
         color: colorScheme.primary,
         elevation: 8,
         shadowColor: Colors.black,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-          side: const BorderSide(color: Colors.black, width: 4),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 36, vertical: 40),
           child: Column(
@@ -37,14 +34,7 @@ class ModeSelectMenu extends StatelessWidget {
             children: [
               Text(
                 'SELECT MODE',
-                style: textTheme.headlineMedium?.copyWith(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w900,
-                  letterSpacing: 4,
-                  shadows: const [
-                    Shadow(color: Colors.black, offset: Offset(3, 3)),
-                  ],
-                ),
+                style: textTheme.headlineMedium?.copyWith(color: Colors.white),
               ),
               const SizedBox(height: 36),
 
@@ -112,15 +102,10 @@ class _ModeButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
     return Card(
       margin: EdgeInsets.zero,
       color: color,
-      elevation: 4,
-      shadowColor: Colors.black,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-        side: const BorderSide(color: Colors.black, width: 3),
-      ),
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(12),
@@ -138,18 +123,12 @@ class _ModeButton extends StatelessWidget {
                   children: [
                     Text(
                       label,
-                      style: TextStyle(
-                        color: onColor,
-                        fontSize: 24,
-                        fontWeight: FontWeight.w900,
-                        letterSpacing: 1.5,
-                      ),
+                      style: textTheme.titleMedium?.copyWith(color: onColor),
                     ),
                     Text(
                       description,
-                      style: TextStyle(
+                      style: textTheme.bodySmall?.copyWith(
                         color: onColor.withValues(alpha: 0.7),
-                        fontSize: 13,
                       ),
                     ),
                   ],

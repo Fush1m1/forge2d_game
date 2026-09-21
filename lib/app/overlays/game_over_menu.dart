@@ -18,10 +18,7 @@ class GameOverMenu extends StatelessWidget {
         color: _cardGreen,
         elevation: 12,
         shadowColor: colorScheme.error,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-          side: BorderSide(color: colorScheme.error, width: 4),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
         child: Padding(
           padding: const EdgeInsets.all(30),
           child: Column(
@@ -31,12 +28,6 @@ class GameOverMenu extends StatelessWidget {
                 'GAME OVER',
                 style: textTheme.headlineLarge?.copyWith(
                   color: colorScheme.error,
-                  fontWeight: FontWeight.w900,
-                  letterSpacing: 4,
-                  shadows: [
-                    Shadow(color: colorScheme.error, blurRadius: 30),
-                    const Shadow(color: Colors.black, blurRadius: 2),
-                  ],
                 ),
               ),
               const SizedBox(height: 30),
@@ -47,17 +38,9 @@ class GameOverMenu extends StatelessWidget {
                 style: FilledButton.styleFrom(
                   backgroundColor: colorScheme.primaryContainer,
                   foregroundColor: colorScheme.onPrimaryContainer,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
                   padding: const EdgeInsets.symmetric(
                     horizontal: 50,
                     vertical: 20,
-                  ),
-                  textStyle: const TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.w900,
-                    letterSpacing: 1.5,
                   ),
                 ),
               ),
