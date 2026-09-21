@@ -431,8 +431,8 @@ class SuikaGame extends Forge2DGame
     final threshold =
         (camera.visibleWorldRect.bottom - groundTileSize) *
         (isEasyMode ? gameOverHeightMultiplierEasy : 1);
-    DebugInfo.add('Obj Height: $_objectHeight');
-    DebugInfo.add('Threshold: $threshold');
+    DebugInfo.add('Obj Height: ${_objectHeight.toStringAsFixed(1)}');
+    DebugInfo.add('Threshold: ${threshold.toStringAsFixed(1)}');
     DebugInfo.add('Ball count: $_ballCount');
     DebugInfo.add(_lastTapLog);
   }
