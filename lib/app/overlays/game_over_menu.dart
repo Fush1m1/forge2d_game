@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:forge2d_game/game/suika_game.dart';
 
 const _cardGreen = Color(0xFF1FB65A);
-const _deepViolet = Color(0xFF3D0080);
 
 class GameOverMenu extends StatelessWidget {
   final SuikaGame game;
@@ -46,8 +45,6 @@ class GameOverMenu extends StatelessWidget {
                 icon: const Icon(Icons.refresh),
                 label: const Text('NEW GAME'),
                 style: FilledButton.styleFrom(
-                  backgroundColor: _deepViolet,
-                  foregroundColor: colorScheme.onPrimary,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8),
                   ),
