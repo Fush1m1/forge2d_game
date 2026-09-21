@@ -412,11 +412,11 @@ class SuikaGame extends Forge2DGame
         'This is a Suika-style merge puzzle. Balls are numbered 1 to 10; '
         'when two balls of the same number touch they merge into one ball '
         'of the next number up. The board is divided into $jevLaneCount '
-        'lanes from left to right (${jevLaneKeys.join(', ')}). The next '
-        'ball about to be dropped is level $nextLevel. Choose the lane '
-        'that is most likely to merge this ball with an existing one of '
-        'the same level, or failing that, the lane that keeps the overall '
-        'stack lowest.';
+        'lanes from left to right, numbered ${jevLaneKeys.first} (leftmost) '
+        'to ${jevLaneKeys.last} (rightmost). The next ball about to be '
+        'dropped is level $nextLevel. Choose the lane that is most likely '
+        'to merge this ball with an existing one of the same level, or '
+        'failing that, the lane that keeps the overall stack lowest.';
 
     final chosenLane = await jevAssistant.chooseLane(
       apiKey: jevDefaultApiKey,

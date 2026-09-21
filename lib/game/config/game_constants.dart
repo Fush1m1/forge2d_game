@@ -38,11 +38,8 @@ const Color mergeBurstColorHigh = Color(0xFFFF7A1A);
 
 // Jev連携 (issue #48): 盤面を横方向にこの数のレーンへ分割し、Jevに
 // どのレーンへ落とすかを選んでもらう。
-const int jevLaneCount = 5;
-const List<String> jevLaneKeys = [
-  'far_left',
-  'left',
-  'center',
-  'right',
-  'far_right',
-];
+const int jevLaneCount = 50;
+final List<String> jevLaneKeys = List.generate(
+  jevLaneCount,
+  (i) => 'lane_${i.toString().padLeft(2, '0')}',
+);
