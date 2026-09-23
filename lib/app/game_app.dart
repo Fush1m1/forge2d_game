@@ -11,21 +11,10 @@ import 'overlays/mode_select_menu.dart';
 import 'overlays/settings_menu.dart';
 import 'overlays/top_controls.dart';
 
-class GameApp extends StatefulWidget {
-  const GameApp({super.key});
+class GameApp extends StatelessWidget {
+  GameApp({super.key}) : _appSettings = AppSettings();
 
-  @override
-  State<GameApp> createState() => _GameAppState();
-}
-
-class _GameAppState extends State<GameApp> {
-  final AppSettings _appSettings = AppSettings();
-
-  @override
-  void dispose() {
-    _appSettings.dispose();
-    super.dispose();
-  }
+  final AppSettings _appSettings;
 
   @override
   Widget build(BuildContext context) {
