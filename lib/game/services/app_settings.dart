@@ -170,8 +170,13 @@ class AppSettings {
     (await SharedPreferences.getInstance()).remove(_keyJevAuthenticatedDate);
   }
 
+  /// Restores the user-tunable settings to their defaults. The Jev
+  /// authentication date isn't a setting, so it's kept as is — otherwise
+  /// "Reset to Defaults" would make the password prompt reappear (issue #76).
   Future<void> resetToDefaults() async {
-    state.value = AppSettingsState.defaults();
+    state.value = AppSettingsState.defaults().copyWith(
+      jevAuthenticatedDate: state.value.jevAuthenticatedDate,
+    );
     final prefs = await SharedPreferences.getInstance();
     await Future.wait([
       prefs.remove(_keySoundVolume),
@@ -180,7 +185,6 @@ class AppSettings {
       prefs.remove(_keyShakeStrength),
       prefs.remove(_keyStrongShakeProbability),
       prefs.remove(_keyMergeEffectScale),
-      prefs.remove(_keyJevAuthenticatedDate),
     ]);
   }
 
