@@ -32,6 +32,11 @@ class GameApp extends StatelessWidget {
             ),
           ),
           home: Scaffold(
+            // Keep the game viewport a fixed size when the software keyboard
+            // opens (e.g. for the Jev password dialog). Otherwise the camera's
+            // visible world rect shrinks and every ball below the new bottom
+            // edge is removed as off-screen, wiping the board (issue #76).
+            resizeToAvoidBottomInset: false,
             body: SafeArea(
               child: GameWidget<SuikaGame>.controlled(
                 gameFactory: () => SuikaGame(appSettings: _appSettings),

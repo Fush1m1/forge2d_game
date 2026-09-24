@@ -88,6 +88,22 @@ void main() {
     expect(settings.state.value.isJevAuthenticatedToday, isFalse);
   });
 
+  test('resetToDefaults keeps the Jev authentication for today', () async {
+    final settings = AppSettings();
+    addTearDown(settings.dispose);
+    await settings.ready;
+
+    await settings.markJevAuthenticatedToday();
+    await settings.resetToDefaults();
+    expect(settings.state.value.isJevAuthenticatedToday, isTrue);
+
+    final reloaded = AppSettings();
+    addTearDown(reloaded.dispose);
+    await reloaded.ready;
+
+    expect(reloaded.state.value.isJevAuthenticatedToday, isTrue);
+  });
+
   test('resetJevAuthentication clears the remembered date', () async {
     final settings = AppSettings();
     addTearDown(settings.dispose);
