@@ -4,8 +4,17 @@ import 'package:flame/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:forge2d_game/game/model/ball_definition.dart';
 import 'package:forge2d_game/game/suika_game.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 const _deepViolet = Color(0xFF3D0080);
+
+final _privacyPolicyUrl = Uri.parse(
+  'https://github.com/Fush1m1/forge2d_game/blob/main/privacy_policy.md',
+);
+final _supportUrl = Uri.parse(
+  'https://github.com/Fush1m1/forge2d_game/issues/',
+);
+final _authorUrl = Uri.parse('https://github.com/Fush1m1');
 
 /// Shows every ball level arranged in a ring ("進化の輪"), from level 1 at
 /// the top going clockwise to level 10, connected by arrows so players can
@@ -44,7 +53,7 @@ class EvolutionGuideMenu extends StatelessWidget {
       onTap: () {},
       child: SizedBox(
         width: 360,
-        height: 420,
+        height: 460,
         child: Card(
           margin: EdgeInsets.zero,
           color: colorScheme.primary,
@@ -110,6 +119,14 @@ class EvolutionGuideMenu extends StatelessWidget {
                     },
                   ),
                 ),
+                Wrap(
+                  alignment: WrapAlignment.center,
+                  children: [
+                    _InfoLink(label: 'Privacy Policy', url: _privacyPolicyUrl),
+                    _InfoLink(label: 'Support', url: _supportUrl),
+                    _InfoLink(label: 'Author', url: _authorUrl),
+                  ],
+                ),
               ],
             ),
           ),
@@ -154,6 +171,23 @@ class EvolutionGuideMenu extends StatelessWidget {
           sprite: game.aliens.getSprite(definition.spriteName),
         ),
       ),
+    );
+  }
+}
+
+/// Opens [url] in the external browser.
+class _InfoLink extends StatelessWidget {
+  final String label;
+  final Uri url;
+
+  const _InfoLink({required this.label, required this.url});
+
+  @override
+  Widget build(BuildContext context) {
+    return TextButton(
+      onPressed: () => launchUrl(url, mode: LaunchMode.externalApplication),
+      style: TextButton.styleFrom(foregroundColor: _deepViolet),
+      child: Text(label),
     );
   }
 }
