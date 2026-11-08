@@ -119,13 +119,29 @@ class EvolutionGuideMenu extends StatelessWidget {
                     },
                   ),
                 ),
-                Wrap(
-                  alignment: WrapAlignment.center,
-                  children: [
-                    _InfoLink(label: 'Privacy Policy', url: _privacyPolicyUrl),
-                    _InfoLink(label: 'Support', url: _supportUrl),
-                    _InfoLink(label: 'Author', url: _authorUrl),
-                  ],
+                const SizedBox(height: 8),
+                IntrinsicHeight(
+                  child: Row(
+                    children: [
+                      _InfoLink(
+                        icon: Icons.privacy_tip_outlined,
+                        label: 'Privacy',
+                        url: _privacyPolicyUrl,
+                      ),
+                      const _InfoLinkDivider(),
+                      _InfoLink(
+                        icon: Icons.help_outline,
+                        label: 'Support',
+                        url: _supportUrl,
+                      ),
+                      const _InfoLinkDivider(),
+                      _InfoLink(
+                        icon: Icons.person_outline,
+                        label: 'Author',
+                        url: _authorUrl,
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),
@@ -175,19 +191,53 @@ class EvolutionGuideMenu extends StatelessWidget {
   }
 }
 
-/// Opens [url] in the external browser.
+/// An equal-width icon-over-label link that opens [url] in the external
+/// browser.
 class _InfoLink extends StatelessWidget {
+  final IconData icon;
   final String label;
   final Uri url;
 
-  const _InfoLink({required this.label, required this.url});
+  const _InfoLink({required this.icon, required this.label, required this.url});
 
   @override
   Widget build(BuildContext context) {
-    return TextButton(
-      onPressed: () => launchUrl(url, mode: LaunchMode.externalApplication),
-      style: TextButton.styleFrom(foregroundColor: _deepViolet),
-      child: Text(label),
+    final textTheme = Theme.of(context).textTheme;
+    return Expanded(
+      child: InkWell(
+        onTap: () => launchUrl(url, mode: LaunchMode.externalApplication),
+        borderRadius: BorderRadius.circular(12),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 6),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(icon, size: 22, color: _deepViolet),
+              const SizedBox(height: 2),
+              Text(
+                label,
+                maxLines: 1,
+                style: textTheme.labelMedium?.copyWith(color: _deepViolet),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _InfoLinkDivider extends StatelessWidget {
+  const _InfoLinkDivider();
+
+  @override
+  Widget build(BuildContext context) {
+    return VerticalDivider(
+      width: 1,
+      thickness: 1,
+      indent: 8,
+      endIndent: 8,
+      color: _deepViolet.withValues(alpha: 0.3),
     );
   }
 }
