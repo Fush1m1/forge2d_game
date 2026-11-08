@@ -1,7 +1,7 @@
 # forge2d_game
 
 Flutter + Flame + Forge2D (`flame_forge2d`) で作られたスイカゲーム風の物理パズルゲーム。
-SDK: Dart `^3.7.2` / Flutter (stable)。
+SDK: Dart `^3.11.0` / Flutter (stable)。
 
 ## セットアップ
 
@@ -18,6 +18,15 @@ dart format .              # フォーマット
 flutter run                # 実機/エミュレータが必要（クラウドサンドボックスでは不可）
 ```
 
+パスキー用のローカルサーバ（`server/`, Node + TypeScript）:
+
+```
+cd server && npm install
+npm test                   # vitest
+npm run dev                # 起動。実機確認の手順は server/README.md
+flutter run --dart-define=PASSKEY_SERVER_URL=https://<tunnel-domain>
+```
+
 クラウド上のセッション（claude.ai/code 等）にはデバイス/エミュレータが無いため、
 `flutter run` によるアプリの目視確認はできない。挙動確認は `flutter test` と
 `flutter analyze` で行い、実機確認はローカル環境でブランチを pull して行うこと。
@@ -31,5 +40,6 @@ flutter run                # 実機/エミュレータが必要（クラウド�
 - `lib/game/model/`: モード・フェーズ・ボール定義などの不変状態
 - `lib/game/services/`: `GameSession` (可変状態はここに閉じる)
 - `test/game/`: ユニットテスト
+- `server/`: パスキー（WebAuthn）RPサーバ。`lib/game/services/passkey_account.dart` が利用
 
 UIは `GameSession` が持つ可変状態を、読み取り専用の `GameState` として購読する設計。

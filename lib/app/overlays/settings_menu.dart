@@ -12,8 +12,8 @@ const _colorSeedPresets = [
 ];
 
 /// Lets the player adjust sound volume, the app's accent color, and a
-/// handful of gameplay-feel tunables. Opens as a peek overlay on top of the
-/// current game (like the evolution guide): tapping outside dismisses it
+/// handful of gameplay-feel tunables, and links to the passkey account
+/// screen. Opens as a peek overlay on top of the current game (like the evolution guide): tapping outside dismisses it
 /// without touching the game underneath.
 class SettingsMenu extends StatelessWidget {
   final SuikaGame game;
@@ -126,6 +126,16 @@ class SettingsMenu extends StatelessWidget {
                               ],
                             ),
                             const SizedBox(height: 16),
+                            OutlinedButton.icon(
+                              onPressed: game.openAccount,
+                              style: OutlinedButton.styleFrom(
+                                foregroundColor: Colors.white,
+                                side: const BorderSide(color: Colors.white),
+                              ),
+                              icon: const Icon(Icons.key),
+                              label: const Text('Passkey Account'),
+                            ),
+                            const SizedBox(height: 8),
                             OutlinedButton(
                               onPressed: game.appSettings.resetToDefaults,
                               style: OutlinedButton.styleFrom(

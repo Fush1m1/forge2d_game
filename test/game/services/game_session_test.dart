@@ -45,4 +45,21 @@ void main() {
     expect(session.state.value.mode, GameMode.normal);
     expect(session.state.value.stage, Stage.rugged);
   });
+
+  test('maxLevelReached tracks drops and merges, resetting per round', () {
+    final session = GameSession(random: Random(1));
+    addTearDown(session.dispose);
+    expect(session.maxLevelReached, 0);
+
+    session.start(GameMode.normal, Stage.rugged);
+    final dropped = session.takeNextBall();
+    expect(session.maxLevelReached, dropped);
+
+    session.recordLevel(7);
+    session.recordLevel(4);
+    expect(session.maxLevelReached, 7);
+
+    session.start(GameMode.easy, Stage.rugged);
+    expect(session.maxLevelReached, 0);
+  });
 }

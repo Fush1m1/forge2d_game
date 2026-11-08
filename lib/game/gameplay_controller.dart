@@ -100,6 +100,7 @@ class GameplayController {
 
     audio.playMerge();
     final newLevel = first.number + 1;
+    session.recordLevel(newLevel);
     final newPosition =
         (first.bodyComponent.body.position +
             second.bodyComponent.body.position) /

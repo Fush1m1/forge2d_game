@@ -49,3 +49,7 @@ app.*.map.json
 
 # secrets
 docs/release.md
+# Passkey local server
+/server/node_modules/
+/server/data/
+/ios/Flutter/Passkey.xcconfig

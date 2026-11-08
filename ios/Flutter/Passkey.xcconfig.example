@@ -1,0 +1,2 @@
+// Copy to Passkey.xcconfig (gitignored) and set your tunnel host.
+PASSKEY_RP_ID = your-name.ngrok-free.app

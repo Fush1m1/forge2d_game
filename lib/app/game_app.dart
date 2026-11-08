@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 
 import '../game/model/game_overlay.dart';
 import '../game/services/app_settings.dart';
+import '../game/services/passkey_account.dart';
 import '../game/suika_game.dart';
+import 'overlays/account_menu.dart';
 import 'overlays/congratulations_menu.dart';
 import 'overlays/evolution_guide_menu.dart';
 import 'overlays/game_over_menu.dart';
@@ -12,9 +14,12 @@ import 'overlays/settings_menu.dart';
 import 'overlays/top_controls.dart';
 
 class GameApp extends StatelessWidget {
-  GameApp({super.key}) : _appSettings = AppSettings();
+  GameApp({super.key})
+    : _appSettings = AppSettings(),
+      _account = PasskeyAccount();
 
   final AppSettings _appSettings;
+  final PasskeyAccount _account;
 
   @override
   Widget build(BuildContext context) {
@@ -34,7 +39,11 @@ class GameApp extends StatelessWidget {
           home: Scaffold(
             body: SafeArea(
               child: GameWidget<SuikaGame>.controlled(
-                gameFactory: () => SuikaGame(appSettings: _appSettings),
+                gameFactory:
+                    () => SuikaGame(
+                      appSettings: _appSettings,
+                      account: _account,
+                    ),
                 overlayBuilderMap: {
                   GameOverlay.gameOver:
                       (context, game) => GameOverMenu(game: game),
@@ -48,6 +57,8 @@ class GameApp extends StatelessWidget {
                       (context, game) => EvolutionGuideMenu(game: game),
                   GameOverlay.settings:
                       (context, game) => SettingsMenu(game: game),
+                  GameOverlay.account:
+                      (context, game) => AccountMenu(game: game),
                 },
               ),
             ),

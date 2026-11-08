@@ -33,6 +33,7 @@ import 'model/stage.dart';
 import 'services/app_settings.dart';
 import 'services/game_session.dart';
 import 'services/jev_assistant.dart';
+import 'services/passkey_account.dart';
 
 class SuikaGame extends Forge2DGame
     with
@@ -40,13 +41,18 @@ class SuikaGame extends Forge2DGame
         PointerMoveCallbacks,
         HasCollisionDetection,
         WidgetsBindingObserver {
-  SuikaGame({GameSession? session, AppSettings? appSettings})
-    : session = session ?? GameSession(),
-      appSettings = appSettings ?? AppSettings(),
-      super(zoom: worldScale, gravity: Vector2(0, worldGravity));
+  SuikaGame({
+    GameSession? session,
+    AppSettings? appSettings,
+    PasskeyAccount? account,
+  }) : session = session ?? GameSession(),
+       appSettings = appSettings ?? AppSettings(),
+       account = account ?? PasskeyAccount(),
+       super(zoom: worldScale, gravity: Vector2(0, worldGravity));
 
   final GameSession session;
   final AppSettings appSettings;
+  final PasskeyAccount account;
   final DropController _dropController = DropController();
   final TiltController _tiltController = TiltController();
   final Random _random = Random();
@@ -198,6 +204,10 @@ class SuikaGame extends Forge2DGame
 
   void closeSettings() => overlays.remove(GameOverlay.settings);
 
+  void openAccount() => overlays.add(GameOverlay.account);
+
+  void closeAccount() => overlays.remove(GameOverlay.account);
+
   /// Debug-only: shows the Game Over overlay without actually losing, so the
   /// screen can be checked without playing a full round out.
   void debugShowGameOver() {
@@ -256,6 +266,7 @@ class SuikaGame extends Forge2DGame
   void _showCongratulations() {
     _audio.playCongratulations();
     session.congratulate();
+    _submitBestLevel();
     overlays.remove(GameOverlay.topControls);
     overlays.add(GameOverlay.congratulations);
   }
@@ -356,7 +367,17 @@ class SuikaGame extends Forge2DGame
 
     _audio.playGameOver();
     session.gameOver();
+    _submitBestLevel();
     overlays.remove(GameOverlay.topControls);
     overlays.add(GameOverlay.gameOver);
+  }
+
+  /// Reports this round's highest level to the passkey account (no-op when
+  /// signed out). Called from the real round-end paths only, not the debug
+  /// overlay shortcuts.
+  void _submitBestLevel() {
+    final mode = session.mode;
+    if (mode == null) return;
+    unawaited(account.submitLevel(mode, session.maxLevelReached));
   }
 }
