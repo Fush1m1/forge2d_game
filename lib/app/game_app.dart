@@ -1,5 +1,5 @@
 import 'package:flame/game.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 import '../game/model/game_overlay.dart';
 import '../game/services/app_settings.dart';
@@ -36,18 +36,18 @@ class GameApp extends StatelessWidget {
               child: GameWidget<SuikaGame>.controlled(
                 gameFactory: () => SuikaGame(appSettings: _appSettings),
                 overlayBuilderMap: {
-                  GameOverlay.gameOver:
-                      (context, game) => GameOverMenu(game: game),
-                  GameOverlay.congratulations:
-                      (context, game) => CongratulationsMenu(game: game),
-                  GameOverlay.modeSelect:
-                      (context, game) => ModeSelectMenu(game: game),
-                  GameOverlay.topControls:
-                      (context, game) => TopControls(game: game),
-                  GameOverlay.evolutionGuide:
-                      (context, game) => EvolutionGuideMenu(game: game),
-                  GameOverlay.settings:
-                      (context, game) => SettingsMenu(game: game),
+                  GameOverlay.gameOver: (context, game) =>
+                      GameOverMenu(game: game),
+                  GameOverlay.congratulations: (context, game) =>
+                      CongratulationsMenu(game: game),
+                  GameOverlay.modeSelect: (context, game) =>
+                      ModeSelectMenu(game: game),
+                  GameOverlay.topControls: (context, game) =>
+                      TopControls(game: game),
+                  GameOverlay.evolutionGuide: (context, game) =>
+                      EvolutionGuideMenu(game: game),
+                  GameOverlay.settings: (context, game) =>
+                      SettingsMenu(game: game),
                 },
               ),
             ),

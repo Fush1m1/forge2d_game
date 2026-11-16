@@ -1,7 +1,7 @@
 import 'dart:math' as math;
 
 import 'package:flame/widgets.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:forge2d_game/game/model/ball_definition.dart';
 import 'package:forge2d_game/game/suika_game.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -38,9 +38,9 @@ class EvolutionGuideMenu extends StatelessWidget {
 
   static double _iconSizeFor(int level) {
     final definition = BallDefinition.forLevel(level);
-    final sizeT = ((definition.diameter - _minDiameter) /
-            (_maxDiameter - _minDiameter))
-        .clamp(0, 1);
+    final sizeT =
+        ((definition.diameter - _minDiameter) / (_maxDiameter - _minDiameter))
+            .clamp(0, 1);
     return _minIconSize + sizeT * (_maxIconSize - _minIconSize);
   }
 
@@ -258,12 +258,11 @@ class _EvolutionArrowsPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final center = Offset(size.width / 2, size.height / 2);
-    final strokePaint =
-        Paint()
-          ..color = color
-          ..style = PaintingStyle.stroke
-          ..strokeWidth = 2.5
-          ..strokeCap = StrokeCap.round;
+    final strokePaint = Paint()
+      ..color = color
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 2.5
+      ..strokeCap = StrokeCap.round;
     final fillPaint = Paint()..color = color;
 
     for (
@@ -281,12 +280,12 @@ class _EvolutionArrowsPainter extends CustomPainter {
       final sweep = endAngle - startAngle;
       if (sweep <= 0.02) continue;
 
-      final path =
-          Path()..addArc(
-            Rect.fromCircle(center: center, radius: ringRadius),
-            startAngle,
-            sweep,
-          );
+      final path = Path()
+        ..addArc(
+          Rect.fromCircle(center: center, radius: ringRadius),
+          startAngle,
+          sweep,
+        );
       canvas.drawPath(path, strokePaint);
 
       final tip =
@@ -297,12 +296,11 @@ class _EvolutionArrowsPainter extends CustomPainter {
       final left = base + perpendicular * (_arrowWidth / 2);
       final right = base - perpendicular * (_arrowWidth / 2);
 
-      final arrowHead =
-          Path()
-            ..moveTo(tip.dx, tip.dy)
-            ..lineTo(left.dx, left.dy)
-            ..lineTo(right.dx, right.dy)
-            ..close();
+      final arrowHead = Path()
+        ..moveTo(tip.dx, tip.dy)
+        ..lineTo(left.dx, left.dy)
+        ..lineTo(right.dx, right.dy)
+        ..close();
       canvas.drawPath(arrowHead, fillPaint);
     }
   }

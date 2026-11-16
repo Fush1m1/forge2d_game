@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:forge2d_game/game/model/game_mode.dart';
 import 'package:forge2d_game/game/model/stage.dart';
 import 'package:forge2d_game/game/suika_game.dart';
@@ -67,10 +67,9 @@ class ModeSelectMenu extends StatelessWidget {
                           selectedColor: colorScheme.primaryContainer,
                           backgroundColor: Colors.white.withValues(alpha: 0.15),
                           labelStyle: TextStyle(
-                            color:
-                                selectedStage == stage
-                                    ? colorScheme.onPrimaryContainer
-                                    : Colors.white,
+                            color: selectedStage == stage
+                                ? colorScheme.onPrimaryContainer
+                                : Colors.white,
                           ),
                           onSelected: (_) {
                             setState(() => selectedStage = stage);

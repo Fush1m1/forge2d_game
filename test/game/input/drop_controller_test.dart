@@ -10,10 +10,9 @@ void main() {
   });
 
   test('easy mode emits after the long-press threshold and interval', () {
-    final controller =
-        DropController()
-          ..beginPress()
-          ..recordInitialDrop();
+    final controller = DropController()
+      ..beginPress()
+      ..recordInitialDrop();
 
     expect(controller.update(0.49, GameMode.easy), isFalse);
     expect(controller.update(0.01, GameMode.easy), isFalse);
@@ -21,10 +20,9 @@ void main() {
   });
 
   test('ending a press stops burst drops', () {
-    final controller =
-        DropController()
-          ..beginPress()
-          ..endPress();
+    final controller = DropController()
+      ..beginPress()
+      ..endPress();
 
     expect(controller.update(1, GameMode.easy), isFalse);
   });

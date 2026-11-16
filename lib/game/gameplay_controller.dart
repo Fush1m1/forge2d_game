@@ -104,9 +104,8 @@ class GameplayController {
         (first.bodyComponent.body.position +
             second.bodyComponent.body.position) /
         2;
-    final newBallSize = BallDefinition.forLevel(
-      newLevel,
-    ).diameterFor(session.mode!);
+    final newBallSize = BallDefinition.forLevel(newLevel)
+        .diameterFor(session.mode!);
     _ballsToRemove.addAll([first, second]);
     _ballsToAdd.add(
       AlienBall(

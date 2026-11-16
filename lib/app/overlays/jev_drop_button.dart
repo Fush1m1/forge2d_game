@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:forge2d_game/game/services/jev_assistant.dart';
 import 'package:forge2d_game/game/suika_game.dart';
 
@@ -46,9 +46,8 @@ class JevDropButton extends StatelessWidget {
     final result = game.jevAssistant.state.value;
     if (result.status == JevRequestStatus.error &&
         result.errorMessage != null) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(result.errorMessage!)));
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(result.errorMessage!)));
     }
   }
 
@@ -60,17 +59,16 @@ class JevDropButton extends StatelessWidget {
         final isLoading = jevState.status == JevRequestStatus.loading;
         return IconButton.filled(
           onPressed: isLoading ? null : () => _onPressed(context),
-          icon:
-              isLoading
-                  ? const SizedBox(
-                    width: 20,
-                    height: 20,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      color: Colors.white,
-                    ),
-                  )
-                  : const Icon(Icons.auto_awesome, size: 20),
+          icon: isLoading
+              ? const SizedBox(
+                  width: 20,
+                  height: 20,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: Colors.white,
+                  ),
+                )
+              : const Icon(Icons.auto_awesome, size: 20),
           style: IconButton.styleFrom(elevation: 4, shadowColor: Colors.black),
         );
       },

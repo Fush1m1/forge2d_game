@@ -5,7 +5,7 @@ import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flame_forge2d/flame_forge2d.dart';
 import 'package:flame_kenney_xml/flame_kenney_xml.dart';
-import 'package:flutter/material.dart'
+import 'package:material_ui/material_ui.dart'
     hide PointerCancelEvent, PointerDownEvent, PointerMoveEvent, PointerUpEvent;
 import 'package:sensors_plus/sensors_plus.dart';
 import 'package:shake/shake.dart';
@@ -123,13 +123,13 @@ class SuikaGame extends Forge2DGame
     _shakeDetector = ShakeDetector.autoStart(
       onPhoneShake: (event) => _shakeStackedBalls(),
     );
-    _accelerometerSubscription = accelerometerEventStream(
-      samplingPeriod: SensorInterval.gameInterval,
-    ).listen(
-      (event) => _tiltController.update(event.x),
-      onError: (Object _) {},
-      cancelOnError: true,
-    );
+    _accelerometerSubscription =
+        accelerometerEventStream(samplingPeriod: SensorInterval.gameInterval)
+            .listen(
+              (event) => _tiltController.update(event.x),
+              onError: (Object _) {},
+              cancelOnError: true,
+            );
 
     await world.add(Background(sprite: Sprite(backgroundImage)));
     await _levelBuilder.build(Stage.classic);
@@ -307,8 +307,9 @@ class SuikaGame extends Forge2DGame
   }
 
   void _updateTiltGravity() {
-    final targetGravityX =
-        session.isPlaying ? _tiltController.horizontalGravity : 0.0;
+    final targetGravityX = session.isPlaying
+        ? _tiltController.horizontalGravity
+        : 0.0;
     // Setting world.gravity wakes up every body, so only do it when the
     // tilt actually changed enough to matter, otherwise settled balls would
     // never be able to fall back asleep.

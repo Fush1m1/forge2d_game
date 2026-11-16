@@ -37,11 +37,10 @@ class AlienBall extends PositionComponent
   double timeElapsed = 0.0;
   void _loadSprite() {
     final spriteName = game.ballDefinitionFor(number).spriteName;
-    spriteComponent =
-        SpriteComponent()
-          ..sprite = game.aliens.getSprite(spriteName)
-          ..anchor = Anchor.center
-          ..size = Vector2.all(ballSize);
+    spriteComponent = SpriteComponent()
+      ..sprite = game.aliens.getSprite(spriteName)
+      ..anchor = Anchor.center
+      ..size = Vector2.all(ballSize);
     isSpriteLoaded = true;
   }
 
