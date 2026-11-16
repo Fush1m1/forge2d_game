@@ -1,0 +1,35 @@
+name: CI
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+concurrency:
+  group: ci-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - run: flutter --version
+
+      - run: flutter pub get
+
+      # dart fix で修正可能な箇所が残っていれば差分を表示して失敗させる
+      - name: dart fix --apply
+        run: |
+          dart fix --apply
+          git diff --exit-code
+
+      - run: flutter analyze
+
+      - run: flutter test
