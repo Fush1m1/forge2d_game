@@ -171,10 +171,9 @@ class JevAssistant {
     } catch (_) {
       // Not JSON — fall through to the raw body.
     }
-    final truncated =
-        responseBody.length > 200
-            ? '${responseBody.substring(0, 200)}...'
-            : responseBody;
+    final truncated = responseBody.length > 200
+        ? '${responseBody.substring(0, 200)}...'
+        : responseBody;
     return truncated;
   }
 

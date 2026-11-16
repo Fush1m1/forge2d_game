@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:forge2d_game/game/suika_game.dart';
 
 class CongratulationsMenu extends StatelessWidget {

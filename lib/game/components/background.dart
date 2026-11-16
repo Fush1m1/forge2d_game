@@ -1,5 +1,7 @@
 import 'dart:math';
+
 import 'package:flame/components.dart';
+
 import '../suika_game.dart';
 
 class Background extends SpriteComponent with HasGameReference<SuikaGame> {

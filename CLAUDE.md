@@ -1,7 +1,7 @@
 # forge2d_game
 
 Flutter + Flame + Forge2D (`flame_forge2d`) で作られたスイカゲーム風の物理パズルゲーム。
-SDK: Dart `^3.7.2` / Flutter (stable)。
+SDK: Dart `^3.14.0` / Flutter `>=3.50.0` (stable)。
 
 ## セットアップ
 

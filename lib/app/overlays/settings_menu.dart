@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:forge2d_game/game/services/app_settings.dart';
 import 'package:forge2d_game/game/suika_game.dart';
 
@@ -119,9 +119,8 @@ class SettingsMenu extends StatelessWidget {
                                     selected:
                                         seed.toARGB32() ==
                                         settings.colorSeed.toARGB32(),
-                                    onTap:
-                                        () =>
-                                            game.appSettings.setColorSeed(seed),
+                                    onTap: () =>
+                                        game.appSettings.setColorSeed(seed),
                                   ),
                               ],
                             ),
@@ -229,10 +228,9 @@ class _ColorSwatch extends StatelessWidget {
           shape: BoxShape.circle,
           border: Border.all(color: Colors.white, width: selected ? 3 : 1),
         ),
-        child:
-            selected
-                ? const Icon(Icons.check, color: Colors.white, size: 18)
-                : null,
+        child: selected
+            ? const Icon(Icons.check, color: Colors.white, size: 18)
+            : null,
       ),
     );
   }

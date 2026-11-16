@@ -1,5 +1,5 @@
 import 'package:flame/widgets.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:forge2d_game/game/suika_game.dart';
 
 class NextAlien extends StatelessWidget {

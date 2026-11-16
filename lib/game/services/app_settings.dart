@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../config/game_constants.dart' as defaults;
@@ -102,10 +102,9 @@ class AppSettings {
     final current = state.value;
     state.value = current.copyWith(
       soundVolume: prefs.getDouble(_keySoundVolume),
-      colorSeed:
-          prefs.containsKey(_keyColorSeed)
-              ? Color(prefs.getInt(_keyColorSeed)!)
-              : null,
+      colorSeed: prefs.containsKey(_keyColorSeed)
+          ? Color(prefs.getInt(_keyColorSeed)!)
+          : null,
       worldGravity: prefs.getDouble(_keyWorldGravity),
       shakeStrength: prefs.getDouble(_keyShakeStrength),
       strongShakeProbability: prefs.getDouble(_keyStrongShakeProbability),

@@ -44,19 +44,16 @@ class Brick extends BodyComponentWithUserData {
   Brick({
     required this.type,
     required this.size,
-    required BrickDamage damage,
+    required this._damage,
     required Vector2 position,
-    required Map<BrickDamage, Sprite> sprites,
+    required this._sprites,
     double angle = 0,
-  }) : _damage = damage,
-       _sprites = sprites,
-       super(
+  }) : super(
          renderBody: false,
-         bodyDef:
-             BodyDef()
-               ..position = position
-               ..angle = angle
-               ..type = BodyType.static,
+         bodyDef: BodyDef()
+           ..position = position
+           ..angle = angle
+           ..type = BodyType.static,
          fixtureDefs: [
            FixtureDef(
                PolygonShape()..setAsBoxXY(

@@ -80,12 +80,11 @@ class JevController {
           topBall = ball;
         }
       }
-      laneCriteria[laneKey] =
-          topBall == null
-              ? 'Empty lane, no balls stacked yet.'
-              : 'Topmost ball here is level ${topBall.number} out of 10, '
-                  'stack height '
-                  '${gameplay.heightOf(topBall).toStringAsFixed(1)} world units.';
+      laneCriteria[laneKey] = topBall == null
+          ? 'Empty lane, no balls stacked yet.'
+          : 'Topmost ball here is level ${topBall.number} out of 10, '
+                'stack height '
+                '${gameplay.heightOf(topBall).toStringAsFixed(1)} world units.';
     }
 
     final boardState =

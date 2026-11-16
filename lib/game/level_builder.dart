@@ -73,19 +73,18 @@ class LevelBuilder {
     }
 
     final (minCount, maxCount) = stage.obstacleCountRange;
-    final obstacleCount =
-        minCount == maxCount
-            ? minCount
-            : minCount + _random.nextInt(maxCount - minCount + 1);
+    final obstacleCount = minCount == maxCount
+        ? minCount
+        : minCount + _random.nextInt(maxCount - minCount + 1);
     // Keep obstacles away from the very edges of the playfield.
     final inset = visibleRect.width * 0.15;
     for (var i = 0; i < obstacleCount; i++) {
-      final type =
-          stage.randomizeBrickVariety ? BrickType.randomType : BrickType.metal;
-      final size =
-          stage.randomizeBrickVariety
-              ? BrickSize.randomSize
-              : BrickSize.size70x140;
+      final type = stage.randomizeBrickVariety
+          ? BrickType.randomType
+          : BrickType.metal;
+      final size = stage.randomizeBrickVariety
+          ? BrickSize.randomSize
+          : BrickSize.size70x140;
       final x =
           visibleRect.left +
           inset +
